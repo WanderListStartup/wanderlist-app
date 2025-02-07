@@ -1,4 +1,4 @@
-# WANDERLIST README
+# WANDERLIST
 
 ## How to install
 1. Download Android Studio
