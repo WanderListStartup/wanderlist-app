@@ -6,6 +6,4 @@
 3. Open the repo and build
 
 ## Coding Practices
-### PRs and Branches
-- Create branches with your jira ticket and type of edit at the beginning.
-  - Examples: `JRA-123-feat/create-new-button`, `JRA-123-chore/update-gitignore`, `JRA-123-fix/broken-button`
+[Best Practices Jira Docs](https://wanderlistdev.atlassian.net/wiki/spaces/WS/pages/196609/Coding+Standards?atlOrigin=eyJpIjoiMjYxZWJhZmRlN2NjNDYzZmEyMzkyNjhhNzJiZTU3NTQiLCJwIjoiaiJ9)
