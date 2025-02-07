@@ -7,5 +7,5 @@
 
 ## Coding Practices
 ### PRs and Branches
-- Create branches with a type at the beginning.
-  - Examples: `feat: create-new-button`, `chore: update .gitignore file`, `fix: resolve login issue`
+- Create branches with your jira ticket and type of edit at the beginning.
+  - Examples: `JRA-123-feat/create-new-button`, `JRA-123-chore/update-gitignore`, `JRA-123-fix/broken-button`
