@@ -81,7 +81,7 @@ fun Landing( modifier: Modifier = Modifier) {
                     ))
             }
             TextButton(
-                onClick = { onClick() }
+                onClick = { navController.navigate("signup") }
             ) {
                 Text("Create Account",
                     color = wanderlistBlue,

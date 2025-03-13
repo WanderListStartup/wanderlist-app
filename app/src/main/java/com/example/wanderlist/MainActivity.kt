@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.example.wanderlist.ui.theme.WanderlistTheme
 import com.example.wanderlist.view.Landing
+import com.example.wanderlist.view.SignUpScreen
 
 
 class MainActivity : ComponentActivity() {
