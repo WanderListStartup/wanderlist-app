@@ -1,40 +1,27 @@
 package com.example.wanderlist.view
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-// If you have custom fonts/colors (e.g., Montserrat, wanderlistBlue), import them from your theme
-// import com.example.wanderlist.ui.theme.Montserrat
-// import com.example.wanderlist.ui.theme.wanderlistBlue
-// etc.
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.wanderlist.viewmodel.SignUpViewModel
 
 @Composable
-fun SignUpView(modifier: Modifier = Modifier) {
-    // Local states for each text field
-    var name by remember { mutableStateOf("") }
-    var dob by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var city by remember { mutableStateOf("") }
-
-    // Example gradient background (pink-ish)
+fun SignUpView(
+    modifier: Modifier = Modifier,
+    viewModel: SignUpViewModel = viewModel()
+) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -46,116 +33,92 @@ fun SignUpView(modifier: Modifier = Modifier) {
                     )
                 )
             )
-            .padding(24.dp) // Outer padding
+            .padding(24.dp)
     ) {
-        // Main column for the entire form
         Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            // Top Heading
+            // Heading Section
             Text(
                 text = "Welcome!",
-                style = TextStyle(
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                    // fontFamily = Montserrat, if desired
-                ),
+                style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
                 modifier = Modifier.align(Alignment.Start)
             )
             Text(
                 text = "Create your Account",
-                style = TextStyle(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
-                    // fontFamily = Montserrat
-                ),
+                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
                 modifier = Modifier
                     .align(Alignment.Start)
                     .padding(top = 4.dp)
             )
-
-            // Subheading: "Already have an account? Login"
+            // Subheading with login option
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
-                Text(
-                    text = "Already have an account? ",
-                    style = TextStyle(fontSize = 14.sp)
-                )
+                Text(text = "Already have an account? ", fontSize = 14.sp)
                 Text(
                     text = "Login",
-                    style = TextStyle(
-                        color = Color.Blue,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    // Could make this clickable if you eventually add navigation
+                    color = Color.Blue,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
                 )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // -- Outlined Text Fields --
-            // 1) Name
+            // Input Fields: Using state from viewModel
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
+                value = viewModel.name,
+                onValueChange = { viewModel.onNameChange(it) },
                 label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 2) Date of Birth
             OutlinedTextField(
-                value = dob,
-                onValueChange = { dob = it },
+                value = viewModel.dob,
+                onValueChange = { viewModel.onDobChange(it) },
                 label = { Text("Date of Birth") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 3) Email
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = viewModel.email,
+                onValueChange = { viewModel.onEmailChange(it) },
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 4) Password
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = viewModel.password,
+                onValueChange = { viewModel.onPasswordChange(it) },
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 5) Confirm Password
             OutlinedTextField(
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it },
+                value = viewModel.confirmPassword,
+                onValueChange = { viewModel.onConfirmPasswordChange(it) },
                 label = { Text("Confirm Password") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 6) City
             OutlinedTextField(
-                value = city,
-                onValueChange = { city = it },
+                value = viewModel.city,
+                onValueChange = { viewModel.onCityChange(it) },
                 label = { Text("City") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
@@ -163,32 +126,23 @@ fun SignUpView(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // -- Create New Account button --
+            // "Create New Account" button
             Button(
-                onClick = { /* handle create account click */ },
+                onClick = { viewModel.onSignUp() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1E88E5) // or your wanderlistBlue
-                )
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5))
             ) {
-                Text(
-                    text = "Create New Account",
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                )
+                Text("Create New Account", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // -- OR divider --
+            // Divider with "or"
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Divider(
@@ -197,13 +151,7 @@ fun SignUpView(modifier: Modifier = Modifier) {
                         .weight(1f)
                         .align(Alignment.CenterVertically)
                 )
-                Text(
-                    text = "  or  ",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                )
+                Text("  or  ", fontSize = 14.sp, color = Color.Gray)
                 Divider(
                     color = Color.Gray,
                     modifier = Modifier
@@ -214,7 +162,7 @@ fun SignUpView(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // -- Sign Up with Google button --
+            // "Sign Up with Google" button (without icon)
             OutlinedButton(
                 onClick = { /* handle Google sign-up here */ },
                 modifier = Modifier
@@ -224,11 +172,7 @@ fun SignUpView(modifier: Modifier = Modifier) {
                 border = BorderStroke(1.dp, Color.LightGray),
                 colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
             ) {
-                Text(
-                    "Sign Up with Google",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
+                Text("Sign Up with Google", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
         }
     }

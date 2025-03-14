@@ -9,6 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.wanderlist.ui.theme.WanderlistTheme
 import com.example.wanderlist.view.AppView
 import com.example.wanderlist.view.SignUpView
+import com.example.wanderlist.viewmodel.SignUpViewModel
 
 
 class MainActivity : ComponentActivity() {
