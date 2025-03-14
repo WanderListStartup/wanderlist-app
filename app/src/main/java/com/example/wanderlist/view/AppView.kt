@@ -49,7 +49,7 @@ fun AppView(){
 //                    Text("LOGIN")
                 }
                 composable<Register> {
-
+                    SignUpView()
                 }
                 composable<Username> {
 
