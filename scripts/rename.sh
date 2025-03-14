@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd ../app/src/main/res/font
+
 # Loop through all .ttf files in the current directory
 for file in *.ttf; do
     # Convert the filename to lowercase and replace "-" with "_"
