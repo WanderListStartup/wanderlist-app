@@ -29,6 +29,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     WanderlistTheme {
-        SignUpView()
+        AppView()
     }
 }
