@@ -1,16 +1,22 @@
 package com.example.wanderlist.view
 
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.example.wanderlist.viewmodel.AuthState
+import com.example.wanderlist.viewmodel.AuthViewModel
 import kotlinx.serialization.Serializable
 
 //Route to the actual app
@@ -25,9 +31,20 @@ import kotlinx.serialization.Serializable
 @Serializable object Welcome
 
 @Composable
-fun AppView(){
+fun AppView(
+    authViewModel: AuthViewModel = AuthViewModel()
+){
     val navController = rememberNavController()
-    NavHost(navController, startDestination=RegisterLoginView){
+    val authState = authViewModel.authState.observeAsState()
+
+    LaunchedEffect(authState.value){
+        when(authState.value){
+            is AuthState.UnAuthenticated -> navController.navigate(RegisterLoginView)
+            else -> Unit
+        }
+    }
+
+    NavHost(navController, startDestination=MainView){
             composable<MainView>{
                 Text("MAINVIEW")
             }
@@ -49,7 +66,7 @@ fun AppView(){
 //                    Text("LOGIN")
                 }
                 composable<Register> {
-                    SignUpView()
+                    SignUpView(authViewModel = authViewModel)
                 }
                 composable<Username> {
 

@@ -6,9 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.wanderlist.ui.theme.WanderlistTheme
 import com.example.wanderlist.view.AppView
 import com.example.wanderlist.view.SignUpView
+import com.example.wanderlist.viewmodel.AuthViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -28,6 +30,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     WanderlistTheme {
-        SignUpView()
+        AppView()
     }
 }

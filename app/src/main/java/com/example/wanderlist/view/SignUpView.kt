@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.wanderlist.viewmodel.AuthViewModel
 
 // If you have custom fonts/colors (e.g., Montserrat, wanderlistBlue), import them from your theme
 // import com.example.wanderlist.ui.theme.Montserrat
@@ -25,7 +26,8 @@ import androidx.compose.ui.unit.sp
 // etc.
 
 @Composable
-fun SignUpView(modifier: Modifier = Modifier) {
+fun SignUpView(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
+    val uiState = authViewModel.uiState
     // Local states for each text field
     var name by remember { mutableStateOf("") }
     var dob by remember { mutableStateOf("") }
@@ -124,8 +126,8 @@ fun SignUpView(modifier: Modifier = Modifier) {
 
             // 3) Email
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = uiState.value.email,
+                onValueChange = {authViewModel.onEmailChange(it)},
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
@@ -134,8 +136,8 @@ fun SignUpView(modifier: Modifier = Modifier) {
 
             // 4) Password
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = uiState.value.password,
+                onValueChange = { authViewModel.onPasswordChange(it)},
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
@@ -165,7 +167,7 @@ fun SignUpView(modifier: Modifier = Modifier) {
 
             // -- Create New Account button --
             Button(
-                onClick = { /* handle create account click */ },
+                onClick = {authViewModel.register()},
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
