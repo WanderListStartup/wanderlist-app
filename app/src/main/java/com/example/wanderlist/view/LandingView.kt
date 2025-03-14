@@ -36,6 +36,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.wanderlist.R
+import com.example.wanderlist.ui.theme.Fascinate
 
 //Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 //    Landing(
