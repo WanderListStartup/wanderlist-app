@@ -112,20 +112,20 @@ fun Landing( modifier: Modifier = Modifier,
         Spacer(modifier = Modifier.weight(0.5f))
     }}
 
-@Composable
-fun Login(onBackClick: ()->Unit){
-    Scaffold(
-        topBar = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.,
-                            contentDescription = "Back",
-                            tint = Color.Black
-                        )
-                    }
-            )
-        }
-    ) { paddingValues ->
-        // Content goes here
-        Text("Login Screen Content", modifier = Modifier.padding(paddingValues))
-    }}
+//@Composable
+//fun Login(onBackClick: ()->Unit){
+//    Scaffold(
+//        topBar = {
+//                    IconButton(onClick = onBackClick) {
+//                        Icon(
+//                            imageVector = Icons.,
+//                            contentDescription = "Back",
+//                            tint = Color.Black
+//                        )
+//                    }
+//            )
+//        }
+//    ) { paddingValues ->
+//        // Content goes here
+//        Text("Login Screen Content", modifier = Modifier.padding(paddingValues))
+//    }}

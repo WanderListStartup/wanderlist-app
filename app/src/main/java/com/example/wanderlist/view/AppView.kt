@@ -27,7 +27,7 @@ import kotlinx.serialization.Serializable
 @Composable
 fun AppView(){
     val navController = rememberNavController()
-        NavHost(navController, startDestination=RegisterLoginView){
+    NavHost(navController, startDestination=RegisterLoginView){
             composable<MainView>{
                 Text("MAINVIEW")
             }
