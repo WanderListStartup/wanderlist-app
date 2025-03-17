@@ -44,7 +44,7 @@ class PlacesApiService(context: Context) {
         )
         val defaultCenter = LatLng(42.731544, -73.682535)
         val defaultRadius = 1000.0
-        val defaultResultCount = 1
+        val defaultResultCount = 10
 
         getNearbyPlaces(
             center = defaultCenter,

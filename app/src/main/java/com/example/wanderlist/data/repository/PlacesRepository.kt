@@ -6,7 +6,6 @@ import com.example.wanderlist.data.model.PlaceDetails
 import com.example.wanderlist.data.model.PlacePhotoMetadata
 import com.google.gson.Gson
 import java.io.File
-import android.util.Log
 
 class PlacesRepository(private val context: Context) {
 
@@ -29,7 +28,6 @@ class PlacesRepository(private val context: Context) {
          */
         val storedPlaces = getStoredPlaces()
         if (!storedPlaces.isNullOrEmpty()) {
-            Log.d("PlacesRepository", "Already stored places found. Returning stored data.")
             onComplete(storedPlaces)
             return
         }
