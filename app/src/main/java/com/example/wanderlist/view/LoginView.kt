@@ -15,12 +15,17 @@ import androidx.navigation.NavController
 import com.example.wanderlist.R
 import com.example.wanderlist.components.HeaderLoginPage
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import com.example.wanderlist.components.SubHeaderLoginPage
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -29,6 +34,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -54,13 +60,22 @@ fun LoginView(
     ) {
         // Back Button
         Spacer(modifier = Modifier.padding(top = 50.dp))
-        Image(
-            painter = painterResource(R.drawable.back_action_button),
-            contentDescription = null,
-            modifier = Modifier.clickable { onNavigateToLanding() }
-                .padding(horizontal = 31.dp),
+        Box(
+            modifier = Modifier.padding()
+                .clickable { onNavigateToLanding() }
+                .padding(horizontal = 31.dp)
+                .size(24.dp)
+                .clip(CircleShape)
+                .border(1.dp, Color.Black, CircleShape)
 
-        )
+        ) {
+            Image(
+                painter = painterResource(R.drawable.chevron_back_arrow),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+
 
         Spacer(modifier = Modifier.height(16.dp)) // Optional spacing for better alignment
 
