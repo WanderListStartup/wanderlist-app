@@ -1,8 +1,5 @@
 package com.example.wanderlist.data.model
 
-/**
- * Represents the metadata for a place photo.
- */
 data class PlacePhotoMetadata(
     // The non-empty photo reference string (from PhotoMetadata.zza()).
     val photoReference: String,
@@ -16,9 +13,6 @@ data class PlacePhotoMetadata(
     val authorAttributions: String?
 )
 
-/**
- * Holds all the details for a place as provided by Google Maps.
- */
 data class PlaceDetails(
     val id: String,
     val displayName: String?,                       // Place.Field.DISPLAY_NAME

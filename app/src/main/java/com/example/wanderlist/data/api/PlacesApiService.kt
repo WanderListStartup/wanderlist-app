@@ -11,7 +11,7 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.api.net.SearchNearbyRequest
 
 
-class PlacesApiService(private val context: Context) {
+class PlacesApiService(context: Context) {
 
     private val apiKey = BuildConfig.PLACES_API_KEY
     private val placesClient: PlacesClient
