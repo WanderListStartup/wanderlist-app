@@ -7,10 +7,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.example.wanderlist.viewmodel.SignUpViewModel
 import kotlinx.serialization.Serializable
 
 //Route to the actual app
@@ -27,6 +29,7 @@ import kotlinx.serialization.Serializable
 @Composable
 fun AppView(){
     val navController = rememberNavController()
+    val viewModel: SignUpViewModel = viewModel()
     NavHost(navController, startDestination=RegisterLoginView){
             composable<MainView>{
                 Text("MAINVIEW")
@@ -46,7 +49,13 @@ fun AppView(){
                     }
                 }
                 composable<Login> {
-//                    Text("LOGIN")
+                    LoginView(
+                        viewModel = viewModel,
+                        onNavigateToLanding = { navController.navigate(route=Landing)},
+                        onNavigateToRegister = { navController.navigate(route=Register)}
+                    )
+
+
                 }
                 composable<Register> {
                     SignUpView()
