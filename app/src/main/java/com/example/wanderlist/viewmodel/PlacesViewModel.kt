@@ -30,18 +30,19 @@ class PlacesViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch(Dispatchers.IO) {
             repository.fetchAndStorePlaces(
                 onComplete = { places ->
-                    Log.d("MainActivity", "Fetched and stored ${places.size} places locally")
+                    Log.d("PlacesViewModel", "Fetched and stored ${places.size} places locally")
                     // Retrieve stored places, or fallback to the fetched places.
                     val storedPlaces = repository.getStoredPlaces() ?: places
-                    Log.d("MainActivity", "Retrieved ${storedPlaces.size} stored places")
+                    Log.d("PlacesViewModel", "Retrieved ${storedPlaces.size} stored places")
 
                     // Update state on the main thread.
                     launch(Dispatchers.Main) {
                         _places.value = storedPlaces
+                        Log.d("PlacesViewModel", "Places updated in ViewModel")
                     }
                 },
                 onError = { exception ->
-                    Log.e("MainActivity", "Error fetching places: ${exception.message}")
+                    Log.e("PlacesViewModel", "Error fetching places: ${exception.message}")
                 }
             )
         }
