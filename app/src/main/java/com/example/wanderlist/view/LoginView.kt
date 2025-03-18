@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.height
 import com.example.wanderlist.components.SubHeaderLoginPage
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -119,7 +120,7 @@ fun LoginView(
             Spacer(modifier = Modifier.height(10.dp))
             PasswordInput("Password", viewModel )
 
-            Spacer(modifier = Modifier.height(275.dp))
+            Spacer(modifier = Modifier.height(220.dp))
             Button(
                 onClick = {
                     authViewModel.loginWithEmailAndPassword(viewModel.email, viewModel.password){ result ->
