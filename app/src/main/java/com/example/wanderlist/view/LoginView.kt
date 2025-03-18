@@ -1,6 +1,7 @@
 package com.example.wanderlist.view
 
 import android.preference.PreferenceActivity.Header
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -36,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -58,6 +60,7 @@ fun LoginView(
     onNavigateToRegister: () -> Unit,
     onNavigateToHome: () -> Unit
 ) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start
@@ -123,7 +126,9 @@ fun LoginView(
                         when(result){
                             is AuthDataStore.Result.Success -> onNavigateToHome()
                             // need to implement an error page
-                            is AuthDataStore.Result.Error -> Unit
+                            is AuthDataStore.Result.Error -> {
+                                Toast.makeText(context, result.exception.message, Toast.LENGTH_SHORT).show()
+                            }
                         }
 
                 } },
@@ -163,7 +168,15 @@ fun LoginView(
             Spacer(modifier = Modifier.height(10.dp))
             // Sign up with Google Button
             OutlinedButton(
-                onClick = { /* handle Google sign-up here */ },
+                onClick = { authViewModel.googleOAuth(){result->
+                    when(result){
+                        is AuthDataStore.Result.Success -> onNavigateToHome()
+                        // need to implement an error page
+                        is AuthDataStore.Result.Error -> {
+                            Toast.makeText(context, result.exception.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } },
                 modifier = Modifier
                     .fillMaxWidth(1.0f)
                     .height(60.dp)

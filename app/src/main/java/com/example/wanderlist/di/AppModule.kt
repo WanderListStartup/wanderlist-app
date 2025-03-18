@@ -25,12 +25,4 @@ object AppModule {
         return context.getString(R.string.googleOAuthClientID)
     }
 
-    @Provides
-    @Singleton
-    fun provideAuthDataStore(
-        googleOAuthClientID: String,
-        auth: FirebaseAuth
-    ): AuthDataStore {
-        return AuthDataStore(googleOAuthClientID, auth)
-    }
 }

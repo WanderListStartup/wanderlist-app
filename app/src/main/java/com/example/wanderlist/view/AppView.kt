@@ -103,6 +103,8 @@ fun AppView(
                 composable<Register> {
                     SignUpView(
                         onNavigateToHome = {navController.navigate(route=MainView)},
+                        onNavigateToLogin = {navController.navigate(route=Login)},
+                        onBack = {navController.navigate(route=Landing)},
                         authViewModel=authViewModel
                     )
                 }
