@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Wanderlist</string>
+    <string name="googleOAuthClientID">229762199691-j8m2b5286u8mjh5e08v7nub4kc7o76lv.apps.googleusercontent.com</string>
 </resources>

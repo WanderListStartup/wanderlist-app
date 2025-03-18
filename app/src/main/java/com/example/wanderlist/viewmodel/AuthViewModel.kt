@@ -1,107 +1,86 @@
 package com.example.wanderlist.viewmodel
 
-import android.content.ContentValues.TAG
-import android.util.Log
-import android.widget.Toast
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import androidx.lifecycle.viewModelScope
+import com.example.wanderlist.model.AuthDataStore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AuthViewModel : ViewModel() {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
-    private val _authState = MutableLiveData<AuthState>()
-    val authState: LiveData<AuthState> = _authState
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val authDataStore: AuthDataStore
+) : ViewModel() {
 
     var uiState = mutableStateOf(LoginUIState())
         private set
 
-    fun onEmailChange(e: String){
-        uiState.value = uiState.value.copy(email = e)
-    }
-    fun onPasswordChange(p: String){
-        uiState.value= uiState.value.copy(password = p)
-    }
+    private val _authState = MutableStateFlow<AuthState>(AuthState.UnAuthenticated)
+    val authState: StateFlow<AuthState> = _authState
 
     init {
         checkAuth()
     }
 
-    fun checkAuth(){
-        if(auth.currentUser == null){
-            _authState.value = AuthState.UnAuthenticated
-        }
-        else{
-            _authState.value = AuthState.Authenticated
-        }
+    fun onEmailChange(e: String) {
+        uiState.value = uiState.value.copy(email = e)
     }
 
-    fun login(){
-        _authState.value = AuthState.Loading
-
-        if(uiState.value.email.isEmpty() || uiState.value.password.isEmpty()){
-            _authState.value = AuthState.Error("Email and/or Password fields cannot be empty!")
-            return
-        }
-
-            val email = uiState.value.email
-            val password = uiState.value.password
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener() { task->
-                    if(task.isSuccessful) {
-                        _authState.value = AuthState.Authenticated
-                    } else {
-                        _authState.value = AuthState.Error(task.exception?.message?:"Authorization Failed")
-                    }
-
-                }
-
-
+    fun onPasswordChange(p: String) {
+        uiState.value = uiState.value.copy(password = p)
     }
 
-    fun register(){
-        _authState.value = AuthState.Loading
+    fun checkAuth() {
+        val user = authDataStore.getCurrentUser()
+        _authState.value = if (user == null) AuthState.UnAuthenticated else AuthState.Authenticated
+    }
 
-        val email = uiState.value.email
-        val password = uiState.value.password
-
-        if(email.isEmpty() || password.isEmpty()){
-            _authState.value = AuthState.Error("Email and/or Password fields cannot be empty!")
-            return
-        }
-
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener() { task->
-                if(task.isSuccessful) {
-                    _authState.value = AuthState.Authenticated
-                    Log.d("ngas","ngas")
-                } else {
-                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                    _authState.value = AuthState.Error(task.exception?.message?:"Authorization Failed")
-                }
-
+    fun loginWithEmailAndPassword() {
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            val result = authDataStore.loginWithEmailAndPassword(uiState.value.email, uiState.value.password)
+            _authState.value = when (result) {
+                is AuthDataStore.Result.Success -> AuthState.Authenticated
+                is AuthDataStore.Result.Error -> AuthState.Error(result.exception.message ?: "Login failed")
+                else -> AuthState.UnAuthenticated
             }
+        }
     }
 
-    fun logout(){
-        auth.signOut()
+    fun registerWithEmailAndPassword() {
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            val result = authDataStore.registerWithEmailAndPassword(uiState.value.email, uiState.value.password)
+            _authState.value = when (result) {
+                is AuthDataStore.Result.Success -> AuthState.Authenticated
+                is AuthDataStore.Result.Error -> AuthState.Error(result.exception.message ?: "Registration failed")
+                else -> AuthState.UnAuthenticated
+            }
+        }
+    }
+
+    fun handleGoogleOAuth() {
+        val clientID = authDataStore.getGoogleOAuthClientID()
+        authDataStore.googleOAuth()
+    }
+
+    fun logout() {
+        authDataStore.logout()
         _authState.value = AuthState.UnAuthenticated
     }
-
 }
 
-sealed class AuthState{
-    data object Authenticated : AuthState()
-    data object UnAuthenticated : AuthState()
-    data object Loading : AuthState()
+sealed class AuthState {
+    object Authenticated : AuthState()
+    object UnAuthenticated : AuthState()
+    object Loading : AuthState()
     data class Error(val message: String) : AuthState()
 }
 
 data class LoginUIState(
-   val email: String = "",
-   val password: String = "",
+    val email: String = "",
+    val password: String = ""
 )

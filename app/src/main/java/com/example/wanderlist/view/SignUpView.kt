@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.wanderlist.viewmodel.AuthViewModel
 
+
 // If you have custom fonts/colors (e.g., Montserrat, wanderlistBlue), import them from your theme
 // import com.example.wanderlist.ui.theme.Montserrat
 // import com.example.wanderlist.ui.theme.wanderlistBlue
@@ -167,7 +168,7 @@ fun SignUpView(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
 
             // -- Create New Account button --
             Button(
-                onClick = {authViewModel.register()},
+                onClick = {authViewModel.registerWithEmailAndPassword()},
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
