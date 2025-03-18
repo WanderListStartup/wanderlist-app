@@ -1,0 +1,284 @@
+package com.example.wanderlist.view
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
+import coil.compose.rememberAsyncImagePainter
+import com.example.wanderlist.R
+import androidx.compose.ui.text.withStyle
+
+// Data class for representing a Place.
+data class Place(
+    val name: String,
+    val rating: Double,
+    val distance: String,
+    val coverImageUrl: String,
+    val aboutText: String,
+    val thumbnailUrls: List<String>
+)
+
+class HomePageView {
+    companion object {
+
+        @Composable
+        fun HomePage(places: List<Place>) {
+            HomeScreen(places)
+        }
+
+        @Composable
+        fun HomeScreen(places: List<Place>) {
+            Scaffold(
+                topBar = { TopBarCategories() },
+                bottomBar = { BottomNavigationBar() }
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) {
+                    // Horizontal scroll for multiple places.
+                    LazyRow(modifier = Modifier.fillMaxSize()) {
+                        items(places) { place ->
+                            // Each place item takes full available space.
+                            Box(modifier = Modifier.fillParentMaxSize()) {
+                                PlaceContent(place)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        @Composable
+        fun TopBarCategories() {
+            Surface(elevation = 4.dp) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    // Logo image at the top left.
+                    Image(
+                        painter = rememberAsyncImagePainter(R.drawable.wlist_logo),
+                        contentDescription = "Logo",
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(43.dp)
+                            .padding(top = 16.dp, start = 5.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    // Categories row under the logo.
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 5.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Food", modifier = Modifier.clickable { /* Handle click action */ })
+                        Text("Bars", modifier = Modifier.clickable { /* Handle click action */ })
+                        Text("Adventures", modifier = Modifier.clickable { /* Handle click action */ })
+                        Text("Parks", modifier = Modifier.clickable { /* Handle click action */ })
+                        Text("Activities", modifier = Modifier.clickable { /* Handle click action */ })
+                    }
+                }
+            }
+        }
+
+        @Composable
+        fun BottomNavigationBar() {
+            BottomNavigation {
+                BottomNavigationItem(
+                    icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
+                    selected = true,
+                    onClick = { /* Handle click action */ }
+                )
+                BottomNavigationItem(
+                    icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
+                    selected = false,
+                    onClick = { /* Handle click action */ }
+                )
+            }
+        }
+
+        /**
+         * Composable that displays the about text with a clickable "Show More" at the end.
+         */
+        @Composable
+        fun AboutTextWithShowMore(
+            text: String,
+            maxLines: Int = 4,
+            onShowMoreClick: () -> Unit
+        ) {
+            val annotatedText = buildAnnotatedString {
+                append(text.trimEnd())
+                append(" ")
+                pushStringAnnotation(tag = "SHOW_MORE", annotation = "SHOW_MORE")
+                withStyle(style = SpanStyle(color = Color.Blue)) {
+                    append("Show More")
+                }
+                pop()
+            }
+            ClickableText(
+                text = annotatedText,
+                style = MaterialTheme.typography.body2,
+                maxLines = maxLines,
+                overflow = TextOverflow.Ellipsis,
+                onClick = { offset ->
+                    annotatedText.getStringAnnotations("SHOW_MORE", start = offset, end = offset)
+                        .firstOrNull()?.let {
+                            onShowMoreClick()
+                        }
+                }
+            )
+        }
+
+        @Composable
+        fun PlaceContent(place: Place) {
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(top = 0.dp)
+            ) {
+                // Row with restaurant name, rating, and distance.
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = place.name,
+                        style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = "⭐ ${place.rating}")
+                        Spacer(modifier = Modifier.width(170.dp))
+                        Text(
+                            text = place.distance,
+                            color = Color(0xFF176FF2)
+                        )
+                        Image(
+                            painter = rememberAsyncImagePainter(R.drawable.distance),
+                            contentDescription = "Distance Icon",
+                            modifier = Modifier
+                                .width(40.dp)
+                                .height(40.dp)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                // Cover image.
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 30.dp)
+                        .width(350.dp)
+                        .height(345.dp)
+                        .clip(RoundedCornerShape(32.dp))
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(place.coverImageUrl),
+                        contentDescription = place.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                // About section.
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "About",
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(start = 20.dp, bottom = 4.dp)
+                )
+                Box(modifier = Modifier.padding(start = 40.dp, bottom = 8.dp)) {
+                    AboutTextWithShowMore(
+                        text = place.aboutText,
+                        maxLines = 4,
+                        onShowMoreClick = {
+                            // Handle "Show More" click (e.g., expand text or navigate to details).
+                        }
+                    )
+                }
+                // Thumbnails.
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    place.thumbnailUrls.forEach { thumbUrl ->
+                        Image(
+                            painter = rememberAsyncImagePainter(thumbUrl),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .width(110.dp)
+                                .height(95.dp)
+                                .clip(RoundedCornerShape(15.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+                // Additional details for "Naughters".
+                if (place.name == "Naughters") {
+                    AdditionalDetailsSection()
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+
+        @Composable
+        fun AdditionalDetailsSection() {
+            Column(
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp)
+            ) {
+                Text("Menu", style = MaterialTheme.typography.h6)
+                Text("http://naughters.com", style = MaterialTheme.typography.body2)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Address/Contact", style = MaterialTheme.typography.h6)
+                Text(
+                    text = "136 2nd St, Troy, NY 12180\n(518) 238-3130",
+                    style = MaterialTheme.typography.body2
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Hour of Operations", style = MaterialTheme.typography.h6)
+                Text(
+                    text = """
+                        Monday 6AM–3PM
+                        Tuesday 6AM–3PM
+                        Wednesday 6AM–3PM
+                        Thursday 6AM–3PM
+                        Friday 6AM–3PM
+                        Saturday 8AM–5PM
+                        Sunday 8AM–5PM
+                    """.trimIndent(),
+                    style = MaterialTheme.typography.body2
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Accessibility", style = MaterialTheme.typography.h6)
+                Text("Wheelchair Accessible", style = MaterialTheme.typography.body2)
+            }
+        }
+    }
+}
