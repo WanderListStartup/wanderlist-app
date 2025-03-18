@@ -4,19 +4,16 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-03-14T04:57:28.666235Z">
+        <DropdownSelection timestamp="2025-03-18T17:28:18.364066Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=R3CW50QQP4X" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/joseph/.android/avd/Medium_Phone.avd" />
             </handle>
           </Target>
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
       <SelectionState runConfigName="GreetingPreview">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="SignUpViewWithPlacesApiDirect">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

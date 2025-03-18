@@ -43,16 +43,20 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.wanderlist.components.EmailInput
 import com.example.wanderlist.components.LoginText
 import com.example.wanderlist.components.PasswordInput
+import com.example.wanderlist.model.AuthDataStore
 import com.example.wanderlist.ui.theme.Alef
 import com.example.wanderlist.ui.theme.wanderlistBlue
+import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.SignUpViewModel
 
 
 @Composable
 fun LoginView(
     viewModel: SignUpViewModel = viewModel(),
+    authViewModel: AuthViewModel,
     onNavigateToLanding: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onNavigateToRegister: () -> Unit,
+    onNavigateToHome: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -114,7 +118,15 @@ fun LoginView(
 
             Spacer(modifier = Modifier.height(275.dp))
             Button(
-                onClick = { /* implement navigation to home page */ },
+                onClick = {
+                    authViewModel.loginWithEmailAndPassword(viewModel.email, viewModel.password){ result ->
+                        when(result){
+                            is AuthDataStore.Result.Success -> onNavigateToHome()
+                            // need to implement an error page
+                            is AuthDataStore.Result.Error -> Unit
+                        }
+
+                } },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp)

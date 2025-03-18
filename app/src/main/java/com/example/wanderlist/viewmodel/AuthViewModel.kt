@@ -15,8 +15,6 @@ class AuthViewModel @Inject constructor(
     private val authDataStore: AuthDataStore
 ) : ViewModel() {
 
-    var uiState = mutableStateOf(LoginUIState())
-        private set
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.UnAuthenticated)
     val authState: StateFlow<AuthState> = _authState
@@ -25,40 +23,35 @@ class AuthViewModel @Inject constructor(
         checkAuth()
     }
 
-    fun onEmailChange(e: String) {
-        uiState.value = uiState.value.copy(email = e)
-    }
-
-    fun onPasswordChange(p: String) {
-        uiState.value = uiState.value.copy(password = p)
-    }
 
     fun checkAuth() {
         val user = authDataStore.getCurrentUser()
         _authState.value = if (user == null) AuthState.UnAuthenticated else AuthState.Authenticated
     }
 
-    fun loginWithEmailAndPassword() {
+    fun loginWithEmailAndPassword(email:String, password:String, callback: (result:AuthDataStore.Result)->Unit) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
-            val result = authDataStore.loginWithEmailAndPassword(uiState.value.email, uiState.value.password)
+            val result = authDataStore.loginWithEmailAndPassword(email, password)
             _authState.value = when (result) {
                 is AuthDataStore.Result.Success -> AuthState.Authenticated
                 is AuthDataStore.Result.Error -> AuthState.Error(result.exception.message ?: "Login failed")
                 else -> AuthState.UnAuthenticated
             }
+            callback(result)
         }
     }
 
-    fun registerWithEmailAndPassword() {
+    fun registerWithEmailAndPassword(email:String, password:String,callback: (result:AuthDataStore.Result)->Unit) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
-            val result = authDataStore.registerWithEmailAndPassword(uiState.value.email, uiState.value.password)
+            val result = authDataStore.registerWithEmailAndPassword(email, password)
             _authState.value = when (result) {
                 is AuthDataStore.Result.Success -> AuthState.Authenticated
                 is AuthDataStore.Result.Error -> AuthState.Error(result.exception.message ?: "Registration failed")
                 else -> AuthState.UnAuthenticated
             }
+            callback(result)
         }
     }
 
@@ -79,8 +72,3 @@ sealed class AuthState {
     object Loading : AuthState()
     data class Error(val message: String) : AuthState()
 }
-
-data class LoginUIState(
-    val email: String = "",
-    val password: String = ""
-)

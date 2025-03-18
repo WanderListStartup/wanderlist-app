@@ -18,15 +18,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.wanderlist.model.AuthDataStore
 import com.example.wanderlist.viewmodel.SignUpViewModel
 import com.example.wanderlist.ui.theme.Alef
 import com.example.wanderlist.ui.theme.WorkSans
+import com.example.wanderlist.viewmodel.AuthViewModel
 
 @Composable
 fun SignUpView(
     modifier: Modifier = Modifier,
+    authViewModel: AuthViewModel,
     viewModel: SignUpViewModel = viewModel(),
-    onBack: () -> Unit = {}  // New parameter for back navigation
+    onBack: () -> Unit = {},  // New parameter for back navigation
+    onNavigateToHome: () -> Unit
 ) {
     Box(
         modifier = modifier
@@ -196,7 +200,13 @@ fun SignUpView(
             Spacer(modifier = Modifier.height(10.dp))
             // "Create New Account" button
             Button(
-                onClick = { viewModel.onSignUp() },
+                onClick = { authViewModel.registerWithEmailAndPassword(viewModel.email, viewModel.password){result->
+                    when(result){
+                        is AuthDataStore.Result.Success -> onNavigateToHome()
+                        //need an error page
+                        is AuthDataStore.Result.Error -> Unit
+                    }
+                } },
                 modifier = Modifier
                     .fillMaxWidth(1.0f)
                     .height(56.dp),
