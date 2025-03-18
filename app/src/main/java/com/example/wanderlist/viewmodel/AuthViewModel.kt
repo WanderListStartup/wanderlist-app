@@ -34,8 +34,8 @@ class AuthViewModel @Inject constructor(
 
     fun googleOAuth(callback: (result:AuthDataStore.Result)->Unit){
         val googleIdOption = GetGoogleIdOption.Builder()
-            .setServerClientId("229762199691-j8m2b5286u8mjh5e08v7nub4kc7o76lv.apps.googleusercontent.com")
-            .setFilterByAuthorizedAccounts(false)
+            .setServerClientId(authDataStore.getGoogleOAuthClientID())
+            .setFilterByAuthorizedAccounts(true)
             .build()
 
         val request = GetCredentialRequest.Builder()
