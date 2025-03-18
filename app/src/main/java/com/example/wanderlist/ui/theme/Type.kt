@@ -47,6 +47,48 @@ val Montserrat = FontFamily(
     Font(R.font.montserrat_blackitalic, FontWeight.Black, FontStyle.Italic)
 )
 
+val Fascinate = FontFamily(
+    Font(R.font.fascinate_regular, FontWeight.Normal, FontStyle.Normal),
+)
+
+val Exo = FontFamily(
+    // Thin (100)
+    Font(R.font.exo_thin, FontWeight.Thin, FontStyle.Normal),
+    Font(R.font.exo_thinitalic, FontWeight.Thin, FontStyle.Italic),
+
+    // ExtraLight (200)
+    Font(R.font.exo_extralight, FontWeight.ExtraLight, FontStyle.Normal),
+    Font(R.font.exo_extralightitalic, FontWeight.ExtraLight, FontStyle.Italic),
+
+    // Light (300)
+    Font(R.font.exo_light, FontWeight.Light, FontStyle.Normal),
+    Font(R.font.exo_lightitalic, FontWeight.Light, FontStyle.Italic),
+
+    // Regular (400)
+    Font(R.font.exo_regular, FontWeight.Normal, FontStyle.Normal),
+    Font(R.font.exo_italic, FontWeight.Normal, FontStyle.Italic),
+
+    // Medium (500)
+    Font(R.font.exo_medium, FontWeight.Medium, FontStyle.Normal),
+    Font(R.font.exo_mediumitalic, FontWeight.Medium, FontStyle.Italic),
+
+    // SemiBold (600)
+    Font(R.font.exo_semibold, FontWeight.SemiBold, FontStyle.Normal),
+    Font(R.font.exo_semibolditalic, FontWeight.SemiBold, FontStyle.Italic),
+
+    // Bold (700)
+    Font(R.font.exo_bold, FontWeight.Bold, FontStyle.Normal),
+    Font(R.font.exo_bolditalic, FontWeight.Bold, FontStyle.Italic),
+
+    // ExtraBold (800)
+    Font(R.font.exo_extrabold, FontWeight.ExtraBold, FontStyle.Normal),
+    Font(R.font.exo_extrabolditalic, FontWeight.ExtraBold, FontStyle.Italic),
+
+    // Black (900)
+    Font(R.font.exo_black, FontWeight.Black, FontStyle.Normal),
+    Font(R.font.exo_blackitalic, FontWeight.Black, FontStyle.Italic)
+)
+
 val Alef = FontFamily(
     Font(R.font.alef_bold, FontWeight.Bold, FontStyle.Normal),
     Font(R.font.alef_regular, FontWeight.Normal, FontStyle.Normal)

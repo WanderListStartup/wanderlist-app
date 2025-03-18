@@ -14,12 +14,14 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.example.wanderlist.viewmodel.AuthState
 import com.example.wanderlist.viewmodel.AuthViewModel
+import com.example.wanderlist.viewmodel.SignUpViewModel
 import kotlinx.serialization.Serializable
 
 //Route to the actual app
@@ -38,6 +40,7 @@ fun AppView(
     authViewModel: AuthViewModel = viewModel()
 ){
     val navController = rememberNavController()
+    val viewModel: SignUpViewModel = viewModel()
     val authState by authViewModel.authState.collectAsState()
 
     LaunchedEffect(authState){
@@ -66,7 +69,13 @@ fun AppView(
                     }
                 }
                 composable<Login> {
-//                    Text("LOGIN")
+                    LoginView(
+                        viewModel = viewModel,
+                        onNavigateToLanding = { navController.navigate(route=Landing)},
+                        onNavigateToRegister = { navController.navigate(route=Register)}
+                    )
+
+
                 }
                 composable<Register> {
                     SignUpView(authViewModel = authViewModel)
