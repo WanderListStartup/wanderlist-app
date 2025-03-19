@@ -5,9 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
@@ -75,6 +77,7 @@ fun HomePageView() {
 
 @Composable
 fun HomeScreen(places: List<Place>) {
+    val state = rememberLazyListState()
     Scaffold(
         topBar = { TopBarCategories() },
         bottomBar = { BottomNavigationBar() }
@@ -85,7 +88,11 @@ fun HomeScreen(places: List<Place>) {
                 .padding(innerPadding)
         ) {
             // Horizontal scroll for multiple places
-            LazyRow(modifier = Modifier.fillMaxSize()) {
+            LazyRow(
+                modifier = Modifier.fillMaxSize(),
+                state = state,
+                flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
+                ) {
                 items(places) { place ->
                     // Each place item takes the full screen width
                     Box(modifier = Modifier.fillParentMaxSize()) {

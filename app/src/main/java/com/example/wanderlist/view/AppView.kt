@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.example.wanderlist.HomePageView
 import com.example.wanderlist.viewmodel.SignUpViewModel
 import kotlinx.serialization.Serializable
 
@@ -30,9 +31,9 @@ import kotlinx.serialization.Serializable
 fun AppView(){
     val navController = rememberNavController()
     val viewModel: SignUpViewModel = viewModel()
-    NavHost(navController, startDestination=RegisterLoginView){
+    NavHost(navController, startDestination=MainView){
             composable<MainView>{
-                Text("MAINVIEW")
+                HomePageView()
             }
             navigation<RegisterLoginView>(startDestination=Landing){
                 composable<Landing> {
