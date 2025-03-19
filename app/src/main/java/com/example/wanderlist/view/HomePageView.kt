@@ -171,7 +171,7 @@ fun TopBarCategories() {
                                     text = category,
                                     color = Color(0xFF176FF2),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                    modifier = Modifier.padding(horizontal = 16.dp,vertical = 8.dp)
                                 )
                             }
                         } else {
