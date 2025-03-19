@@ -1,21 +1,32 @@
 package com.example.wanderlist.components
 
-import android.graphics.Paint.Align
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.wanderlist.R
 import com.example.wanderlist.ui.theme.Alef
 import com.example.wanderlist.ui.theme.Montserrat
 import com.example.wanderlist.viewmodel.SignUpViewModel
@@ -130,6 +141,78 @@ fun PasswordInput(value: String, infoViewModel: SignUpViewModel) {
         modifier = Modifier.fillMaxWidth(0.95f).padding(horizontal = 16.dp),
         shape = RoundedCornerShape(12.dp)
     )
+}
+
+
+@Composable
+fun BackCircle()
+{
+    Box(
+        modifier = Modifier.padding()
+            .padding(horizontal = 31.dp)
+            .size(24.dp)
+            .clip(CircleShape)
+            .border(1.dp, Color.Black, CircleShape)
+
+    ) {
+        Image(
+            painter = painterResource(R.drawable.chevron_back_arrow),
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
+    }
+}
+
+@Composable
+fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.Gray,
+        modifier = Modifier.padding(top = 24.dp)
+    )
+}
+
+@Composable
+fun SettingItem(title: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(top = 15.dp, bottom = 15.dp))
+        Text(text = value, fontSize = 16.sp, color = Color.Gray,
+            modifier = Modifier.padding(top = 15.dp, bottom = 15.dp))
+    }
+}
+
+@Composable
+fun ToggleSettingItem(title: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Medium,
+            modifier = Modifier.align(Alignment.CenterVertically))
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+
+}
+
+@Composable
+fun ClickableSettingItem(title: String, isDestructive: Boolean = false, onClick: () -> Unit) {
+    TextButton(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = if (isDestructive) Color.Red else Color.Black
+
+        )
+    }
 }
 
 
