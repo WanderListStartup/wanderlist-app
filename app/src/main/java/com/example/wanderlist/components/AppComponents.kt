@@ -1,8 +1,8 @@
 package com.example.wanderlist.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,15 +11,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -40,6 +41,75 @@ import com.example.wanderlist.viewmodel.SignUpViewModel
 *
 * TLDR: improves readability and reusability
 */
+
+@Composable
+fun ProfilePictureCircle(
+    imagePainter: Int,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .size(120.dp)
+            .shadow(
+                elevation = 10.dp, // This approximates a blur radius of 10
+                shape = CircleShape,
+                clip = false
+            )
+            .clip(CircleShape)
+            .background(Color.LightGray) // A fallback background in case the image has transparency
+    ) {
+        Image(
+            painter = painterResource(imagePainter),
+            contentDescription = "Profile Picture",
+            modifier = Modifier.size(120.dp)
+        )
+    }
+}
+
+// For each text field in the Edit Profile Page
+@Composable
+fun EditProfileTextField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        // Label on the left.
+        Text(
+            text = label,
+            fontFamily = Montserrat,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            modifier = Modifier.weight(1f)
+        )
+        // The text field on the right.
+        OutlinedTextField(
+            value = value,
+            textStyle = TextStyle(
+                fontFamily = Montserrat,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium
+            ),
+            onValueChange = onValueChange,
+            modifier = Modifier.weight(2f),
+            shape = RoundedCornerShape(12.dp),
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color(0xFFF2F2F2)
+            )
+
+        )
+    }
+}
 
 // For Both the Login Text and Create Account Text
 @Composable
@@ -168,8 +238,8 @@ fun SectionTitle(title: String) {
     Text(
         text = title,
         fontSize = 14.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color.Gray,
+        fontWeight = FontWeight.Medium,
+        color = Color.Black,
         modifier = Modifier.padding(top = 24.dp)
     )
 }
