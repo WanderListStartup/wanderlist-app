@@ -36,18 +36,22 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
+import com.example.wanderlist.data.model.PlaceDetails
+import com.example.wanderlist.viewmodel.PlacesViewModel
 
 
 // 1) Simple data class
-data class Place(
-    val name: String,
-    val rating: Double,
-    val distance: String,
-    val coverImageUrl: String,
-    val aboutText: String,
-    val thumbnailUrls: List<String>
-)
+//data class Place(
+//    val name: String,
+//    val rating: Double,
+//    val distance: String,
+//    val coverImageUrl: String,
+//    val aboutText: String,
+//    val thumbnailUrls: List<String>
+//)
 
 @Preview(showBackground = true)
 @Composable
@@ -55,40 +59,43 @@ fun HomePageViewPreview() {
     HomePageView()
 }
 @Composable
-fun HomePageView() {
+fun HomePageView(
+    placesViewModel: PlacesViewModel = viewModel()
+) {
+    val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
         // Example places with actual direct image URLs
-        val places = listOf(
-            Place(
-                name = "Naughters",
-                rating = 3.2,
-                distance = "0.3 mi",
-                coverImageUrl = "https://i0.wp.com/www.troyrecord.com/wp-content/uploads/2022/02/DSC_5566.jpg?fit=620,9999px&ssl=1&tbnid=NVplyHZxBYgiaM&vet=1",
-                aboutText = "Naughter's in Troy, New York is a diner and coffee shop ...",
-                thumbnailUrls = listOf(
-                    "https://lh3.googleusercontent.com/gps-cs-s/AB5caB-vaLr7eVC5t8VNIa79Jo4DK4wA4_7ki93JfMFFEbdmyeYNrPBHJX99IEokroqFu_dmCMI-QDJqW_WNJJcnSB9wwqKH_Y0saD3-9vSssDfK--d5b4bUrMZgGSr3tPqm_U_xM3pm=s1360-w1360-h1020",
-                    "https://lh3.googleusercontent.com/p/AF1QipO7FgCa3IkHZjpWSE8erilXu8TQYCIkrXeaFK2W=s1360-w1360-h1020",
-                    "https://lh3.googleusercontent.com/gps-cs-s/AB5caB8oMzpr4pLQB7hqTCO0dT53PhsTjAkTvjCyq34wTFvdLGvETNPv6_aBff7Mtp0-7vlFQH2K4ZFI0E_6AEZQ6QMKIW3xfxJ1YMdvWxD0zIzNs1orHnsw_Kwn906XBXoAIFzQYZ5T=s1360-w1360-h1020"
-                )
-            ),
-            Place(
-                name = "Starbucks",
-                rating = 4.1,
-                distance = "0.5 mi",
-                coverImageUrl = "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
-                aboutText = "Famous coffeehouse chain offering specialty coffees, teas, & light bites...",
-                thumbnailUrls = listOf(
-                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
-                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG"
-                )
-            )
-        )
+//        val places = listOf(
+//            Place(
+//                name = "Naughters",
+//                rating = 3.2,
+//                distance = "0.3 mi",
+//                coverImageUrl = "https://i0.wp.com/www.troyrecord.com/wp-content/uploads/2022/02/DSC_5566.jpg?fit=620,9999px&ssl=1&tbnid=NVplyHZxBYgiaM&vet=1",
+//                aboutText = "Naughter's in Troy, New York is a diner and coffee shop ...",
+//                thumbnailUrls = listOf(
+//                    "https://lh3.googleusercontent.com/gps-cs-s/AB5caB-vaLr7eVC5t8VNIa79Jo4DK4wA4_7ki93JfMFFEbdmyeYNrPBHJX99IEokroqFu_dmCMI-QDJqW_WNJJcnSB9wwqKH_Y0saD3-9vSssDfK--d5b4bUrMZgGSr3tPqm_U_xM3pm=s1360-w1360-h1020",
+//                    "https://lh3.googleusercontent.com/p/AF1QipO7FgCa3IkHZjpWSE8erilXu8TQYCIkrXeaFK2W=s1360-w1360-h1020",
+//                    "https://lh3.googleusercontent.com/gps-cs-s/AB5caB8oMzpr4pLQB7hqTCO0dT53PhsTjAkTvjCyq34wTFvdLGvETNPv6_aBff7Mtp0-7vlFQH2K4ZFI0E_6AEZQ6QMKIW3xfxJ1YMdvWxD0zIzNs1orHnsw_Kwn906XBXoAIFzQYZ5T=s1360-w1360-h1020"
+//                )
+//            ),
+//            Place(
+//                name = "Starbucks",
+//                rating = 4.1,
+//                distance = "0.5 mi",
+//                coverImageUrl = "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
+//                aboutText = "Famous coffeehouse chain offering specialty coffees, teas, & light bites...",
+//                thumbnailUrls = listOf(
+//                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
+//                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG"
+//                )
+//            )
+//        )
         HomeScreen(places)
     }
 }
 
 @Composable
-fun HomeScreen(places: List<Place>) {
+fun HomeScreen(places: List<PlaceDetails>) {
     val state = rememberLazyListState()
     Scaffold(
         topBar = { TopBarCategories() },
@@ -257,7 +264,7 @@ fun AboutTextWithShowMore(
     )}
 
 @Composable
-fun PlaceContent(place: Place) {
+fun PlaceContent(place: PlaceDetails) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -275,14 +282,14 @@ fun PlaceContent(place: Place) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = place.name,
+                text = place.displayName ?: "NO NAME FOUND?",
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "⭐ ${place.rating}")
                 Spacer(modifier = Modifier.width(170.dp))
                 Text(
-                    text = place.distance,
+                    text = "${place.distance} mi",
                     color = Color(0xFF176FF2)
                 )
                 Image(
@@ -305,8 +312,8 @@ fun PlaceContent(place: Place) {
                 .clip(RoundedCornerShape(32.dp))
         ) {
             Image(
-                painter = rememberAsyncImagePainter(place.coverImageUrl),
-                contentDescription = place.name,
+                painter = rememberAsyncImagePainter(if (place.photoURIs?.size!! > 0) place.photoURIs.get(0) else ""),
+                contentDescription = place.displayName,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
@@ -323,7 +330,7 @@ fun PlaceContent(place: Place) {
         // Only "Show More" is clickable here
         Box(modifier = Modifier.padding(start = 40.dp, bottom = 8.dp)) {
             AboutTextWithShowMore(
-                text = place.aboutText,
+                text = place.editorialSummary ?: "no summary",
                 maxLines = 4,
                 onShowMoreClick = {
                     // Handle "Show More" click here (e.g., expand text, navigate, etc.)
@@ -338,7 +345,7 @@ fun PlaceContent(place: Place) {
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            place.thumbnailUrls.forEach { thumbUrl ->
+            place.photoURIs?.forEach { thumbUrl ->
                 Image(
                     painter = rememberAsyncImagePainter(thumbUrl),
                     contentDescription = null,
@@ -352,7 +359,7 @@ fun PlaceContent(place: Place) {
         }
 
         // Additional details for "Naughters" (example data)
-        if (place.name == "Naughters") {
+        if (place.displayName == "Naughters") {
             AdditionalDetailsSection()
         }
 

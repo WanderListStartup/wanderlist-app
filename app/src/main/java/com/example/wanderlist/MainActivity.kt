@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WanderlistTheme {
-                PlacesScreen()
+                AppView()
             }
         }
     }
