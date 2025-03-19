@@ -10,8 +10,10 @@ import com.example.wanderlist.ui.theme.WanderlistTheme
 import com.example.wanderlist.view.AppView
 import com.example.wanderlist.view.SignUpView
 import com.example.wanderlist.viewmodel.SignUpViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

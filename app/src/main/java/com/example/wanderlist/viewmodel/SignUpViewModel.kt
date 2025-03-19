@@ -45,8 +45,4 @@ class SignUpViewModel : ViewModel() {
         city = newCity
     }
 
-    // Optionally, add sign-up logic here:
-    fun onSignUp() {
-        // Handle account creation logic
-    }
 }

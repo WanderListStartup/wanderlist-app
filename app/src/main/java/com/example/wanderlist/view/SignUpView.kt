@@ -1,7 +1,9 @@
 package com.example.wanderlist.view
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -12,22 +14,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.wanderlist.model.AuthDataStore
 import com.example.wanderlist.viewmodel.SignUpViewModel
 import com.example.wanderlist.ui.theme.Alef
 import com.example.wanderlist.ui.theme.WorkSans
+import com.example.wanderlist.viewmodel.AuthViewModel
 
 @Composable
 fun SignUpView(
     modifier: Modifier = Modifier,
+    authViewModel: AuthViewModel,
     viewModel: SignUpViewModel = viewModel(),
-    onBack: () -> Unit = {}  // New parameter for back navigation
+    onBack: () -> Unit,  // New parameter for back navigation
+    onNavigateToLogin: () -> Unit,
+    onNavigateToHome: () -> Unit
 ) {
+    val context= LocalContext.current
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -85,7 +94,9 @@ fun SignUpView(
                     fontWeight = FontWeight.Bold,
                     fontFamily = WorkSans
                 )
+
                 Text(
+                    modifier = Modifier.clickable { onNavigateToLogin() },
                     text = "Login",
                     fontFamily = WorkSans,
                     color = Color.Blue,
@@ -196,7 +207,15 @@ fun SignUpView(
             Spacer(modifier = Modifier.height(10.dp))
             // "Create New Account" button
             Button(
-                onClick = { viewModel.onSignUp() },
+                onClick = { authViewModel.registerWithEmailAndPassword(viewModel.email, viewModel.password){result->
+                    when(result){
+                        is AuthDataStore.Result.Success -> onNavigateToHome()
+                        //need an error page
+                        is AuthDataStore.Result.Error ->
+                            Toast.makeText(context, result.exception.message, Toast.LENGTH_SHORT).show()
+
+                    }
+                } },
                 modifier = Modifier
                     .fillMaxWidth(1.0f)
                     .height(56.dp),
