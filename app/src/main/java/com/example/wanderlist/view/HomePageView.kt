@@ -1,6 +1,10 @@
 package com.example.wanderlist
-
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.MutableState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.*
@@ -34,6 +38,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import coil.compose.rememberAsyncImagePainter
 
+
 // 1) Simple data class
 data class Place(
     val name: String,
@@ -44,6 +49,11 @@ data class Place(
     val thumbnailUrls: List<String>
 )
 
+@Preview(showBackground = true)
+@Composable
+fun HomePageViewPreview() {
+    HomePageView()
+}
 @Composable
 fun HomePageView() {
     MaterialTheme {
@@ -108,32 +118,75 @@ fun HomeScreen(places: List<Place>) {
 
 @Composable
 fun TopBarCategories() {
-    Surface(shadowElevation = 4.dp) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            // Logo image at the top left
-            Image(
-                painter = rememberAsyncImagePainter(R.drawable.wlist_logo),
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(43.dp)
-                    .padding(top = 16.dp, start = 5.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            // Categories row directly under the logo
+    // Keep track of which category is selected
+    var selectedCategory = remember { mutableStateOf("Food") }
+
+    // List of category labels
+    val categories = listOf("Food", "Bars", "Adventures", "Parks", "Activities")
+
+    Surface(
+        color = Color.White,
+        shadowElevation = 0.dp
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
+            // Logo row
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = rememberAsyncImagePainter(R.drawable.wlist_logo),
+                    contentDescription = "Logo",
+                    modifier = Modifier
+                        .width(70.dp)
+                        .height(30.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Categories row
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, top = 5.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,         // Center them horizontally
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Food", modifier = Modifier.clickable { /* Handle click action */ })
-                Text("Bars", modifier = Modifier.clickable { /* Handle click action */ })
-                Text("Adventures", modifier = Modifier.clickable { /* Handle click action */ })
-                Text("Parks", modifier = Modifier.clickable { /* Handle click action */ })
-                Text("Activities", modifier = Modifier.clickable { /* Handle click action */ })
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    categories.forEach { category ->
+                        if (category == selectedCategory.value) {
+                            // Selected category: Blue pill
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(Color(0xFFE8F0FE))
+                                    .clickable { selectedCategory.value = category }
+                            ) {
+                                Text(
+                                    text = category,
+                                    color = Color(0xFF176FF2),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                )
+                            }
+                        } else {
+                            // Non-selected category: Gray text
+                            Text(
+                                text = category,
+                                color = Color.Gray,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier
+                                    .clickable { selectedCategory.value = category }
+                                    .padding(horizontal = 8.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -141,20 +194,30 @@ fun TopBarCategories() {
 
 @Composable
 fun BottomNavigationBar() {
-    NavigationBar {
+    NavigationBar(
+        containerColor = Color.White,
+        tonalElevation = 8.dp,
+        modifier = Modifier.height(72.dp)
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
+
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-            label = { Text("Home") },
             selected = true,
-            onClick = {}
+            onClick = { }
         )
+
+        Spacer(modifier = Modifier.width(1.dp))
+
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
-            label = { Text("Profile") },
-            selected = true,
-            onClick = {}
+            selected = false,
+            onClick = { }
         )
-    }}
+
+        Spacer(modifier = Modifier.weight(1f))
+    }
+}
 
 /**
  * Composable that displays the about text plus "Show More", but
