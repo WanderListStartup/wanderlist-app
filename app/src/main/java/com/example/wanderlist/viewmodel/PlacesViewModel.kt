@@ -10,11 +10,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import android.util.Log
+import kotlin.math.log
 
 class PlacesViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = PlacesRepository(application.applicationContext)
     private val _places = MutableStateFlow<List<PlaceDetails>>(emptyList())
+    private val TAG = "PlacesViewModel"
     val places: StateFlow<List<PlaceDetails>> = _places
 
     init {
@@ -27,24 +29,15 @@ class PlacesViewModel(application: Application) : AndroidViewModel(application) 
      */
 
     private fun fetchPlaces() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.fetchAndStorePlaces(
-                onComplete = { places ->
-                    Log.d("PlacesViewModel", "Fetched and stored ${places.size} places locally")
-                    // Retrieve stored places, or fallback to the fetched places.
-                    val storedPlaces = repository.getStoredPlaces() ?: places
-                    Log.d("PlacesViewModel", "Retrieved ${storedPlaces.size} stored places")
-
-                    // Update state on the main thread.
-                    launch(Dispatchers.Main) {
-                        _places.value = storedPlaces
-                        Log.d("PlacesViewModel", "Places updated in ViewModel")
-                    }
-                },
-                onError = { exception ->
-                    Log.e("PlacesViewModel", "Error fetching places: ${exception.message}")
-                }
-            )
+        Log.d("PlacesViewModel", "fetchPlaces: startingfetch")
+        viewModelScope.launch(Dispatchers.IO){
+            Log.d(TAG, "fetchPlaces: starting async repo fetch")
+            val placeDetails = repository.fetchAndStorePlaces()
+            Log.d(TAG, "fetchPlaces: after async repo fetch got: $placeDetails")
+            launch(Dispatchers.Main){
+                Log.d(TAG, "fetchPlaces: updating state")
+               _places.value = placeDetails 
+            }
         }
     }
 

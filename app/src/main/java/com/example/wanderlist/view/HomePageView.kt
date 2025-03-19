@@ -34,7 +34,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import coil.compose.rememberAsyncImagePainter
 
-// 1) Simple data class
 data class Place(
     val name: String,
     val rating: Double,
@@ -151,15 +150,11 @@ fun BottomNavigationBar() {
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
             label = { Text("Profile") },
-            selected = true,
+            selected = false,
             onClick = {}
         )
     }}
 
-/**
- * Composable that displays the about text plus "Show More", but
- * **only** the "Show More" portion is clickable.
- */
 @Composable
 fun AboutTextWithShowMore(
     text: String,
