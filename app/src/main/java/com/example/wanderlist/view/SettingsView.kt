@@ -39,10 +39,6 @@ fun SettingsView(
     viewModel: SettingsViewModel = viewModel()
 ) {
 
-    var isPrivateAccount by remember { mutableStateOf(false) }
-    var isNotificationsEnabled by remember { mutableStateOf(true) }
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
