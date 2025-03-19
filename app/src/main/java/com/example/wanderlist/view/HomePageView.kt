@@ -8,9 +8,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -27,6 +25,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import coil.compose.rememberAsyncImagePainter
 
 // 1) Simple data class
@@ -103,7 +108,7 @@ fun HomeScreen(places: List<Place>) {
 
 @Composable
 fun TopBarCategories() {
-    Surface(elevation = 4.dp) {
+    Surface(shadowElevation = 4.dp) {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Logo image at the top left
             Image(
@@ -136,19 +141,20 @@ fun TopBarCategories() {
 
 @Composable
 fun BottomNavigationBar() {
-    BottomNavigation {
-        BottomNavigationItem(
+    NavigationBar {
+        NavigationBarItem(
             icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
+            label = { Text("Home") },
             selected = true,
-            onClick = { /* ... */ }
+            onClick = {}
         )
-        BottomNavigationItem(
+        NavigationBarItem(
             icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
-            selected = false,
-            onClick = { /* ... */ }
+            label = { Text("Profile") },
+            selected = true,
+            onClick = {}
         )
-    }
-}
+    }}
 
 /**
  * Composable that displays the about text plus "Show More", but
@@ -177,21 +183,15 @@ fun AboutTextWithShowMore(
     }
 
     // Use ClickableText so only the "Show More" region is clickable
-    ClickableText(
+    Text(
         text = annotatedText,
-        style = MaterialTheme.typography.body2,
+        style = MaterialTheme.typography.bodyMedium,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
-        onClick = { offset ->
-            // Check if the user clicked in the "SHOW_MORE" region
-            annotatedText.getStringAnnotations("SHOW_MORE", start = offset, end = offset)
-                .firstOrNull()?.let {
-                    // If so, invoke the callback
-                    onShowMoreClick()
-                }
+        modifier = Modifier.clickable {
+            onShowMoreClick()
         }
-    )
-}
+    )}
 
 @Composable
 fun PlaceContent(place: Place) {
@@ -213,7 +213,7 @@ fun PlaceContent(place: Place) {
         ) {
             Text(
                 text = place.name,
-                style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "⭐ ${place.rating}")
@@ -253,7 +253,7 @@ fun PlaceContent(place: Place) {
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "About",
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(start = 20.dp, bottom = 4.dp)
         )
 
@@ -302,18 +302,18 @@ fun AdditionalDetailsSection() {
     Column(
         modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp)
     ) {
-        Text("Menu", style = MaterialTheme.typography.h6)
-        Text("http://naughters.com", style = MaterialTheme.typography.body2)
+        Text("Menu", style = MaterialTheme.typography.titleLarge)
+        Text("http://naughters.com", style = MaterialTheme.typography.bodyMedium)
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text("Address/Contact", style = MaterialTheme.typography.h6)
+        Text("Address/Contact", style = MaterialTheme.typography.titleLarge)
         Text(
             text = "136 2nd St, Troy, NY 12180\n(518) 238-3130",
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text("Hour of Operations", style = MaterialTheme.typography.h6)
+        Text("Hour of Operations", style = MaterialTheme.typography.titleLarge)
         Text(
             text = """
                 Monday 6AM–3PM
@@ -324,11 +324,11 @@ fun AdditionalDetailsSection() {
                 Saturday 8AM–5PM
                 Sunday 8AM–5PM
             """.trimIndent(),
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text("Accessibility", style = MaterialTheme.typography.h6)
-        Text("Wheelchair Accessible", style = MaterialTheme.typography.body2)
+        Text("Accessibility", style = MaterialTheme.typography.titleLarge)
+        Text("Wheelchair Accessible", style = MaterialTheme.typography.bodyMedium)
     }
 }
