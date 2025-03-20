@@ -1,32 +1,63 @@
 package com.example.wanderlist.viewmodel
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import android.util.Log
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.lifecycle.viewModelScope
 import com.example.wanderlist.R
+import com.example.wanderlist.repository.UserProfileRepository
+import com.example.wanderlist.repository.UserProfile
+import com.example.wanderlist.model.AuthDataStore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class EditProfileViewModel : ViewModel() {
-    // State variables for user profile
-    var name by mutableStateOf("Josh")
+@HiltViewModel
+class EditProfileViewModel @Inject constructor(
+    private val userProfileRepository: UserProfileRepository,
+    private val authDataStore: AuthDataStore
+) : ViewModel() {
+
+    // These values will be loaded from Firestore
+    var name by mutableStateOf("")
         private set
-    var username by mutableStateOf("imjosh")
+    var username by mutableStateOf("")
         private set
-    var bio by mutableStateOf("I like Taco Bell.")
+    var bio by mutableStateOf("")
         private set
-    var location by mutableStateOf("Troy, NY")
+    var location by mutableStateOf("")
         private set
-    var gender by mutableStateOf("Male")
+    var gender by mutableStateOf("")
         private set
+
+    // For profile picture, you might handle it separately. We'll keep a default.
     var profilePicture by mutableIntStateOf(R.drawable.lebron)
         private set
 
-    // Functions to update state variables
+    init {
+        loadUserProfile()
+    }
+
+    private fun loadUserProfile() {
+        viewModelScope.launch {
+            val currentUser = authDataStore.getCurrentUser()
+            if (currentUser != null) {
+                val profile: UserProfile? = userProfileRepository.getUserProfile(currentUser.uid)
+                profile?.let {
+                    name = it.name
+                    username = it.username
+                    bio = it.bio
+                    location = it.location
+                    gender = it.gender
+                }
+            }
+        }
+    }
+
     fun onNameChange(newName: String) {
         name = newName
-        Log.d("EditProfileViewModel", "Firestore update: Name changed to $newName")
     }
 
     fun onUsernameChange(newUsername: String) {
@@ -44,13 +75,4 @@ class EditProfileViewModel : ViewModel() {
     fun onGenderChange(newGender: String) {
         gender = newGender
     }
-/*    fun onProfilePictureChange(newImageRes: Int) {
-        profilePicture = newImageRes
-    }*/
-
-    fun saveProfile() {
-        Log.d("EditProfileViewModel", "Profile saved: name=$name, username=$username, bio=$bio, location=$location, gender=$gender")
-        // TODO: Implement the actual save logic, e.g., Firestore update.
-    }
-
 }

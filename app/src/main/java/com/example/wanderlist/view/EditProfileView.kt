@@ -1,5 +1,6 @@
 package com.example.wanderlist.view
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -18,46 +19,47 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.wanderlist.components.BackCircle
-import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.components.EditProfileTextField
 import com.example.wanderlist.components.LoginTitle
 import com.example.wanderlist.components.ProfilePictureCircle
 import com.example.wanderlist.components.SectionTitle
+import com.example.wanderlist.model.AuthDataStore
 import com.example.wanderlist.ui.theme.Montserrat
+import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.EditProfileViewModel
+import com.example.wanderlist.viewmodel.AuthViewModel
 
 @Composable
 fun EditProfileView(
-    viewModel: EditProfileViewModel = viewModel(),
+    viewModel: EditProfileViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel
 ) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-
+        // Header with Back button and Title
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 50.dp)
         ) {
-            // BackCircle aligned at the start.
             Box(modifier = Modifier.align(Alignment.CenterStart)) {
                 BackCircle()
             }
-
-            // LoginTitle centered in the Box.
             Box(modifier = Modifier.align(Alignment.Center)) {
                 LoginTitle("Edit Profile")
             }
         }
 
-        // profile picture circle below the header
+        // Profile picture display
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -70,19 +72,6 @@ fun EditProfileView(
         }
 
         Spacer(modifier = Modifier.height(14.dp))
-
-/*        Text(
-            text = "Change Profile Picture",
-            fontSize = 14.sp,
-            fontFamily = Montserrat,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .clickable { viewModel.onProfilePictureChange() }
-                .padding(top = 8.dp),
-            color = Color(0xFF196EEE)
-        )*/
-
         Spacer(modifier = Modifier.height(28.dp))
 
         Column(
@@ -90,14 +79,10 @@ fun EditProfileView(
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp)
         ) {
-            SectionTitle(
-                "About You"
-            )
-
+            SectionTitle("About You")
             Spacer(modifier = Modifier.height(8.dp))
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
-
 
             EditProfileTextField(
                 label = "Name",
@@ -108,7 +93,6 @@ fun EditProfileView(
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
 
-
             EditProfileTextField(
                 label = "Username",
                 value = viewModel.username,
@@ -117,7 +101,6 @@ fun EditProfileView(
             Spacer(modifier = Modifier.height(8.dp))
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
-
 
             EditProfileTextField(
                 label = "Bio",
@@ -128,7 +111,6 @@ fun EditProfileView(
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
 
-
             EditProfileTextField(
                 label = "Location",
                 value = viewModel.location,
@@ -137,7 +119,6 @@ fun EditProfileView(
             Spacer(modifier = Modifier.height(8.dp))
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
-
 
             EditProfileTextField(
                 label = "Gender",
@@ -148,9 +129,26 @@ fun EditProfileView(
             HorizontalDivider()
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Save button at the bottom.
+            // Save button calls AuthViewModel to update Firestore
             Button(
-                onClick = { viewModel.saveProfile() },
+                onClick = {
+                    authViewModel.updateUserProfileSettings(
+                        name = viewModel.name,
+                        username = viewModel.username,
+                        bio = viewModel.bio,
+                        location = viewModel.location,
+                        gender = viewModel.gender
+                    ) { result ->
+                        when (result) {
+                            is AuthDataStore.Result.Success -> {
+                                Toast.makeText(context, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                            }
+                            is AuthDataStore.Result.Error -> {
+                                Toast.makeText(context, result.exception.message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                },
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = wanderlistBlue),
                 modifier = Modifier
@@ -158,11 +156,9 @@ fun EditProfileView(
                     .align(Alignment.End)
                     .height(48.dp)
             ) {
-                Text("Save")
+                Text("Save", fontSize = 16.sp)
             }
-
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
-
