@@ -27,9 +27,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.R
 import com.example.wanderlist.ui.theme.wanderlistBlue
+import com.example.wanderlist.viewmodel.EditProfileViewModel
 
 @Preview(showBackground = true)
 @Composable
@@ -39,7 +41,7 @@ fun ProfileViewPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileView() {
+fun ProfileView(viewModel: EditProfileViewModel = viewModel()) {
     val selectedTab = remember { mutableStateOf(0) }
 
     Scaffold(
@@ -92,14 +94,14 @@ fun ProfileView() {
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = "Jake Paul",
+                        text = viewModel.name,
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                         fontSize = 32.sp,
                         modifier = Modifier.padding(PaddingValues(start = 36.dp))
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "@jtrex_44",
+                        text = viewModel.username,
                         modifier = Modifier.padding(PaddingValues(start = 38.dp)),
                         style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
                     )
@@ -136,7 +138,7 @@ fun ProfileView() {
                     contentScale = ContentScale.Fit
                 )
                 Text(
-                    text = "Troy, NY",
+                    text = viewModel.location,
                     fontSize = 12.sp,
                     style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
                 )
@@ -170,7 +172,7 @@ fun ProfileView() {
                 Spacer(modifier = Modifier.width(4.dp))
             }
             Text(
-                text = "I am a huge foodie, local to the Troy Area! My goal is to collect as many badges as I can!",
+                text = viewModel.bio,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(PaddingValues(start = 15.dp, end = 30.dp))
@@ -243,6 +245,24 @@ fun ProfileView() {
             ) {
                 when (selectedTab.value) {
                     0 -> {
+                        Text(
+                            text = "Liked tab content here",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    1 -> {
+                        Text(
+                            text = "Quest tab content here",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    2 -> {
                         Spacer(modifier = Modifier.height(15.dp))
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally
@@ -329,24 +349,6 @@ fun ProfileView() {
                             // ... additional rows as needed
                         }
                         Spacer(modifier = Modifier.height(24.dp))
-                    }
-                    1 -> {
-                        Text(
-                            text = "Search tab content here",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    2 -> {
-                        Text(
-                            text = "Profile tab content here",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            textAlign = TextAlign.Center
-                        )
                     }
                 }
             }
