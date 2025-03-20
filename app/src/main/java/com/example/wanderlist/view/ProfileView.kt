@@ -215,7 +215,6 @@ fun ProfileView(
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            val tabs = listOf(Icons.Filled.Home, Icons.Filled.Search, Icons.Filled.Person)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -241,13 +240,12 @@ fun ProfileView(
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            // IMPORTANT CHANGE: Extra bottom padding for scrollable content
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .padding(bottom = 72.dp) // Enough space to keep items from being hidden by bottom bar
+                    .padding(bottom = 72.dp)
             ) {
                 when (selectedTab.value) {
                     0 -> {
