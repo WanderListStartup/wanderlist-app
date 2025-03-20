@@ -44,9 +44,9 @@ class EditProfileViewModel : ViewModel() {
     fun onGenderChange(newGender: String) {
         gender = newGender
     }
-    fun onProfilePictureChange(newImageRes: Int) {
+/*    fun onProfilePictureChange(newImageRes: Int) {
         profilePicture = newImageRes
-    }
+    }*/
 
     fun saveProfile() {
         Log.d("EditProfileViewModel", "Profile saved: name=$name, username=$username, bio=$bio, location=$location, gender=$gender")
