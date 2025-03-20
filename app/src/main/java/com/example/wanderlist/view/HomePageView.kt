@@ -281,15 +281,19 @@ fun PlaceContent(place: PlaceDetails) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = place.displayName ?: "NO NAME FOUND?",
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = place.displayName ?: "no display names",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
+            }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "⭐ ${place.rating}")
                 Spacer(modifier = Modifier.width(170.dp))
                 Text(
-                    text = "${place.distance} mi",
+                    text = "${String.format("%.1f", place.distance)} mi",
                     color = Color(0xFF176FF2)
                 )
                 Image(
@@ -300,6 +304,7 @@ fun PlaceContent(place: PlaceDetails) {
                         .height(40.dp)
                 )
             }
+
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -330,7 +335,7 @@ fun PlaceContent(place: PlaceDetails) {
         // Only "Show More" is clickable here
         Box(modifier = Modifier.padding(start = 40.dp, bottom = 8.dp)) {
             AboutTextWithShowMore(
-                text = place.editorialSummary ?: "no summary",
+                text = place.editorialSummary ?: "No Editorial Summary Available",
                 maxLines = 4,
                 onShowMoreClick = {
                     // Handle "Show More" click here (e.g., expand text, navigate, etc.)
