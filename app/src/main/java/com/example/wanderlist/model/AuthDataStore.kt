@@ -1,3 +1,4 @@
+// AuthDataStore.kt
 package com.example.wanderlist.model
 
 import android.content.Context
@@ -6,7 +7,6 @@ import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
-import com.example.wanderlist.R
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 import com.google.firebase.auth.FirebaseAuth
@@ -16,19 +16,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class AuthDataStore
-    @Inject
-    constructor(
-        @ApplicationContext private val context: Context,
-        private val googleOAuthClientID: String,
-        private val auth: FirebaseAuth,
-    ) {
-        private var credentialManager: CredentialManager = CredentialManager.create(context)
+class AuthDataStore @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val googleOAuthClientID: String,
+    private val auth: FirebaseAuth
+) {
+    private var credentialManager: CredentialManager = CredentialManager.create(context)
 
-        // Google OAuth
-        fun getGoogleOAuthClientID(): String {
-            return context.getString(R.string.googleOAuthClientID)
-        }
+    // Return the injected Google OAuth client ID.
+    fun getGoogleOAuthClientID(): String = googleOAuthClientID
 
         suspend fun startGoogleOAuth(request: GetCredentialRequest): Result {
             try {
@@ -99,9 +95,9 @@ class AuthDataStore
             auth.signOut()
         }
 
-        sealed class Result {
-            data class Success(val user: FirebaseUser) : Result()
-
-            data class Error(val exception: Exception) : Result()
-        }
+    sealed class Result {
+        data class Success(val user: FirebaseUser) : Result()
+        data class Error(val exception: Exception) : Result()
     }
+}
+

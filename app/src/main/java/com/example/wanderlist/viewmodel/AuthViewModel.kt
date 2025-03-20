@@ -4,6 +4,8 @@ import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wanderlist.model.AuthDataStore
+import com.example.wanderlist.repository.UserProfile
+import com.example.wanderlist.repository.UserProfileRepository
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,17 +14,125 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel
-    @Inject
-    constructor(
-        private val authDataStore: AuthDataStore,
-    ) : ViewModel() {
-        private val _authState = MutableStateFlow<AuthState>(AuthState.UnAuthenticated)
-        val authState: StateFlow<AuthState> = _authState
+class AuthViewModel @Inject constructor(
+    private val authDataStore: AuthDataStore,
+    private val userProfileRepository: UserProfileRepository
+) : ViewModel() {
 
-        init {
-            checkAuth()
+    private val _authState = MutableStateFlow<AuthState>(AuthState.UnAuthenticated)
+    val authState: StateFlow<AuthState> = _authState
+
+    init {
+        checkAuth()
+    }
+
+    fun registerWithEmailAndPasswordAndProfile(
+        name: String,
+        username: String,
+        bio: String,
+        location: String,
+        gender: String,
+        dob: String,
+        email: String,
+        password: String,
+        phone: String,
+        isPrivateAccount: Boolean,
+        isNotificationsEnabled: Boolean,
+        callback: (result: AuthDataStore.Result) -> Unit
+    ) {
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            val result = authDataStore.registerWithEmailAndPassword(email, password)
+            if (result is AuthDataStore.Result.Success) {
+                val user = authDataStore.getCurrentUser()
+                if (user != null) {
+                    try {
+                        val profile = UserProfile(
+                            uid = user.uid,
+                            name = name,
+                            username = username,
+                            bio = bio,
+                            location = location,
+                            gender = gender,
+                            dob = dob,
+                            email = email,
+                            phone = phone,
+                            isPrivateAccount = isPrivateAccount,
+                            isNotificationsEnabled = isNotificationsEnabled
+                        )
+                        userProfileRepository.createUserProfile(profile)
+                        _authState.value = AuthState.Authenticated
+                    } catch (e: Exception) {
+                        _authState.value = AuthState.Error(e.message ?: "Failed to create user profile")
+                    }
+                } else {
+                    _authState.value = AuthState.Error("User UID is null")
+                }
+            } else if (result is AuthDataStore.Result.Error) {
+                _authState.value = AuthState.Error(result.exception.message ?: "Registration failed")
+            }
+            callback(result)
         }
+    }
+
+    fun updateUserSettings(
+        phone: String,
+        email: String,
+        isPrivateAccount: Boolean,
+        isNotificationsEnabled: Boolean,
+        callback: (result: AuthDataStore.Result) -> Unit
+    ) {
+        viewModelScope.launch {
+            val currentUser = authDataStore.getCurrentUser()
+            if (currentUser != null) {
+                val updatedFields = mapOf(
+                    "phone" to phone,
+                    "email" to email,
+                    "isPrivateAccount" to isPrivateAccount,
+                    "isNotificationsEnabled" to isNotificationsEnabled
+                )
+                try {
+                    userProfileRepository.updateUserProfile(currentUser.uid, updatedFields)
+                    callback(AuthDataStore.Result.Success(currentUser))
+                } catch (e: Exception) {
+                    callback(AuthDataStore.Result.Error(e))
+                }
+            } else {
+                callback(AuthDataStore.Result.Error(Exception("User not logged in")))
+            }
+        }
+    }
+
+    fun updateUserProfileSettings(
+        name: String,
+        username: String,
+        bio: String,
+        location: String,
+        gender: String,
+        callback: (result: AuthDataStore.Result) -> Unit
+    ) {
+        viewModelScope.launch {
+            val currentUser = authDataStore.getCurrentUser()
+            if (currentUser != null) {
+                val updatedFields = mapOf(
+                    "name" to name,
+                    "username" to username,
+                    "bio" to bio,
+                    "location" to location,
+                    "gender" to gender
+                )
+                try {
+                    userProfileRepository.updateUserProfile(currentUser.uid, updatedFields)
+                    callback(AuthDataStore.Result.Success(currentUser))
+                } catch (e: Exception) {
+                    callback(AuthDataStore.Result.Error(e))
+                }
+            } else {
+                callback(AuthDataStore.Result.Error(Exception("User not logged in")))
+            }
+        }
+    }
+
 
         fun checkAuth() {
             val user = authDataStore.getCurrentUser()

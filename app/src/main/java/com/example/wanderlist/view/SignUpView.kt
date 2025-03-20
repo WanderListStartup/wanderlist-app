@@ -1,3 +1,4 @@
+// SignUpView.kt
 package com.example.wanderlist.view
 
 import android.widget.Toast
@@ -31,9 +32,11 @@ fun SignUpView(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
     viewModel: SignUpViewModel = viewModel(),
-    onBack: () -> Unit, // New parameter for back navigation
+    onBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     onNavigateToHome: () -> Unit,
+    onNavigateToProfileSettings: () -> Unit
 ) {
     val context = LocalContext.current
     Box(
@@ -47,7 +50,6 @@ fun SignUpView(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Back button at the top left
             IconButton(
                 onClick = onBack,
                 modifier = Modifier.align(Alignment.Start),
@@ -57,8 +59,6 @@ fun SignUpView(
                     contentDescription = "Back",
                 )
             }
-
-            // Heading Section
             Text(
                 text = "Welcome!",
                 style =
@@ -82,8 +82,6 @@ fun SignUpView(
                         .align(Alignment.Start)
                         .padding(top = 4.dp),
             )
-
-            // Subheading with login option
             Row(
                 modifier =
                     Modifier
@@ -97,7 +95,6 @@ fun SignUpView(
                     fontWeight = FontWeight.Bold,
                     fontFamily = WorkSans,
                 )
-
                 Text(
                     modifier = Modifier.clickable { onNavigateToLogin() },
                     text = "Login",
@@ -107,10 +104,7 @@ fun SignUpView(
                     fontSize = 14.sp,
                 )
             }
-
             Spacer(modifier = Modifier.height(24.dp))
-
-            // Input Fields with adjusted width and spacing
             OutlinedTextField(
                 value = viewModel.name,
                 onValueChange = { viewModel.onNameChange(it) },
@@ -126,7 +120,7 @@ fun SignUpView(
                 shape = RoundedCornerShape(12.dp),
             )
             Spacer(modifier = Modifier.height(10.dp))
-
+            // The "City" field from the front end.
             OutlinedTextField(
                 value = viewModel.city,
                 onValueChange = { viewModel.onCityChange(it) },
@@ -142,7 +136,6 @@ fun SignUpView(
                 shape = RoundedCornerShape(12.dp),
             )
             Spacer(modifier = Modifier.height(24.dp))
-
             OutlinedTextField(
                 value = viewModel.dob,
                 onValueChange = { viewModel.onDobChange(it) },
@@ -158,7 +151,6 @@ fun SignUpView(
                 shape = RoundedCornerShape(12.dp),
             )
             Spacer(modifier = Modifier.height(10.dp))
-
             OutlinedTextField(
                 value = viewModel.email,
                 onValueChange = { viewModel.onEmailChange(it) },
@@ -174,7 +166,6 @@ fun SignUpView(
                 shape = RoundedCornerShape(12.dp),
             )
             Spacer(modifier = Modifier.height(10.dp))
-
             OutlinedTextField(
                 value = viewModel.password,
                 onValueChange = { viewModel.onPasswordChange(it) },
@@ -190,7 +181,6 @@ fun SignUpView(
                 shape = RoundedCornerShape(12.dp),
             )
             Spacer(modifier = Modifier.height(10.dp))
-
             OutlinedTextField(
                 value = viewModel.confirmPassword,
                 onValueChange = { viewModel.onConfirmPasswordChange(it) },
@@ -206,15 +196,25 @@ fun SignUpView(
                 shape = RoundedCornerShape(12.dp),
             )
             Spacer(modifier = Modifier.height(10.dp))
-
             Spacer(modifier = Modifier.height(10.dp))
-            // "Create New Account" button
             Button(
                 onClick = {
-                    authViewModel.registerWithEmailAndPassword(viewModel.email, viewModel.password) { result ->
+                    // Pass the city field as the backend location.
+                    authViewModel.registerWithEmailAndPasswordAndProfile(
+                        name = viewModel.name,
+                        username = "",
+                        bio = "",
+                        location = viewModel.city, // Use the city input as the location field
+                        gender = "",
+                        dob = viewModel.dob,
+                        email = viewModel.email,
+                        password = viewModel.password,
+                        phone = "",
+                        isPrivateAccount = true,
+                        isNotificationsEnabled = true
+                    ) { result ->
                         when (result) {
                             is AuthDataStore.Result.Success -> onNavigateToHome()
-                            // need an error page
                             is AuthDataStore.Result.Error ->
                                 Toast.makeText(context, result.exception.message, Toast.LENGTH_SHORT).show()
                         }
@@ -233,10 +233,7 @@ fun SignUpView(
                     fontWeight = FontWeight.Bold,
                 )
             }
-
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Divider with "or"
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -257,10 +254,7 @@ fun SignUpView(
                             .align(Alignment.CenterVertically),
                 )
             }
-
             Spacer(modifier = Modifier.height(16.dp))
-
-            // "Sign Up with Google" button (without icon)
             OutlinedButton(
                 onClick = { /* handle Google sign-up here */ },
                 modifier =
