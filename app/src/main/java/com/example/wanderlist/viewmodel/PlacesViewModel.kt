@@ -1,6 +1,7 @@
 package com.example.wanderlist.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wanderlist.data.model.PlaceDetails
@@ -9,10 +10,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import android.util.Log
 
-class PlacesViewModel(application: Application) : AndroidViewModel(application) {
+const val TAG = "PlacesViewModel"
 
+class PlacesViewModel(
+    application: Application,
+) : AndroidViewModel(application) {
     private val repository = PlacesRepository(application.applicationContext)
     private val _places = MutableStateFlow<List<PlaceDetails>>(emptyList())
     val places: StateFlow<List<PlaceDetails>> = _places
@@ -27,25 +30,14 @@ class PlacesViewModel(application: Application) : AndroidViewModel(application) 
      */
 
     private fun fetchPlaces() {
+        Log.d("PlacesViewModel", "fetchPlaces: startingfetch")
         viewModelScope.launch(Dispatchers.IO) {
-            repository.fetchAndStorePlaces(
-                onComplete = { places ->
-                    Log.d("PlacesViewModel", "Fetched and stored ${places.size} places locally")
-                    // Retrieve stored places, or fallback to the fetched places.
-                    val storedPlaces = repository.getStoredPlaces() ?: places
-                    Log.d("PlacesViewModel", "Retrieved ${storedPlaces.size} stored places")
-
-                    // Update state on the main thread.
-                    launch(Dispatchers.Main) {
-                        _places.value = storedPlaces
-                        Log.d("PlacesViewModel", "Places updated in ViewModel")
-                    }
-                },
-                onError = { exception ->
-                    Log.e("PlacesViewModel", "Error fetching places: ${exception.message}")
-                }
-            )
+            Log.d(TAG, "fetchPlaces: starting async repo fetch")
+            val placeDetails = repository.fetchAndStorePlaces()
+            Log.d(TAG, "fetchPlaces: after async repo fetch got: $placeDetails")
+            launch(Dispatchers.Main) {
+                _places.value = placeDetails
+            }
         }
     }
-
 }

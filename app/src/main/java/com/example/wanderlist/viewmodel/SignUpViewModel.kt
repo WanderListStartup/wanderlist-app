@@ -44,5 +44,4 @@ class SignUpViewModel : ViewModel() {
     fun onCityChange(newCity: String) {
         city = newCity
     }
-
 }
