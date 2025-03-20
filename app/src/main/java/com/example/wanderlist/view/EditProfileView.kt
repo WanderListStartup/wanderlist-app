@@ -1,6 +1,7 @@
 package com.example.wanderlist.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -70,16 +71,17 @@ fun EditProfileView(
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        Text(
+/*        Text(
             text = "Change Profile Picture",
             fontSize = 14.sp,
             fontFamily = Montserrat,
             fontWeight = FontWeight.Medium,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
+                .clickable { viewModel.onProfilePictureChange() }
                 .padding(top = 8.dp),
             color = Color(0xFF196EEE)
-        )
+        )*/
 
         Spacer(modifier = Modifier.height(28.dp))
 
