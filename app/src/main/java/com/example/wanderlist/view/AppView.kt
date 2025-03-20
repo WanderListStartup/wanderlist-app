@@ -72,6 +72,26 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
                 onNavigateToProfile = {navController.navigate(route = Profile)}
             )
         }
+        composable<Settings> {
+            SettingsView(
+                onNavigateToProfile = {navController.navigate(route=Profile)},
+                authViewModel=authViewModel
+            )
+        }
+        composable<UserSettings> {
+            EditProfileView(
+                onNavigateToProfile = {navController.navigate(route=Profile)},
+                authViewModel=authViewModel
+            )
+        }
+        composable<Profile> {
+            ProfileView(
+                onNavigateToHome = { navController.navigate(route = MainView) },
+                onNavigateToSettings = {navController.navigate(route=Settings)},
+                onNavigateToUserSettings = {navController.navigate(route=UserSettings)},
+                authViewModel=authViewModel
+            )
+        }
         navigation<RegisterLoginView>(startDestination = Landing) {
             composable<Landing> {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -105,34 +125,9 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
                     authViewModel = authViewModel,
                 )
             }
-            composable<Username> {
-            }
             composable<Welcome> {
+                //implement later
             }
-
-            composable<Settings> {
-                SettingsView(
-                    onNavigateToProfile = {navController.navigate(route=Profile)},
-                    authViewModel=authViewModel
-                )
-            }
-            composable<UserSettings> {
-                EditProfileView(
-                    onNavigateToProfile = {navController.navigate(route=Profile)},
-                    authViewModel=authViewModel
-                )
-            }
-            composable<Profile> {
-                ProfileView(
-                    onNavigateToHome = { navController.navigate(route = MainView) },
-                    onNavigateToSettings = {navController.navigate(route=Settings)},
-                    onNavigateToUserSettings = {navController.navigate(route=UserSettings)},
-                    authViewModel=authViewModel
-                )
-            }
-
-
-
         }
     }
 }
