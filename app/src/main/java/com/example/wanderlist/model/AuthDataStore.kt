@@ -101,9 +101,3 @@ class AuthDataStore @Inject constructor(
     }
 }
 
-        sealed class Result {
-            data class Success(val user: FirebaseUser) : Result()
-
-            data class Error(val exception: Exception) : Result()
-        }
-    }

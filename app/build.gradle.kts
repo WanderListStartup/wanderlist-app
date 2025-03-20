@@ -85,7 +85,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation(libs.google.services)
+    implementation(libs.androidx.hilt.navigation.compose)
 
 
 

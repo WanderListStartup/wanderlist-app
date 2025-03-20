@@ -1,7 +1,6 @@
 package com.example.wanderlist.viewmodel
 
 import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wanderlist.model.AuthDataStore

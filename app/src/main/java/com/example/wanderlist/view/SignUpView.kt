@@ -39,7 +39,6 @@ fun SignUpView(
     onNavigateToProfileSettings: () -> Unit
 ) {
     val context = LocalContext.current
-    val context = LocalContext.current
     Box(
         modifier =
             modifier

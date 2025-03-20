@@ -79,12 +79,21 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
                     onNavigateToHome = { navController.navigate(route = MainView) },
                     onNavigateToLogin = { navController.navigate(route = Login) },
                     onBack = { navController.navigate(route = Landing) },
+                    onNavigateToSettings = {navController.navigate(route=Settings)},
+                    onNavigateToProfileSettings = {navController.navigate(route=UserSettings)},
                     authViewModel = authViewModel,
                 )
             }
             composable<Username> {
             }
             composable<Welcome> {
+            }
+
+            composable<Settings> {
+                SettingsView(authViewModel=authViewModel)
+            }
+            composable<UserSettings> {
+                EditProfileView(authViewModel=authViewModel)
             }
 
         }
