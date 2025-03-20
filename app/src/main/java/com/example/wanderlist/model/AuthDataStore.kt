@@ -1,3 +1,4 @@
+// AuthDataStore.kt
 package com.example.wanderlist.model
 
 import android.content.Context
@@ -5,15 +6,12 @@ import android.util.Log
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import androidx.credentials.GetCredentialRequest
-import com.example.wanderlist.R
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -23,49 +21,39 @@ class AuthDataStore @Inject constructor(
     private val googleOAuthClientID: String,
     private val auth: FirebaseAuth
 ) {
-    private var credentialManager : CredentialManager = CredentialManager.create(context)
+    private var credentialManager: CredentialManager = CredentialManager.create(context)
 
-    // Google OAuth
-    fun getGoogleOAuthClientID(): String {
-        return context.getString(R.string.googleOAuthClientID)
-    }
+    // Return the injected Google OAuth client ID.
+    fun getGoogleOAuthClientID(): String = googleOAuthClientID
 
-    suspend fun startGoogleOAuth(request: GetCredentialRequest) : Result {
+    suspend fun startGoogleOAuth(request: GetCredentialRequest): Result {
         try {
             val result = credentialManager.getCredential(context, request)
             return handleGoogleSignIn(result.credential)
-        } catch (e: Exception){
-            Log.d("GoogleOAuth", "startGoogleOAuth: getcred " + e.message)
+        } catch (e: Exception) {
+            Log.d("GoogleOAuth", "startGoogleOAuth: getCredential error: ${e.message}")
             return Result.Error(e)
         }
     }
 
-
-    suspend private fun handleGoogleSignIn(credential: Credential) : Result{
-        // Check if credential is of type Google ID
+    private suspend fun handleGoogleSignIn(credential: Credential): Result {
         if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-            // Create Google ID Token
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-
-            // Sign in to Firebase with using the token
             return firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
         } else {
             Log.w("GOOGLEOAUTH", "Credential is not of type Google ID!")
-            return Result.Error(exception = Exception("Invalid credential"))
+            return Result.Error(Exception("Invalid credential"))
         }
     }
-    // [END handle_sign_in]
 
-    // [START auth_with_google]
-     suspend private fun firebaseAuthWithGoogle(idToken: String) : Result {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
+    private suspend fun firebaseAuthWithGoogle(idToken: String): Result {
+        val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
         return try {
-            val result = auth.signInWithCredential(credential).await()
+            val result = auth.signInWithCredential(firebaseCredential).await()
             Result.Success(result.user!!)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Result.Error(e)
         }
-
     }
 
     // Email/Password Authentication
@@ -87,9 +75,7 @@ class AuthDataStore @Inject constructor(
         }
     }
 
-    fun getCurrentUser(): FirebaseUser? {
-        return auth.currentUser
-    }
+    fun getCurrentUser(): FirebaseUser? = auth.currentUser
 
     fun logout() {
         auth.signOut()

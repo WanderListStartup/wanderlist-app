@@ -1,6 +1,5 @@
 package com.example.wanderlist.view
 
-import android.preference.PreferenceActivity.Header
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column

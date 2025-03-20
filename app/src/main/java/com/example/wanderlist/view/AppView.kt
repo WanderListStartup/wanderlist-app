@@ -43,6 +43,8 @@ import kotlinx.serialization.Serializable
 @Serializable object Register
 @Serializable object Username
 @Serializable object Welcome
+@Serializable object Settings
+@Serializable object UserSettings
 
 @Composable
 fun AppView(
@@ -105,6 +107,8 @@ fun AppView(
                         onNavigateToHome = {navController.navigate(route=MainView)},
                         onNavigateToLogin = {navController.navigate(route=Login)},
                         onBack = {navController.navigate(route=Landing)},
+                        onNavigateToSettings = {navController.navigate(route=Settings)},
+                        onNavigateToProfileSettings = {navController.navigate(route=UserSettings)},
                         authViewModel=authViewModel
                     )
                 }
@@ -114,7 +118,14 @@ fun AppView(
                 composable<Welcome>{
 
                 }
+                composable<Settings> {
+                    SettingsView(authViewModel=authViewModel)
+                }
+                composable<UserSettings> {
+                    EditProfileView(authViewModel=authViewModel)
+                }
             }
+
         }
 
 }

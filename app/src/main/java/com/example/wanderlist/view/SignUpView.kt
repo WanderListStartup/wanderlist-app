@@ -1,3 +1,4 @@
+// SignUpView.kt
 package com.example.wanderlist.view
 
 import android.widget.Toast
@@ -32,7 +33,9 @@ fun SignUpView(
     viewModel: SignUpViewModel = viewModel(),
     onBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
-    onNavigateToHome: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onNavigateToHome: () -> Unit,
+    onNavigateToProfileSettings: () -> Unit
 ) {
     val context = LocalContext.current
     Box(
@@ -45,7 +48,6 @@ fun SignUpView(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Back button
             IconButton(
                 onClick = onBack,
                 modifier = Modifier.align(Alignment.Start)
@@ -55,8 +57,6 @@ fun SignUpView(
                     contentDescription = "Back"
                 )
             }
-
-            // Heading Section
             Text(
                 text = "Welcome!",
                 style = TextStyle(
@@ -77,8 +77,6 @@ fun SignUpView(
                     .align(Alignment.Start)
                     .padding(top = 4.dp)
             )
-
-            // Subheading with login option
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -100,73 +98,114 @@ fun SignUpView(
                     fontSize = 14.sp
                 )
             }
-
             Spacer(modifier = Modifier.height(24.dp))
-
-            // Input Fields (Name, City, DOB, Email, Password, Confirm Password)
             OutlinedTextField(
                 value = viewModel.name,
                 onValueChange = { viewModel.onNameChange(it) },
-                label = { Text("Name", fontWeight = FontWeight.Bold, fontSize = 15.sp) },
+                label = {
+                    Text(
+                        "Name",
+                        lineHeight = 35.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(0.95f),
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(10.dp))
-
+            // The "City" field from the front end.
             OutlinedTextField(
                 value = viewModel.city,
                 onValueChange = { viewModel.onCityChange(it) },
-                label = { Text("City", fontWeight = FontWeight.Bold, fontSize = 15.sp) },
+                label = {
+                    Text(
+                        "City",
+                        lineHeight = 35.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(0.95f),
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(24.dp))
-
             OutlinedTextField(
                 value = viewModel.dob,
                 onValueChange = { viewModel.onDobChange(it) },
-                label = { Text("Date of Birth", fontWeight = FontWeight.Bold, fontSize = 15.sp) },
+                label = {
+                    Text(
+                        "Date of Birth",
+                        lineHeight = 35.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(0.95f),
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(10.dp))
-
             OutlinedTextField(
                 value = viewModel.email,
                 onValueChange = { viewModel.onEmailChange(it) },
-                label = { Text("Email", fontWeight = FontWeight.Bold, fontSize = 15.sp) },
+                label = {
+                    Text(
+                        "Email",
+                        lineHeight = 35.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(0.95f),
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(10.dp))
-
             OutlinedTextField(
                 value = viewModel.password,
                 onValueChange = { viewModel.onPasswordChange(it) },
-                label = { Text("Password", fontWeight = FontWeight.Bold, fontSize = 15.sp) },
+                label = {
+                    Text(
+                        "Password",
+                        lineHeight = 35.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(0.95f),
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(10.dp))
-
             OutlinedTextField(
                 value = viewModel.confirmPassword,
                 onValueChange = { viewModel.onConfirmPasswordChange(it) },
-                label = { Text("Confirm Password", fontWeight = FontWeight.Bold, fontSize = 15.sp) },
+                label = {
+                    Text(
+                        "Confirm Password",
+                        lineHeight = 35.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(0.95f),
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(10.dp))
-
-            // "Create New Account" button
+            Spacer(modifier = Modifier.height(10.dp))
             Button(
                 onClick = {
+                    // Pass the city field as the backend location.
                     authViewModel.registerWithEmailAndPasswordAndProfile(
                         name = viewModel.name,
+                        username = "",
+                        bio = "",
+                        location = viewModel.city, // Use the city input as the location field
+                        gender = "",
                         dob = viewModel.dob,
                         email = viewModel.email,
                         password = viewModel.password,
-                        city = viewModel.city
+                        phone = "",
+                        isPrivateAccount = true,
+                        isNotificationsEnabled = true
                     ) { result ->
                         when (result) {
                             is AuthDataStore.Result.Success -> onNavigateToHome()
@@ -187,8 +226,6 @@ fun SignUpView(
                     fontWeight = FontWeight.Bold
                 )
             }
-
-            // Rest of your UI (dividers, alternative sign up options, etc.) remains unchanged.
             Spacer(modifier = Modifier.height(16.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
