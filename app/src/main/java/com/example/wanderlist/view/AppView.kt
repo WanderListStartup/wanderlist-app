@@ -124,16 +124,10 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
             }
             composable<Profile> {
                 ProfileView(
-                    onNavigateToHome = { navController.navigate(route = HomeView) },
+                    onNavigateToHome = { navController.navigate(route = MainView) },
                     onNavigateToSettings = {navController.navigate(route=Settings)},
                     onNavigateToUserSettings = {navController.navigate(route=UserSettings)},
                     authViewModel=authViewModel
-                )
-            }
-            composable<HomeView> {
-                HomePageView(
-                    authViewModel = authViewModel,
-                    onNavigateToProfile = {navController.navigate(route=Profile)}
                 )
             }
 
