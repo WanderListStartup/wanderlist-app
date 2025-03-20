@@ -1,6 +1,7 @@
 package com.example.wanderlist.viewmodel
 
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wanderlist.model.AuthDataStore
@@ -134,55 +135,86 @@ class AuthViewModel @Inject constructor(
     }
 
 
-    fun checkAuth() {
-        val user = authDataStore.getCurrentUser()
-        _authState.value = if (user == null) AuthState.UnAuthenticated else AuthState.Authenticated
-    }
+        fun checkAuth() {
+            val user = authDataStore.getCurrentUser()
+            _authState.value = if (user == null) AuthState.UnAuthenticated else AuthState.Authenticated
+        }
 
-    fun googleOAuth(callback: (result: AuthDataStore.Result) -> Unit) {
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setServerClientId(authDataStore.getGoogleOAuthClientID())
-            .setFilterByAuthorizedAccounts(true)
-            .build()
+        fun googleOAuth(callback: (result: AuthDataStore.Result) -> Unit) {
+            val googleIdOption =
+                GetGoogleIdOption.Builder()
+                    .setServerClientId(authDataStore.getGoogleOAuthClientID())
+                    .setFilterByAuthorizedAccounts(true)
+                    .build()
 
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
-        viewModelScope.launch {
-            _authState.value = AuthState.Loading
-            val result = authDataStore.startGoogleOAuth(request)
-            _authState.value = when (result) {
-                is AuthDataStore.Result.Success -> AuthState.Authenticated
-                is AuthDataStore.Result.Error -> AuthState.Error(result.exception.message ?: "Login failed")
-                else -> AuthState.UnAuthenticated
+            val request =
+                GetCredentialRequest.Builder()
+                    .addCredentialOption(googleIdOption)
+                    .build()
+            viewModelScope.launch {
+                _authState.value = AuthState.Loading
+                val result = authDataStore.startGoogleOAuth(request)
+                _authState.value =
+                    when (result) {
+                        is AuthDataStore.Result.Success -> AuthState.Authenticated
+                        is AuthDataStore.Result.Error -> AuthState.Error(result.exception.message ?: "Login failed")
+                        else -> AuthState.UnAuthenticated
+                    }
+                callback(result)
             }
-            callback(result)
+        }
+
+        fun loginWithEmailAndPassword(
+            email: String,
+            password: String,
+            callback: (result: AuthDataStore.Result) -> Unit,
+        ) {
+            viewModelScope.launch {
+                _authState.value = AuthState.Loading
+                val result = authDataStore.loginWithEmailAndPassword(email, password)
+                _authState.value =
+                    when (result) {
+                        is AuthDataStore.Result.Success -> AuthState.Authenticated
+                        is AuthDataStore.Result.Error -> AuthState.Error(result.exception.message ?: "Login failed")
+                        else -> AuthState.UnAuthenticated
+                    }
+                callback(result)
+            }
+        }
+
+        fun registerWithEmailAndPassword(
+            email: String,
+            password: String,
+            callback: (result: AuthDataStore.Result) -> Unit,
+        ) {
+            viewModelScope.launch {
+                _authState.value = AuthState.Loading
+                val result = authDataStore.registerWithEmailAndPassword(email, password)
+                _authState.value =
+                    when (result) {
+                        is AuthDataStore.Result.Success -> AuthState.Authenticated
+                        is AuthDataStore.Result.Error -> AuthState.Error(result.exception.message ?: "Registration failed")
+                        else -> AuthState.UnAuthenticated
+                    }
+                callback(result)
+            }
+        }
+
+        fun googleOAUTH() {
+        }
+
+        fun logout() {
+            authDataStore.logout()
+            _authState.value = AuthState.UnAuthenticated
         }
     }
-
-    fun loginWithEmailAndPassword(email: String, password: String, callback: (result: AuthDataStore.Result) -> Unit) {
-        viewModelScope.launch {
-            _authState.value = AuthState.Loading
-            val result = authDataStore.loginWithEmailAndPassword(email, password)
-            _authState.value = when (result) {
-                is AuthDataStore.Result.Success -> AuthState.Authenticated
-                is AuthDataStore.Result.Error -> AuthState.Error(result.exception.message ?: "Login failed")
-                else -> AuthState.UnAuthenticated
-            }
-            callback(result)
-        }
-    }
-
-
-    fun logout() {
-        authDataStore.logout()
-        _authState.value = AuthState.UnAuthenticated
-    }
-}
 
 sealed class AuthState {
     object Authenticated : AuthState()
+
     object UnAuthenticated : AuthState()
+
     object Loading : AuthState()
+
     data class Error(val message: String) : AuthState()
 }

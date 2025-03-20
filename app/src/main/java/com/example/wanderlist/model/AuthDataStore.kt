@@ -26,63 +26,84 @@ class AuthDataStore @Inject constructor(
     // Return the injected Google OAuth client ID.
     fun getGoogleOAuthClientID(): String = googleOAuthClientID
 
-    suspend fun startGoogleOAuth(request: GetCredentialRequest): Result {
-        try {
-            val result = credentialManager.getCredential(context, request)
-            return handleGoogleSignIn(result.credential)
-        } catch (e: Exception) {
-            Log.d("GoogleOAuth", "startGoogleOAuth: getCredential error: ${e.message}")
-            return Result.Error(e)
+        suspend fun startGoogleOAuth(request: GetCredentialRequest): Result {
+            try {
+                val result = credentialManager.getCredential(context, request)
+                return handleGoogleSignIn(result.credential)
+            } catch (e: Exception) {
+                Log.d("GoogleOAuth", "startGoogleOAuth: getcred " + e.message)
+                return Result.Error(e)
+            }
         }
-    }
 
-    private suspend fun handleGoogleSignIn(credential: Credential): Result {
-        if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-            return firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
-        } else {
-            Log.w("GOOGLEOAUTH", "Credential is not of type Google ID!")
-            return Result.Error(Exception("Invalid credential"))
+        private suspend fun handleGoogleSignIn(credential: Credential): Result {
+            // Check if credential is of type Google ID
+            if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                // Create Google ID Token
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+
+                // Sign in to Firebase with using the token
+                return firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
+            } else {
+                Log.w("GOOGLEOAUTH", "Credential is not of type Google ID!")
+                return Result.Error(exception = Exception("Invalid credential"))
+            }
         }
-    }
+        // [END handle_sign_in]
 
-    private suspend fun firebaseAuthWithGoogle(idToken: String): Result {
-        val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-        return try {
-            val result = auth.signInWithCredential(firebaseCredential).await()
-            Result.Success(result.user!!)
-        } catch (e: Exception) {
-            Result.Error(e)
+        // [START auth_with_google]
+        private suspend fun firebaseAuthWithGoogle(idToken: String): Result {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            return try {
+                val result = auth.signInWithCredential(credential).await()
+                Result.Success(result.user!!)
+            } catch (e: Exception) {
+                Result.Error(e)
+            }
         }
-    }
 
-    // Email/Password Authentication
-    suspend fun loginWithEmailAndPassword(email: String, password: String): Result {
-        return try {
-            val result = auth.signInWithEmailAndPassword(email, password).await()
-            Result.Success(result.user!!)
-        } catch (e: Exception) {
-            Result.Error(e)
+        // Email/Password Authentication
+        suspend fun loginWithEmailAndPassword(
+            email: String,
+            password: String,
+        ): Result {
+            return try {
+                val result = auth.signInWithEmailAndPassword(email, password).await()
+                Result.Success(result.user!!)
+            } catch (e: Exception) {
+                Result.Error(e)
+            }
         }
-    }
 
-    suspend fun registerWithEmailAndPassword(email: String, password: String): Result {
-        return try {
-            val result = auth.createUserWithEmailAndPassword(email, password).await()
-            Result.Success(result.user!!)
-        } catch (e: Exception) {
-            Result.Error(e)
+        suspend fun registerWithEmailAndPassword(
+            email: String,
+            password: String,
+        ): Result {
+            return try {
+                val result = auth.createUserWithEmailAndPassword(email, password).await()
+                Result.Success(result.user!!)
+            } catch (e: Exception) {
+                Result.Error(e)
+            }
         }
-    }
 
-    fun getCurrentUser(): FirebaseUser? = auth.currentUser
+        fun getCurrentUser(): FirebaseUser? {
+            return auth.currentUser
+        }
 
-    fun logout() {
-        auth.signOut()
-    }
+        fun logout() {
+            auth.signOut()
+        }
 
     sealed class Result {
         data class Success(val user: FirebaseUser) : Result()
         data class Error(val exception: Exception) : Result()
     }
 }
+
+        sealed class Result {
+            data class Success(val user: FirebaseUser) : Result()
+
+            data class Error(val exception: Exception) : Result()
+        }
+    }

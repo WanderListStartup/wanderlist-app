@@ -11,8 +11,8 @@ import com.example.wanderlist.view.AppView
 import com.example.wanderlist.view.SettingsView
 import com.example.wanderlist.view.SignUpView
 import com.example.wanderlist.viewmodel.SignUpViewModel
+import com.example.wanderlist.view.PlacesScreen
 import dagger.hilt.android.AndroidEntryPoint
-
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -27,11 +27,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     WanderlistTheme {
-        AppView()
+        PlacesScreen()
     }
 }
