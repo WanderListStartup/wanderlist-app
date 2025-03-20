@@ -1,6 +1,5 @@
 package com.example.wanderlist.view
 
-
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -19,74 +18,72 @@ import com.example.wanderlist.viewmodel.AuthState
 import com.example.wanderlist.viewmodel.AuthViewModel
 import kotlinx.serialization.Serializable
 
-//Route to the actual app
+// Route to the actual app
 @Serializable object MainView
 
-//Nested NavGraph just for the login shit,
+// Nested NavGraph just for the login shit,
 @Serializable object RegisterLoginView
+
 @Serializable object Landing
+
 @Serializable object Login
+
 @Serializable object Register
+
 @Serializable object Username
+
 @Serializable object Welcome
 
 @Composable
-fun AppView(
-    authViewModel: AuthViewModel = viewModel()
-){
+fun AppView(authViewModel: AuthViewModel = viewModel()) {
     val navController = rememberNavController()
     val authState by authViewModel.authState.collectAsState()
 
-    LaunchedEffect(authState){
-        when(authState){
+    LaunchedEffect(authState) {
+        when (authState) {
             is AuthState.UnAuthenticated -> navController.navigate(RegisterLoginView)
             else -> Unit
         }
     }
 
-    NavHost(navController, startDestination=MainView){
-            composable<MainView>{
-                HomePageView()
+    NavHost(navController, startDestination = MainView) {
+        composable<MainView> {
+            HomePageView()
+        }
+        navigation<RegisterLoginView>(startDestination = Landing) {
+            composable<Landing> {
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Landing(
+                        modifier = Modifier.padding(innerPadding),
+                        onNavigateToLogin = {
+                            navController.navigate(route = Login)
+                        },
+                        onNavigateToRegister = {
+                            navController.navigate(route = Register)
+                        },
+                    )
+                }
             }
-            navigation<RegisterLoginView>(startDestination=Landing){
-                composable<Landing> {
-                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        Landing(
-                            modifier = Modifier.padding(innerPadding),
-                            onNavigateToLogin = {
-                                navController.navigate(route=Login)
-                            },
-                            onNavigateToRegister = {
-                                navController.navigate(route=Register)
-                            }
-                        )
-                    }
-                }
-                composable<Login> {
-                    LoginView(
-                        onNavigateToLanding = { navController.navigate(route=Landing)},
-                        onNavigateToRegister = { navController.navigate(route=Register)},
-                        onNavigateToHome = {navController.navigate(route=MainView)},
-                        authViewModel = authViewModel
-                    )
-
-
-                }
-                composable<Register> {
-                    SignUpView(
-                        onNavigateToHome = {navController.navigate(route=MainView)},
-                        onNavigateToLogin = {navController.navigate(route=Login)},
-                        onBack = {navController.navigate(route=Landing)},
-                        authViewModel=authViewModel
-                    )
-                }
-                composable<Username> {
-
-                }
-                composable<Welcome>{
-
-                }
+            composable<Login> {
+                LoginView(
+                    onNavigateToLanding = { navController.navigate(route = Landing) },
+                    onNavigateToRegister = { navController.navigate(route = Register) },
+                    onNavigateToHome = { navController.navigate(route = MainView) },
+                    authViewModel = authViewModel,
+                )
+            }
+            composable<Register> {
+                SignUpView(
+                    onNavigateToHome = { navController.navigate(route = MainView) },
+                    onNavigateToLogin = { navController.navigate(route = Login) },
+                    onBack = { navController.navigate(route = Landing) },
+                    authViewModel = authViewModel,
+                )
+            }
+            composable<Username> {
+            }
+            composable<Welcome> {
             }
         }
-
+    }
 }

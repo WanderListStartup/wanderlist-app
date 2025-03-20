@@ -1,10 +1,6 @@
 package com.example.wanderlist
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.MutableState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.*
@@ -12,11 +8,22 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,41 +34,31 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.data.model.PlaceDetails
 import com.example.wanderlist.viewmodel.PlacesViewModel
 
-
 // 1) Simple data class
-//data class Place(
+// data class Place(
 //    val name: String,
 //    val rating: Double,
 //    val distance: String,
 //    val coverImageUrl: String,
 //    val aboutText: String,
 //    val thumbnailUrls: List<String>
-//)
+// )
 
 @Preview(showBackground = true)
 @Composable
 fun HomePageViewPreview() {
     HomePageView()
 }
+
 @Composable
-fun HomePageView(
-    placesViewModel: PlacesViewModel = viewModel()
-) {
+fun HomePageView(placesViewModel: PlacesViewModel = viewModel()) {
     val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
         // Example places with actual direct image URLs
@@ -99,19 +96,20 @@ fun HomeScreen(places: List<PlaceDetails>) {
     val state = rememberLazyListState()
     Scaffold(
         topBar = { TopBarCategories() },
-        bottomBar = { BottomNavigationBar() }
+        bottomBar = { BottomNavigationBar() },
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             // Horizontal scroll for multiple places
             LazyRow(
                 modifier = Modifier.fillMaxSize(),
                 state = state,
-                flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
-                ) {
+                flingBehavior = rememberSnapFlingBehavior(lazyListState = state),
+            ) {
                 items(places) { place ->
                     // Each place item takes the full screen width
                     Box(modifier = Modifier.fillParentMaxSize()) {
@@ -133,23 +131,25 @@ fun TopBarCategories() {
 
     Surface(
         color = Color.White,
-        shadowElevation = 0.dp
+        shadowElevation = 0.dp,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
         ) {
             // Logo row
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = rememberAsyncImagePainter(R.drawable.wlist_logo),
                     contentDescription = "Logo",
-                    modifier = Modifier
-                        .width(70.dp)
-                        .height(30.dp)
-                        .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop
+                    modifier =
+                        Modifier
+                            .width(70.dp)
+                            .height(30.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop,
                 )
             }
 
@@ -158,27 +158,28 @@ fun TopBarCategories() {
             // Categories row
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,         // Center them horizontally
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.Center, // Center them horizontally
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     categories.forEach { category ->
                         if (category == selectedCategory.value) {
                             // Selected category: Blue pill
                             Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(Color(0xFFE8F0FE))
-                                    .clickable { selectedCategory.value = category }
+                                modifier =
+                                    Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(Color(0xFFE8F0FE))
+                                        .clickable { selectedCategory.value = category },
                             ) {
                                 Text(
                                     text = category,
                                     color = Color(0xFF176FF2),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(horizontal = 16.dp,vertical = 8.dp)
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                                 )
                             }
                         } else {
@@ -187,9 +188,10 @@ fun TopBarCategories() {
                                 text = category,
                                 color = Color.Gray,
                                 style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier
-                                    .clickable { selectedCategory.value = category }
-                                    .padding(horizontal = 8.dp, vertical = 8.dp)
+                                modifier =
+                                    Modifier
+                                        .clickable { selectedCategory.value = category }
+                                        .padding(horizontal = 8.dp, vertical = 8.dp),
                             )
                         }
                     }
@@ -204,14 +206,14 @@ fun BottomNavigationBar() {
     NavigationBar(
         containerColor = Color.White,
         tonalElevation = 8.dp,
-        modifier = Modifier.height(72.dp)
+        modifier = Modifier.height(72.dp),
     ) {
         Spacer(modifier = Modifier.weight(1f))
 
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
             selected = true,
-            onClick = { }
+            onClick = { },
         )
 
         Spacer(modifier = Modifier.width(1.dp))
@@ -219,7 +221,7 @@ fun BottomNavigationBar() {
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
             selected = false,
-            onClick = { }
+            onClick = { },
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -234,23 +236,24 @@ fun BottomNavigationBar() {
 fun AboutTextWithShowMore(
     text: String,
     maxLines: Int = 4,
-    onShowMoreClick: () -> Unit
+    onShowMoreClick: () -> Unit,
 ) {
     // Build an annotated string with "Show More" as a clickable region
-    val annotatedText = buildAnnotatedString {
-        // The about text
-        append(text.trimEnd())
+    val annotatedText =
+        buildAnnotatedString {
+            // The about text
+            append(text.trimEnd())
 
-        // Add a space or punctuation before "Show More"
-        append(" ")
+            // Add a space or punctuation before "Show More"
+            append(" ")
 
-        // Mark "Show More" region with an annotation
-        pushStringAnnotation(tag = "SHOW_MORE", annotation = "SHOW_MORE")
-        withStyle(style = SpanStyle(color = Color.Blue)) {
-            append("Show More")
+            // Mark "Show More" region with an annotation
+            pushStringAnnotation(tag = "SHOW_MORE", annotation = "SHOW_MORE")
+            withStyle(style = SpanStyle(color = Color.Blue)) {
+                append("Show More")
+            }
+            pop() // End of clickable region
         }
-        pop() // End of clickable region
-    }
 
     // Use ClickableText so only the "Show More" region is clickable
     Text(
@@ -258,35 +261,39 @@ fun AboutTextWithShowMore(
         style = MaterialTheme.typography.bodyMedium,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.clickable {
-            onShowMoreClick()
-        }
-    )}
+        modifier =
+            Modifier.clickable {
+                onShowMoreClick()
+            },
+    )
+}
 
 @Composable
 fun PlaceContent(place: PlaceDetails) {
     val scrollState = rememberScrollState()
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(top = 0.dp)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(top = 0.dp),
     ) {
         // Restaurant name, rating, distance
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = place.displayName ?: "no display names",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -294,33 +301,34 @@ fun PlaceContent(place: PlaceDetails) {
                 Spacer(modifier = Modifier.width(170.dp))
                 Text(
                     text = "${String.format("%.1f", place.distance)} mi",
-                    color = Color(0xFF176FF2)
+                    color = Color(0xFF176FF2),
                 )
                 Image(
                     painter = rememberAsyncImagePainter(R.drawable.distance),
                     contentDescription = "Distance Icon",
-                    modifier = Modifier
-                        .width(40.dp)
-                        .height(40.dp)
+                    modifier =
+                        Modifier
+                            .width(40.dp)
+                            .height(40.dp),
                 )
             }
-
         }
 
         Spacer(modifier = Modifier.height(8.dp))
         // Cover image
         Box(
-            modifier = Modifier
-                .padding(horizontal = 30.dp)
-                .width(350.dp)
-                .height(345.dp)
-                .clip(RoundedCornerShape(32.dp))
+            modifier =
+                Modifier
+                    .padding(horizontal = 30.dp)
+                    .width(350.dp)
+                    .height(345.dp)
+                    .clip(RoundedCornerShape(32.dp)),
         ) {
             Image(
                 painter = rememberAsyncImagePainter(if (place.photoURIs?.size!! > 0) place.photoURIs.get(0) else ""),
                 contentDescription = place.displayName,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             )
         }
 
@@ -329,7 +337,7 @@ fun PlaceContent(place: PlaceDetails) {
         Text(
             text = "About",
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(start = 20.dp, bottom = 4.dp)
+            modifier = Modifier.padding(start = 20.dp, bottom = 4.dp),
         )
 
         // Only "Show More" is clickable here
@@ -339,26 +347,28 @@ fun PlaceContent(place: PlaceDetails) {
                 maxLines = 4,
                 onShowMoreClick = {
                     // Handle "Show More" click here (e.g., expand text, navigate, etc.)
-                }
+                },
             )
         }
 
         // Thumbnails
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             place.photoURIs?.forEach { thumbUrl ->
                 Image(
                     painter = rememberAsyncImagePainter(thumbUrl),
                     contentDescription = null,
-                    modifier = Modifier
-                        .width(110.dp)
-                        .height(95.dp)
-                        .clip(RoundedCornerShape(15.dp)),
-                    contentScale = ContentScale.Crop
+                    modifier =
+                        Modifier
+                            .width(110.dp)
+                            .height(95.dp)
+                            .clip(RoundedCornerShape(15.dp)),
+                    contentScale = ContentScale.Crop,
                 )
             }
         }
@@ -375,7 +385,7 @@ fun PlaceContent(place: PlaceDetails) {
 @Composable
 fun AdditionalDetailsSection() {
     Column(
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp)
+        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
     ) {
         Text("Menu", style = MaterialTheme.typography.titleLarge)
         Text("http://naughters.com", style = MaterialTheme.typography.bodyMedium)
@@ -384,13 +394,14 @@ fun AdditionalDetailsSection() {
         Text("Address/Contact", style = MaterialTheme.typography.titleLarge)
         Text(
             text = "136 2nd St, Troy, NY 12180\n(518) 238-3130",
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         Text("Hour of Operations", style = MaterialTheme.typography.titleLarge)
         Text(
-            text = """
+            text =
+                """
                 Monday 6AM–3PM
                 Tuesday 6AM–3PM
                 Wednesday 6AM–3PM
@@ -398,8 +409,8 @@ fun AdditionalDetailsSection() {
                 Friday 6AM–3PM
                 Saturday 8AM–5PM
                 Sunday 8AM–5PM
-            """.trimIndent(),
-            style = MaterialTheme.typography.bodyMedium
+                """.trimIndent(),
+            style = MaterialTheme.typography.bodyMedium,
         )
         Spacer(modifier = Modifier.height(8.dp))
 

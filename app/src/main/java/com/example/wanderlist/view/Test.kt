@@ -13,7 +13,6 @@ fun PlacesScreen(viewModel: PlacesViewModel = viewModel()) {
     // Collect places state from the ViewModel.
     val places = viewModel.places.collectAsState().value
 
-
     // Display the list of places (using LazyColumn for example).
     LazyColumn {
         items(places) { place ->
