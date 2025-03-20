@@ -22,28 +22,34 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.R
 import com.example.wanderlist.ui.theme.wanderlistBlue
+import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.EditProfileViewModel
 
-@Preview(showBackground = true)
-@Composable
-fun ProfileViewPreview() {
-    ProfileView()
-}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileView(viewModel: EditProfileViewModel = viewModel()) {
-    val selectedTab = remember { mutableStateOf(0) }
-
+fun ProfileView(
+    viewModel: EditProfileViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel,
+    onNavigateToHome: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onNavigateToUserSettings: () -> Unit
+) {
+    val selectedTab = remember { mutableStateOf(0)
+    }
+    val context = LocalContext.current
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -63,7 +69,7 @@ fun ProfileView(viewModel: EditProfileViewModel = viewModel()) {
             )
         },
         bottomBar = {
-            BottomNavigationBar()
+            BottomNavigationBar(onNavigateToHome = onNavigateToHome)
         }
     ) { innerPadding ->
         Column(
@@ -186,7 +192,7 @@ fun ProfileView(viewModel: EditProfileViewModel = viewModel()) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = { /* Edit Profile logic */ },
+                    onClick = { onNavigateToUserSettings() },
                     modifier = Modifier.shadow(elevation = 10.dp).width(220.dp),
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White)
@@ -194,7 +200,7 @@ fun ProfileView(viewModel: EditProfileViewModel = viewModel()) {
                     Text(text = "Edit Profile", color = Color.Black)
                 }
                 Button(
-                    onClick = { /* Some settings action */ },
+                    onClick = { onNavigateToSettings() },
                     colors = ButtonDefaults.textButtonColors(contentColor = Color.Black),
                     contentPadding = PaddingValues(0.dp)
                 ) {
@@ -357,7 +363,7 @@ fun ProfileView(viewModel: EditProfileViewModel = viewModel()) {
 }
 
 @Composable
-fun BottomNavigationBar() {
+fun BottomNavigationBar(onNavigateToHome: () -> Unit) {
     NavigationBar(
         containerColor = Color.White,
         tonalElevation = 8.dp,
@@ -368,7 +374,9 @@ fun BottomNavigationBar() {
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
             selected = false,
-            onClick = { },
+            onClick = {
+                onNavigateToHome()
+            },
         )
 
         Spacer(modifier = Modifier.width(1.dp))
@@ -381,7 +389,8 @@ fun BottomNavigationBar() {
             ),
             icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
             selected = true,
-            onClick = { },
+            onClick = {
+            },
         )
 
         Spacer(modifier = Modifier.weight(1f))

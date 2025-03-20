@@ -36,6 +36,7 @@ import com.example.wanderlist.viewmodel.AuthViewModel
 
 @Composable
 fun EditProfileView(
+    onNavigateToProfile: () -> Unit,
     viewModel: EditProfileViewModel = hiltViewModel(),
     authViewModel: AuthViewModel
 ) {
@@ -51,9 +52,16 @@ fun EditProfileView(
                 .fillMaxWidth()
                 .padding(top = 50.dp)
         ) {
-            Box(modifier = Modifier.align(Alignment.CenterStart)) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .clickable {
+                        onNavigateToProfile()
+                    }
+            ) {
                 BackCircle()
             }
+
             Box(modifier = Modifier.align(Alignment.Center)) {
                 LoginTitle("Edit Profile")
             }

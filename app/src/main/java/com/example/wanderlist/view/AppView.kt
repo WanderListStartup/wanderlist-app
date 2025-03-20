@@ -1,21 +1,36 @@
 package com.example.wanderlist.view
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.example.wanderlist.HomePageView
+import com.example.wanderlist.components.LoginText
+import com.example.wanderlist.model.AuthDataStore
 import com.example.wanderlist.viewmodel.AuthState
 import com.example.wanderlist.viewmodel.AuthViewModel
+import com.example.wanderlist.viewmodel.SignUpViewModel
 import kotlinx.serialization.Serializable
 
 // Route to the actual app
@@ -35,6 +50,8 @@ import kotlinx.serialization.Serializable
 @Serializable object Welcome
 @Serializable object Settings
 @Serializable object UserSettings
+@Serializable object Profile
+@Serializable object HomeView
 
 @Composable
 fun AppView(authViewModel: AuthViewModel = viewModel()) {
@@ -49,8 +66,11 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
     }
 
     NavHost(navController, startDestination = MainView) {
-        composable<MainView> {
-            HomePageView()
+        composable<MainView>{
+            HomePageView(
+                authViewModel = authViewModel,
+                onNavigateToProfile = {navController.navigate(route = Profile)}
+            )
         }
         navigation<RegisterLoginView>(startDestination = Landing) {
             composable<Landing> {
@@ -76,11 +96,12 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
             }
             composable<Register> {
                 SignUpView(
-                    onNavigateToHome = { navController.navigate(route = MainView) },
+                    onNavigateToHome = { navController.navigate(route = HomeView) },
                     onNavigateToLogin = { navController.navigate(route = Login) },
                     onBack = { navController.navigate(route = Landing) },
                     onNavigateToSettings = {navController.navigate(route=Settings)},
                     onNavigateToProfileSettings = {navController.navigate(route=UserSettings)},
+                    onNavigateToProfile = {navController.navigate(route=Profile)},
                     authViewModel = authViewModel,
                 )
             }
@@ -90,11 +111,33 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
             }
 
             composable<Settings> {
-                SettingsView(authViewModel=authViewModel)
+                SettingsView(
+                    onNavigateToProfile = {navController.navigate(route=Profile)},
+                    authViewModel=authViewModel
+                )
             }
             composable<UserSettings> {
-                EditProfileView(authViewModel=authViewModel)
+                EditProfileView(
+                    onNavigateToProfile = {navController.navigate(route=Profile)},
+                    authViewModel=authViewModel
+                )
             }
+            composable<Profile> {
+                ProfileView(
+                    onNavigateToHome = { navController.navigate(route = HomeView) },
+                    onNavigateToSettings = {navController.navigate(route=Settings)},
+                    onNavigateToUserSettings = {navController.navigate(route=UserSettings)},
+                    authViewModel=authViewModel
+                )
+            }
+            composable<HomeView> {
+                HomePageView(
+                    authViewModel = authViewModel,
+                    onNavigateToProfile = {navController.navigate(route=Profile)}
+                )
+            }
+
+
 
         }
     }

@@ -7,10 +7,12 @@ import com.example.wanderlist.model.AuthDataStore
 import com.example.wanderlist.repository.UserProfile
 import com.example.wanderlist.repository.UserProfileRepository
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
@@ -206,7 +208,36 @@ class AuthViewModel @Inject constructor(
             authDataStore.logout()
             _authState.value = AuthState.UnAuthenticated
         }
+
+
+
+
+        fun deleteAccount( callback: (result: AuthDataStore.Result) -> Unit) {
+            viewModelScope.launch {
+                val currentUser = authDataStore.getCurrentUser()
+                if (currentUser != null) {
+                    try {
+                        userProfileRepository.deleteUserProfile(currentUser.uid)
+                        _authState.value = AuthState.UnAuthenticated
+                        callback(AuthDataStore.Result.Success(currentUser))
+                    } catch (e: Exception) {
+                        callback(AuthDataStore.Result.Error(e))
+                    }
+                } else {
+                    callback(AuthDataStore.Result.Error(Exception("User not logged in")))
+                }
+            }
+        }
+
+    private fun UserProfileRepository.deleteUserProfile(uid: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        firestore.collection("user_profiles")
+            .document(uid)
+            .delete()
     }
+
+
+}
 
 sealed class AuthState {
     object Authenticated : AuthState()
