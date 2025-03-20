@@ -2,11 +2,12 @@ package com.example.wanderlist.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.R
+import com.example.wanderlist.ui.theme.wanderlistBlue
 
 @Preview(showBackground = true)
 @Composable
@@ -37,57 +40,53 @@ fun ProfileViewPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileView() {
-    // Track which tab is selected
     val selectedTab = remember { mutableStateOf(0) }
 
     Scaffold(
+        containerColor = Color.White,
         topBar = {
-            // Optional top bar with WList logo
             CenterAlignedTopAppBar(
-                title = { /* Could show "Profile" or remain empty */ },
+                title = { },
                 navigationIcon = {
                     Image(
-                        painter = rememberAsyncImagePainter(R.drawable.wlist_logo),
+                        painter = rememberAsyncImagePainter(R.drawable.bigwlist),
                         contentDescription = "WList Logo",
                         modifier = Modifier
-                            .padding(start = 16.dp)
-                            .width(50.dp)
-                            .height(24.dp),
+                            .padding(start = 20.dp)
+                            .width(66.dp)
+                            .height(53.dp),
                         contentScale = ContentScale.Fit
                     )
                 }
             )
+        },
+        bottomBar = {
+            BottomNavigationBar()
         }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            // 1) Profile Photo + Name/Handle + Stats
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Profile Picture
                 Image(
                     painter = rememberAsyncImagePainter(
                         "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG"
                     ),
                     contentDescription = "User Profile Picture",
                     modifier = Modifier
-                        .size(100.dp)
+                        .size(125.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
-
                 Spacer(modifier = Modifier.width(16.dp))
-
-                // Name, handle, stats
                 Column(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.Start
@@ -95,17 +94,16 @@ fun ProfileView() {
                     Text(
                         text = "Jake Paul",
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        fontSize = 24.sp
+                        fontSize = 32.sp,
+                        modifier = Modifier.padding(PaddingValues(start = 36.dp))
                     )
-
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "@jtrex_44",
+                        modifier = Modifier.padding(PaddingValues(start = 38.dp)),
                         style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
                     )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Followers / Following
+                    Spacer(modifier = Modifier.height(15.dp))
                     Row(
                         modifier = Modifier
                             .padding(start = 40.dp, end = 40.dp)
@@ -113,102 +111,103 @@ fun ProfileView() {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "15", fontWeight = FontWeight.Bold)
                             Text(text = "Followers", color = Color.Gray)
+                            Text(text = "15", fontWeight = FontWeight.Bold)
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "20", fontWeight = FontWeight.Bold)
                             Text(text = "Following", color = Color.Gray)
+                            Text(text = "20", fontWeight = FontWeight.Bold)
                         }
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Location
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "Troy, NY",
-                            style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
-                        )
                     }
                 }
             }
-
-            // 2) Level Row (Descriptor + Progress Bar)
+            Row(
+                modifier = Modifier
+                    .padding(PaddingValues(start = 30.dp, top = 5.dp))
+                    .fillMaxWidth()
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(R.drawable.distance),
+                    contentDescription = "Distance Icon",
+                    modifier = Modifier
+                        .width(25.dp)
+                        .height(20.dp)
+                        .padding(PaddingValues(end = 0.dp)),
+                    contentScale = ContentScale.Fit
+                )
+                Text(
+                    text = "Troy, NY",
+                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+                )
+            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.Center,
+                    .padding(PaddingValues(start = 28.dp, top = 8.dp, bottom = 8.dp)),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "Level 10",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Box(
                     modifier = Modifier
-                        .width(120.dp)
-                        .height(12.dp)
+                        .width(250.dp)
+                        .height(20.dp)
                         .clip(RoundedCornerShape(6.dp))
-                        .background(Color.LightGray)
+                        .border(width = 2.dp, color = Color.Black, shape = CircleShape)
                 ) {
-                    // Filled portion
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
-                            .fillMaxWidth(0.4f) // 40% progress for example
+                            .fillMaxWidth(0.4f)
                             .background(Color(0xFF176FF2))
                     )
                 }
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "XP",
-                    style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
-                )
             }
-
-            // 3) Bio
             Text(
                 text = "I am a huge foodie, local to the Troy Area! My goal is to collect as many badges as I can!",
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.padding(PaddingValues(start = 15.dp, end = 30.dp))
             )
-
-            // 4) Edit Profile + Settings
             Spacer(modifier = Modifier.height(12.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 40.dp),
+                    .padding(PaddingValues(start = 45.dp)),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
                     onClick = { /* Edit Profile logic */ },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.shadow(elevation = 10.dp).width(220.dp),
                     shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
                     Text(text = "Edit Profile", color = Color.Black)
                 }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                OutlinedButton(
+                Button(
                     onClick = { /* Some settings action */ },
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier.size(width = 50.dp, height = 50.dp)
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color.Black),
+                    contentPadding = PaddingValues(0.dp)
                 ) {
-                    // Gear icon or text
-                    Text("⚙") // Placeholder
+                    Image(
+                        painter = rememberAsyncImagePainter(R.drawable.settings),
+                        contentDescription = "Settings Icon",
+                        modifier = Modifier
+                            .padding(end = 18.dp)
+                            .size(30.dp),
+                        contentScale = ContentScale.Fit
+                    )
                 }
             }
-
-            // 6) Tab Bar below "Add Friend"
             Spacer(modifier = Modifier.height(16.dp))
+            val tabs = listOf(Icons.Filled.Home, Icons.Filled.Search, Icons.Filled.Person)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -232,84 +231,161 @@ fun ProfileView() {
                     Icon(Icons.Filled.Person, contentDescription = "Tab 2")
                 }
             }
-
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 7) Tab Content
-            when (selectedTab.value) {
-                0 -> {
-
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Button(
-                        onClick = { /* Add Friend logic */ },
-                        shape = RoundedCornerShape(24.dp),
-                        colors = ButtonDefaults.buttonColors(Color(0xFF176FF2)),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .padding(horizontal = 40.dp)
-                    ) {
-                        Text(text = "Add Friend")
+            // IMPORTANT CHANGE: Extra bottom padding for scrollable content
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(bottom = 72.dp) // Enough space to keep items from being hidden by bottom bar
+            ) {
+                when (selectedTab.value) {
+                    0 -> {
+                        Spacer(modifier = Modifier.height(15.dp))
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Button(
+                                onClick = { /* Add Friend logic */ },
+                                shape = RoundedCornerShape(15.dp),
+                                colors = ButtonDefaults.buttonColors(Color(0xFF176FF2)),
+                                modifier = Modifier
+                                    .width(275.dp)
+                                    .height(40.dp)
+                            ) {
+                                Text(text = "Add Friend")
+                            }
+                            Divider(
+                                modifier = Modifier
+                                    .padding(horizontal = 40.dp, vertical = 20.dp)
+                                    .fillMaxWidth(),
+                                color = Color.Gray.copy(alpha = 0.2f),
+                                thickness = 1.dp
+                            )
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(PaddingValues(top = 60.dp))
+                        ) {
+                            UserRow(
+                                imageUrl = "https://example.com/logan_paul.jpg",
+                                name = "Logan Paul",
+                                handle = "@lPaul_45",
+                                location = "Los Angeles, CA",
+                                level = "Lvl: 2"
+                            )
+                            Divider(
+                                modifier = Modifier
+                                    .padding(horizontal = 40.dp)
+                                    .fillMaxWidth(),
+                                color = Color.Gray.copy(alpha = 0.2f),
+                                thickness = 1.dp
+                            )
+                            UserRow(
+                                imageUrl = "https://example.com/walter_white.jpg",
+                                name = "Walter White",
+                                handle = "@heisenberg",
+                                location = "Albuquerque, NM",
+                                level = "Lvl: 999"
+                            )
+                            Divider(
+                                modifier = Modifier
+                                    .padding(horizontal = 40.dp)
+                                    .fillMaxWidth(),
+                                color = Color.Gray.copy(alpha = 0.2f),
+                                thickness = 1.dp
+                            )
+                            UserRow(
+                                imageUrl = "https://example.com/angel_reese.jpg",
+                                name = "Angel Reese",
+                                handle = "@AngBricks",
+                                location = "Chicago, IL",
+                                level = "Lvl: 22"
+                            )
+                            Divider(
+                                modifier = Modifier
+                                    .padding(horizontal = 40.dp)
+                                    .fillMaxWidth(),
+                                color = Color.Gray.copy(alpha = 0.2f),
+                                thickness = 1.dp
+                            )
+                            UserRow(
+                                imageUrl = "https://example.com/lebron_james.jpg",
+                                name = "LeBron James",
+                                handle = "@LeWanderer",
+                                location = "Los Angeles, CA",
+                                level = "Lvl: 999"
+                            )
+                            Divider(
+                                modifier = Modifier
+                                    .padding(horizontal = 40.dp)
+                                    .fillMaxWidth(),
+                                color = Color.Gray.copy(alpha = 0.2f),
+                                thickness = 1.dp
+                            )
+                            // ... additional rows as needed
+                        }
+                        Spacer(modifier = Modifier.height(24.dp))
                     }
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        UserRow(
-                            imageUrl = "https://example.com/logan_paul.jpg",
-                            name = "Logan Paul",
-                            handle = "@lPaul_45",
-                            location = "Los Angeles, CA",
-                            level = "Lvl: 2"
-                        )
-                        UserRow(
-                            imageUrl = "https://example.com/walter_white.jpg",
-                            name = "Walter White",
-                            handle = "@heisenberg",
-                            location = "Albuquerque, NM",
-                            level = "Lvl: 999"
-                        )
-                        UserRow(
-                            imageUrl = "https://example.com/angel_reese.jpg",
-                            name = "Angel Reese",
-                            handle = "@AngBricks",
-                            location = "Chicago, IL",
-                            level = "Lvl: 22"
-                        )
-                        UserRow(
-                            imageUrl = "https://example.com/lebron_james.jpg",
-                            name = "LeBron James",
-                            handle = "@LeWanderer",
-                            location = "Los Angeles, CA",
-                            level = "Lvl: 999"
+                    1 -> {
+                        Text(
+                            text = "Search tab content here",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            textAlign = TextAlign.Center
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-                }
-                1 -> {
-                    // Show placeholder content for tab 1
-                    Text(
-                        text = "Search tab content here",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        textAlign = TextAlign.Center
-                    )
-                }
-                2 -> {
-                    // Show placeholder content for tab 2
-                    Text(
-                        text = "Profile tab content here",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        textAlign = TextAlign.Center
-                    )
+                    2 -> {
+                        Text(
+                            text = "Profile tab content here",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-// The same user row as before
+@Composable
+fun BottomNavigationBar() {
+    NavigationBar(
+        containerColor = Color.White,
+        tonalElevation = 8.dp,
+        modifier = Modifier.height(72.dp),
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
+
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
+            selected = false,
+            onClick = { },
+        )
+
+        Spacer(modifier = Modifier.width(1.dp))
+
+        NavigationBarItem(
+            colors = NavigationBarItemDefaults.colors(
+                indicatorColor = Color.Transparent,
+                selectedIconColor = wanderlistBlue,
+                unselectedIconColor = Color.Gray,
+            ),
+            icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
+            selected = true,
+            onClick = { },
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
 @Composable
 fun UserRow(
     imageUrl: String,
@@ -321,21 +397,23 @@ fun UserRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 15.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Spacer(modifier = Modifier.width(30.dp))
         Image(
-            painter = rememberAsyncImagePainter(imageUrl),
+            painter = rememberAsyncImagePainter(
+                // Hard-coded same image for demonstration
+                "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG"
+            ),
             contentDescription = "$name profile",
             modifier = Modifier
-                .size(48.dp)
+                .size(60.dp)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop
         )
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
+        Spacer(modifier = Modifier.width(20.dp))
+        Column(modifier = Modifier.width(115.dp)) {
             Text(
                 text = name,
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
@@ -345,12 +423,21 @@ fun UserRow(
                 style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray)
             )
         }
-
-        Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = location,
-                style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray)
-            )
+        Column(horizontalAlignment = Alignment.Start) {
+            Row {
+                Image(
+                    painter = rememberAsyncImagePainter(R.drawable.distance),
+                    contentDescription = "Distance Icon",
+                    modifier = Modifier
+                        .width(20.dp)
+                        .height(20.dp),
+                    contentScale = ContentScale.Fit
+                )
+                Text(
+                    text = location,
+                    style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray)
+                )
+            }
             Text(
                 text = level,
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
@@ -358,3 +445,4 @@ fun UserRow(
         }
     }
 }
+
