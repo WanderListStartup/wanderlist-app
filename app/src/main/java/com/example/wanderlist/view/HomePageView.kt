@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,10 +38,16 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.data.model.PlaceDetails
+import com.example.wanderlist.ui.theme.wanderlistBlue
+import com.example.wanderlist.view.ProfileView
+import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.PlacesViewModel
-
+import com.example.wanderlist.viewmodel.ProfileViewModel
 // 1) Simple data class
 // data class Place(
 //    val name: String,
@@ -51,14 +58,15 @@ import com.example.wanderlist.viewmodel.PlacesViewModel
 //    val thumbnailUrls: List<String>
 // )
 
-@Preview(showBackground = true)
-@Composable
-fun HomePageViewPreview() {
-    HomePageView()
-}
 
 @Composable
-fun HomePageView(placesViewModel: PlacesViewModel = viewModel()) {
+fun HomePageView(
+    modifier: Modifier = Modifier,
+    authViewModel: AuthViewModel,
+    placesViewModel: PlacesViewModel = viewModel(),
+    onNavigateToProfile: () -> Unit
+
+) {
     val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
         // Example places with actual direct image URLs
@@ -87,16 +95,23 @@ fun HomePageView(placesViewModel: PlacesViewModel = viewModel()) {
 //                )
 //            )
 //        )
-        HomeScreen(places)
+        HomeScreen(
+            places,
+            onNavigateToProfile = { onNavigateToProfile() }
+        )
     }
 }
 
 @Composable
-fun HomeScreen(places: List<PlaceDetails>) {
+fun HomeScreen(
+    places: List<PlaceDetails>,
+    onNavigateToProfile: () -> Unit
+
+) {
     val state = rememberLazyListState()
     Scaffold(
         topBar = { TopBarCategories() },
-        bottomBar = { BottomNavigationBar() },
+        bottomBar = { BottomNavigationBar(onNavigateToProfile = onNavigateToProfile) },
     ) { innerPadding ->
         Box(
             modifier =
@@ -202,7 +217,7 @@ fun TopBarCategories() {
 }
 
 @Composable
-fun BottomNavigationBar() {
+fun BottomNavigationBar(onNavigateToProfile: () -> Unit) {
     NavigationBar(
         containerColor = Color.White,
         tonalElevation = 8.dp,
@@ -213,7 +228,14 @@ fun BottomNavigationBar() {
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
             selected = true,
-            onClick = { },
+            colors = NavigationBarItemDefaults.colors(
+                indicatorColor = Color.Transparent,
+                selectedIconColor = wanderlistBlue,
+                unselectedIconColor = Color.Gray,
+            ),
+            onClick = {
+                onNavigateToProfile()
+            },
         )
 
         Spacer(modifier = Modifier.width(1.dp))
@@ -221,7 +243,9 @@ fun BottomNavigationBar() {
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
             selected = false,
-            onClick = { },
+            onClick = {
+                onNavigateToProfile()
+            },
         )
 
         Spacer(modifier = Modifier.weight(1f))

@@ -3,6 +3,7 @@ package com.example.wanderlist.view
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -31,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun SettingsView(
+    onNavigateToProfile: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
     authViewModel: AuthViewModel
 ) {
@@ -43,11 +45,20 @@ fun SettingsView(
     ) {
         Row(
             modifier = Modifier
+                .clickable {
+                }
                 .padding(top = 50.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            BackCircle()
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        onNavigateToProfile()
+                    }
+            ) {
+                BackCircle()
+            }
             Spacer(modifier = Modifier.weight(0.37f))
             LoginTitle("Settings")
             Spacer(modifier = Modifier.weight(1f))
@@ -134,9 +145,11 @@ fun SettingsView(
                 .fillMaxSize()
                 .padding(top = 100.dp)
         ) {
-            ClickableSettingItem(title = "Log out") { }
+
+            ClickableSettingItem(title = "Log out") {authViewModel.logout()}
+
             HorizontalDivider()
-            ClickableSettingItem(title = "Delete Account", isDestructive = true) { }
+            ClickableSettingItem(title = "Delete Account", isDestructive = true) { authViewModel.deleteAccount {} }
         }
     }
 }

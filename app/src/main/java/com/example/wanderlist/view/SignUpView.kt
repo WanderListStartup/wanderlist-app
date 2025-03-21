@@ -26,6 +26,7 @@ import com.example.wanderlist.ui.theme.Alef
 import com.example.wanderlist.ui.theme.WorkSans
 import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.SignUpViewModel
+import com.example.wanderlist.viewmodel.ProfileViewModel
 
 @Composable
 fun SignUpView(
@@ -36,7 +37,8 @@ fun SignUpView(
     onNavigateToLogin: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToHome: () -> Unit,
-    onNavigateToProfileSettings: () -> Unit
+    onNavigateToProfileSettings: () -> Unit,
+    onNavigateToProfile: () -> Unit
 ) {
     val context = LocalContext.current
     Box(
