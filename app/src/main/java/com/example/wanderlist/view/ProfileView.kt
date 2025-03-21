@@ -9,9 +9,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Assignment
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.rounded.Assignment
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.Group
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -193,25 +198,17 @@ fun ProfileView(
             ) {
                 Button(
                     onClick = { onNavigateToUserSettings() },
-                    modifier = Modifier.shadow(elevation = 10.dp).width(220.dp),
+                    modifier = Modifier.shadow(elevation=6.dp, shape= RoundedCornerShape(20.dp)),
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
                     Text(text = "Edit Profile", color = Color.Black)
                 }
-                Button(
+                IconButton(
                     onClick = { onNavigateToSettings() },
-                    colors = ButtonDefaults.textButtonColors(contentColor = Color.Black),
-                    contentPadding = PaddingValues(0.dp)
+                    colors = IconButtonDefaults.iconButtonColors(contentColor = Color.Black),
                 ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(R.drawable.settings),
-                        contentDescription = "Settings Icon",
-                        modifier = Modifier
-                            .padding(end = 18.dp)
-                            .size(30.dp),
-                        contentScale = ContentScale.Fit
-                    )
+                   Icon(Icons.Rounded.Settings, contentDescription = "Settings")
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -225,17 +222,17 @@ fun ProfileView(
                 IconButton(
                     onClick = { selectedTab.value = 0 }
                 ) {
-                    Icon(Icons.Filled.Home, contentDescription = "Tab 0")
+                    Icon(Icons.Rounded.Favorite, contentDescription = "Tab 0")
                 }
                 IconButton(
                     onClick = { selectedTab.value = 1 }
                 ) {
-                    Icon(Icons.Filled.Search, contentDescription = "Tab 1")
+                    Icon(Icons.AutoMirrored.Rounded.Assignment, contentDescription = "Tab 1")
                 }
                 IconButton(
                     onClick = { selectedTab.value = 2 }
                 ) {
-                    Icon(Icons.Filled.Person, contentDescription = "Tab 2")
+                    Icon(Icons.Rounded.Group, contentDescription = "Tab 2")
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
