@@ -19,6 +19,7 @@ import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,11 +31,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.R
 import com.example.wanderlist.ui.theme.wanderlistBlue
@@ -52,7 +51,7 @@ fun ProfileView(
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit
 ) {
-    val selectedTab = remember { mutableStateOf(0)
+    val selectedTab = remember { mutableIntStateOf(0)
     }
     val context = LocalContext.current
     Scaffold(
@@ -220,17 +219,17 @@ fun ProfileView(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { selectedTab.value = 0 }
+                    onClick = { selectedTab.intValue = 0 }
                 ) {
                     Icon(Icons.Rounded.Favorite, contentDescription = "Tab 0")
                 }
                 IconButton(
-                    onClick = { selectedTab.value = 1 }
+                    onClick = { selectedTab.intValue = 1 }
                 ) {
                     Icon(Icons.AutoMirrored.Rounded.Assignment, contentDescription = "Tab 1")
                 }
                 IconButton(
-                    onClick = { selectedTab.value = 2 }
+                    onClick = { selectedTab.intValue = 2 }
                 ) {
                     Icon(Icons.Rounded.Group, contentDescription = "Tab 2")
                 }
@@ -244,7 +243,7 @@ fun ProfileView(
                     .verticalScroll(rememberScrollState())
                     .padding(bottom = 72.dp)
             ) {
-                when (selectedTab.value) {
+                when (selectedTab.intValue) {
                     0 -> {
                         Text(
                             text = "Liked tab content here",
@@ -278,12 +277,12 @@ fun ProfileView(
                             ) {
                                 Text(text = "Add Friend")
                             }
-                            Divider(
+                            HorizontalDivider(
                                 modifier = Modifier
                                     .padding(horizontal = 40.dp, vertical = 20.dp)
                                     .fillMaxWidth(),
-                                color = Color.Gray.copy(alpha = 0.2f),
-                                thickness = 1.dp
+                                thickness = 1.dp,
+                                color = Color.Gray.copy(alpha = 0.2f)
                             )
                         }
                         Column(
@@ -298,12 +297,12 @@ fun ProfileView(
                                 location = "Los Angeles, CA",
                                 level = "Lvl: 2"
                             )
-                            Divider(
+                            HorizontalDivider(
                                 modifier = Modifier
                                     .padding(horizontal = 40.dp)
                                     .fillMaxWidth(),
-                                color = Color.Gray.copy(alpha = 0.2f),
-                                thickness = 1.dp
+                                thickness = 1.dp,
+                                color = Color.Gray.copy(alpha = 0.2f)
                             )
                             UserRow(
                                 imageUrl = "https://example.com/walter_white.jpg",
@@ -312,12 +311,12 @@ fun ProfileView(
                                 location = "Albuquerque, NM",
                                 level = "Lvl: 999"
                             )
-                            Divider(
+                            HorizontalDivider(
                                 modifier = Modifier
                                     .padding(horizontal = 40.dp)
                                     .fillMaxWidth(),
-                                color = Color.Gray.copy(alpha = 0.2f),
-                                thickness = 1.dp
+                                thickness = 1.dp,
+                                color = Color.Gray.copy(alpha = 0.2f)
                             )
                             UserRow(
                                 imageUrl = "https://example.com/angel_reese.jpg",
@@ -326,12 +325,12 @@ fun ProfileView(
                                 location = "Chicago, IL",
                                 level = "Lvl: 22"
                             )
-                            Divider(
+                            HorizontalDivider(
                                 modifier = Modifier
                                     .padding(horizontal = 40.dp)
                                     .fillMaxWidth(),
-                                color = Color.Gray.copy(alpha = 0.2f),
-                                thickness = 1.dp
+                                thickness = 1.dp,
+                                color = Color.Gray.copy(alpha = 0.2f)
                             )
                             UserRow(
                                 imageUrl = "https://example.com/lebron_james.jpg",
@@ -340,12 +339,12 @@ fun ProfileView(
                                 location = "Los Angeles, CA",
                                 level = "Lvl: 999"
                             )
-                            Divider(
+                            HorizontalDivider(
                                 modifier = Modifier
                                     .padding(horizontal = 40.dp)
                                     .fillMaxWidth(),
-                                color = Color.Gray.copy(alpha = 0.2f),
-                                thickness = 1.dp
+                                thickness = 1.dp,
+                                color = Color.Gray.copy(alpha = 0.2f)
                             )
                             // ... additional rows as needed
                         }
