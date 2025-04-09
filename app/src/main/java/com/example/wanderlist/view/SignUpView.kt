@@ -258,7 +258,17 @@ fun SignUpView(
             }
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedButton(
-                onClick = { /* handle Google sign-up here */ },
+                onClick = {
+                    authViewModel.googleOAuth { result ->
+                    when (result) {
+                        is AuthDataStore.Result.Success -> onNavigateToHome()
+                        // need to implement an error page
+                        is AuthDataStore.Result.Error -> {
+                            Toast.makeText(context, result.exception.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                },
                 modifier =
                     Modifier
                         .fillMaxWidth(1.0f)
