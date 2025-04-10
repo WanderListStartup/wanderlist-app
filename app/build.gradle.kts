@@ -88,10 +88,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.google.services)
     implementation(libs.androidx.hilt.navigation.compose)
-
-
-
-
+    implementation(libs.firebase.vertexai)
 }
 
 kapt {
