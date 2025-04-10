@@ -37,6 +37,8 @@ class EstablishmentDetailsRepository @Inject constructor(
     }
 
     suspend fun getEstablishmentDetails(establishmentId: String): EstablishmentDetails? {
+
+
         return try {
             val snapshot = firestore.collection("establishment_details")
                 .document(establishmentId)

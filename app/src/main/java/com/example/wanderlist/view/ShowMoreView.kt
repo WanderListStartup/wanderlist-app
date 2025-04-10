@@ -10,6 +10,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,20 +21,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.wanderlist.components.BackCircle
 import com.example.wanderlist.components.HeaderLoginPage
 import com.example.wanderlist.components.LoginTitle
 import com.example.wanderlist.components.SectionTitle
 import com.example.wanderlist.components.ShowMoreSectionTitle
 import com.example.wanderlist.components.SubHeaderLoginPage
+import com.example.wanderlist.viewmodel.EstablishmentIdHoldViewModel
 import com.example.wanderlist.viewmodel.ShowMoreViewModel
 
 
 @Composable
 fun ShowMoreView(
     //onNavigateToLogin: () -> Unit,
+    establishmentId: String,
     viewModel: ShowMoreViewModel = hiltViewModel(),
+    establishmentIdViewModel: EstablishmentIdHoldViewModel = viewModel(),
 ) {
+    LaunchedEffect(establishmentId) {
+        viewModel.loadEstablishmentDetails(establishmentId)
+
+    }
+
 
     Column(
         modifier = Modifier

@@ -42,6 +42,7 @@ import com.example.wanderlist.data.google.model.PlaceDetails
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.PlacesViewModel
+import com.example.wanderlist.viewmodel.EstablishmentIdHoldViewModel
 
 
 @Composable
@@ -49,7 +50,8 @@ fun HomePageView(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
     placesViewModel: PlacesViewModel = viewModel(),
-    onNavigateToProfile: () -> Unit
+    onNavigateToProfile: () -> Unit,
+    onNavigateToShowMore: (String) -> Unit,
 
 ) {
     // ONE-TIME SEED (debug builds only)
@@ -87,8 +89,11 @@ fun HomePageView(
 //            )
 //        )
         HomeScreen(
-            places,
-            onNavigateToProfile = { onNavigateToProfile() }
+            places = places,
+            onNavigateToProfile = { onNavigateToProfile() },
+            onNavigateToShowMore = { establishmentId ->
+                onNavigateToShowMore(establishmentId)
+            },
         )
     }
 }
@@ -96,8 +101,8 @@ fun HomePageView(
 @Composable
 fun HomeScreen(
     places: List<PlaceDetails>,
-    onNavigateToProfile: () -> Unit
-
+    onNavigateToProfile: () -> Unit,
+    onNavigateToShowMore: (String) -> Unit,
 ) {
     val state = rememberLazyListState()
     Scaffold(
@@ -119,7 +124,10 @@ fun HomeScreen(
                 items(places) { place ->
                     // Each place item takes the full screen width
                     Box(modifier = Modifier.fillParentMaxSize()) {
-                        PlaceContent(place)
+                        PlaceContent(
+                            place,
+                            onNavigateToShowMore = onNavigateToShowMore,
+                        )
                     }
                 }
             }
@@ -284,7 +292,10 @@ fun AboutTextWithShowMore(
 }
 
 @Composable
-fun PlaceContent(place: PlaceDetails) {
+fun PlaceContent(
+    place: PlaceDetails,
+    onNavigateToShowMore: (String) -> Unit,
+) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -358,10 +369,11 @@ fun PlaceContent(place: PlaceDetails) {
         // Only "Show More" is clickable here
         Box(modifier = Modifier.padding(start = 40.dp, bottom = 8.dp)) {
             AboutTextWithShowMore(
-                text = place.editorialSummary ?: "No Editorial Summary Available",
+                text = place.editorialSummary ?: place.id,
                 maxLines = 4,
                 onShowMoreClick = {
-                    // Handle "Show More" click here (e.g., expand text, navigate, etc.)
+
+                    onNavigateToShowMore(place.id)
                 },
             )
         }

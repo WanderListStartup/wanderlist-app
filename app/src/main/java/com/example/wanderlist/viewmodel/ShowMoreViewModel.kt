@@ -1,5 +1,6 @@
 package com.example.wanderlist.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -34,13 +35,9 @@ class ShowMoreViewModel @Inject constructor(
     var photoURIs by mutableStateOf(listOf<String>())
         private set
 
-    private val establishmentId: String = "ChIJ4akrgwcP3okROKDH6fEfhGk"
 
-    init {
-        loadEstablishmentDetails()
-    }
 
-    private fun loadEstablishmentDetails() {
+    fun loadEstablishmentDetails(establishmentId: String) {
         viewModelScope.launch {
             val details = establishmentRepository.getEstablishmentDetails(establishmentId)
             details?.let {
