@@ -19,17 +19,20 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.wanderlist.components.BackCircle
 import com.example.wanderlist.components.HeaderLoginPage
 import com.example.wanderlist.components.LoginTitle
 import com.example.wanderlist.components.SectionTitle
 import com.example.wanderlist.components.ShowMoreSectionTitle
 import com.example.wanderlist.components.SubHeaderLoginPage
+import com.example.wanderlist.viewmodel.ShowMoreViewModel
 
 
 @Composable
 fun ShowMoreView(
     //onNavigateToLogin: () -> Unit,
+    viewModel: ShowMoreViewModel = hiltViewModel(),
 ) {
 
     Column(
@@ -70,22 +73,30 @@ fun ShowMoreView(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            Text("buffer text / / website link ")
+            Text(
+                text = viewModel.websiteUrl,
+            )
 
             Spacer(modifier = Modifier.height(15.dp))
 
             ShowMoreSectionTitle("Address/Contact")
             Spacer(modifier = Modifier.height(15.dp))
 
-            Text("buffer text / / Address Line")
-            Text("Phone # / / buffer text")
+            Text(
+                text = viewModel.formattedAddress,
+            )
+            Text(
+                text = viewModel.nationalPhoneNumber,
+            )
 
             Spacer(modifier = Modifier.height(15.dp))
 
             ShowMoreSectionTitle("Hours of Operations")
             Spacer(modifier = Modifier.height(15.dp))
 
-            Text("buffer text / / Monday")
+            Text(
+                text = viewModel.openingHours,
+            )
             Text("buffer text / / Tuesday")
             Text("buffer text / / Wednesday")
             Text("buffer text / / Thursday")
