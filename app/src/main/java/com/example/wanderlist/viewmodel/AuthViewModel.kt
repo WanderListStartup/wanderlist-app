@@ -59,7 +59,12 @@ class AuthViewModel @Inject constructor(
                             email = email,
                             phone = phone,
                             isPrivateAccount = isPrivateAccount,
-                            isNotificationsEnabled = isNotificationsEnabled
+                            isNotificationsEnabled = isNotificationsEnabled,
+                            likedEstablishments = emptyList(),
+                            reviews = emptyList(),
+                            friends = emptyList(),
+                            incomingRequests = emptyList(),
+                            level = 0
                         )
                         userProfileRepository.createUserProfile(profile)
                         _authState.value = AuthState.Authenticated
@@ -155,11 +160,9 @@ class AuthViewModel @Inject constructor(
                 _authState.value = AuthState.Loading
                 val result = authDataStore.startGoogleOAuth(request)
                 _authState.value =
-                    when (result) {
-                        is AuthDataStore.Result.Success -> AuthState.Authenticated
-                        is AuthDataStore.Result.Error -> AuthState.Error(result.exception.message ?: "Login failed")
-                        else -> AuthState.UnAuthenticated
-                    }
+                    if (result is AuthDataStore.Result.Success) AuthState.Authenticated
+                    else if (result is AuthDataStore.Result.Error) AuthState.Error(result.exception.message ?: "Login failed")
+                    else AuthState.UnAuthenticated
                 callback(result)
             }
         }
@@ -173,11 +176,9 @@ class AuthViewModel @Inject constructor(
                 _authState.value = AuthState.Loading
                 val result = authDataStore.loginWithEmailAndPassword(email, password)
                 _authState.value =
-                    when (result) {
-                        is AuthDataStore.Result.Success -> AuthState.Authenticated
-                        is AuthDataStore.Result.Error -> AuthState.Error(result.exception.message ?: "Login failed")
-                        else -> AuthState.UnAuthenticated
-                    }
+                    if (result is AuthDataStore.Result.Success) AuthState.Authenticated
+                    else if (result is AuthDataStore.Result.Error) AuthState.Error(result.exception.message ?: "Login failed")
+                    else AuthState.UnAuthenticated
                 callback(result)
             }
         }
@@ -191,11 +192,9 @@ class AuthViewModel @Inject constructor(
                 _authState.value = AuthState.Loading
                 val result = authDataStore.registerWithEmailAndPassword(email, password)
                 _authState.value =
-                    when (result) {
-                        is AuthDataStore.Result.Success -> AuthState.Authenticated
-                        is AuthDataStore.Result.Error -> AuthState.Error(result.exception.message ?: "Registration failed")
-                        else -> AuthState.UnAuthenticated
-                    }
+                    if (result is AuthDataStore.Result.Success) AuthState.Authenticated
+                    else if (result is AuthDataStore.Result.Error) AuthState.Error(result.exception.message ?: "Registration failed")
+                    else AuthState.UnAuthenticated
                 callback(result)
             }
         }
