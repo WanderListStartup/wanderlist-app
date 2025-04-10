@@ -63,7 +63,10 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
             arguments = listOf(navArgument("establishmentId") { type = NavType.StringType })
         ) { backStackEntry ->
                 val establishmentId = backStackEntry.arguments?.getString("establishmentId") ?: ""
-                ShowMoreView(establishmentId = establishmentId)
+                ShowMoreView(
+                    establishmentId = establishmentId,
+                    onNavigateToHomePage = {navController.navigate(route=MainView)}
+                )
 
         }
         composable<Settings> {
