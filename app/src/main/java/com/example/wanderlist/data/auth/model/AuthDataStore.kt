@@ -1,5 +1,5 @@
 // AuthDataStore.kt
-package com.example.wanderlist.model
+package com.example.wanderlist.data.auth.model
 
 import android.content.Context
 import android.util.Log

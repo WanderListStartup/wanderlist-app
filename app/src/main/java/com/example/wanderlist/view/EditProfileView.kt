@@ -28,8 +28,7 @@ import com.example.wanderlist.components.EditProfileTextField
 import com.example.wanderlist.components.LoginTitle
 import com.example.wanderlist.components.ProfilePictureCircle
 import com.example.wanderlist.components.SectionTitle
-import com.example.wanderlist.model.AuthDataStore
-import com.example.wanderlist.ui.theme.Montserrat
+import com.example.wanderlist.data.auth.model.AuthDataStore
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.EditProfileViewModel
 import com.example.wanderlist.viewmodel.AuthViewModel

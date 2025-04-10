@@ -40,7 +40,7 @@ import com.example.wanderlist.components.HeaderLoginPage
 import com.example.wanderlist.components.LoginText
 import com.example.wanderlist.components.PasswordInput
 import com.example.wanderlist.components.SubHeaderLoginPage
-import com.example.wanderlist.model.AuthDataStore
+import com.example.wanderlist.data.auth.model.AuthDataStore
 import com.example.wanderlist.ui.theme.Alef
 import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.SignUpViewModel

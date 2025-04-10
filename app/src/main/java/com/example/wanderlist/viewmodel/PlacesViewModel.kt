@@ -4,8 +4,8 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wanderlist.data.model.PlaceDetails
-import com.example.wanderlist.data.repository.PlacesRepository
+import com.example.wanderlist.data.google.model.PlaceDetails
+import com.example.wanderlist.data.google.repository.PlacesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

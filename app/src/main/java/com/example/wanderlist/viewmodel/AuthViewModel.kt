@@ -3,16 +3,15 @@ package com.example.wanderlist.viewmodel
 import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wanderlist.model.AuthDataStore
-import com.example.wanderlist.repository.UserProfile
-import com.example.wanderlist.repository.UserProfileRepository
+import com.example.wanderlist.data.auth.model.AuthDataStore
+import com.example.wanderlist.data.firestore.model.UserProfile
+import com.example.wanderlist.data.firestore.repository.UserProfileRepository
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel

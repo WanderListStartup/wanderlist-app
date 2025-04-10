@@ -7,9 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wanderlist.repository.UserProfileRepository
-import com.example.wanderlist.repository.UserProfile
-import com.example.wanderlist.model.AuthDataStore
+import com.example.wanderlist.data.firestore.repository.UserProfileRepository
+import com.example.wanderlist.data.firestore.model.UserProfile
+import com.example.wanderlist.data.auth.model.AuthDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
