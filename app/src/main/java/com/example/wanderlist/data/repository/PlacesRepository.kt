@@ -8,7 +8,9 @@ import com.example.wanderlist.data.api.PlacesApiService
 import com.example.wanderlist.data.model.PlaceDetails
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.InputStreamReader
+import javax.inject.Inject
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
@@ -38,8 +40,8 @@ fun haversineDistance(
     return r * c
 }
 
-class PlacesRepository(
-    private val context: Context,
+class PlacesRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
 ) {
     private val apiService = PlacesApiService(context)
     private val gson = Gson()
@@ -66,16 +68,16 @@ class PlacesRepository(
      * converts them into a list of [PlaceDetails] objects,
      * and stores them locally as a JSON file.
      */
-    suspend fun fetchAndStorePlaces(): List<PlaceDetails> {
+    suspend fun fetchAndStorePlaces(filters: List<String> = emptyList()): List<PlaceDetails> {
         /* Check if the places data is already stored locally.
          * If it is, return it immediately without making an API call.
          */
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "fetchAndStorePlaces: NOT FETCHING APIS!!!! using test data from res/raw/places.json")
-            return parseJsonToPlaces(context)
-        }
+//        if (BuildConfig.DEBUG) {
+//            Log.d(TAG, "fetchAndStorePlaces: NOT FETCHING APIS!!!! using test data from res/raw/places.json")
+//            return parseJsonToPlaces(context)
+//        }
         Log.d(TAG, "fetchAndStorePlaces: starting getNearbyPlaces")
-        val places = apiService.getNearbyPlaces()
+        val places = apiService.getNearbyPlaces(filters)
         Log.d(TAG, "fetchAndStorePlaces: after getNearbyPlaces got: $places")
         val placeDetailsList =
             places.map { place ->

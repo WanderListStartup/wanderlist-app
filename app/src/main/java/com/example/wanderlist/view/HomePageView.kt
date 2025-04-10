@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -48,6 +49,9 @@ import com.example.wanderlist.view.ProfileView
 import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.PlacesViewModel
 import com.example.wanderlist.viewmodel.ProfileViewModel
+import com.google.android.libraries.places.api.model.Place
+import androidx.compose.runtime.getValue
+
 // 1) Simple data class
 // data class Place(
 //    val name: String,
@@ -63,38 +67,12 @@ import com.example.wanderlist.viewmodel.ProfileViewModel
 fun HomePageView(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
-    placesViewModel: PlacesViewModel = viewModel(),
+    placesViewModel: PlacesViewModel = hiltViewModel(),
     onNavigateToProfile: () -> Unit
 
 ) {
     val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
-        // Example places with actual direct image URLs
-//        val places = listOf(
-//            Place(
-//                name = "Naughters",
-//                rating = 3.2,
-//                distance = "0.3 mi",
-//                coverImageUrl = "https://i0.wp.com/www.troyrecord.com/wp-content/uploads/2022/02/DSC_5566.jpg?fit=620,9999px&ssl=1&tbnid=NVplyHZxBYgiaM&vet=1",
-//                aboutText = "Naughter's in Troy, New York is a diner and coffee shop ...",
-//                thumbnailUrls = listOf(
-//                    "https://lh3.googleusercontent.com/gps-cs-s/AB5caB-vaLr7eVC5t8VNIa79Jo4DK4wA4_7ki93JfMFFEbdmyeYNrPBHJX99IEokroqFu_dmCMI-QDJqW_WNJJcnSB9wwqKH_Y0saD3-9vSssDfK--d5b4bUrMZgGSr3tPqm_U_xM3pm=s1360-w1360-h1020",
-//                    "https://lh3.googleusercontent.com/p/AF1QipO7FgCa3IkHZjpWSE8erilXu8TQYCIkrXeaFK2W=s1360-w1360-h1020",
-//                    "https://lh3.googleusercontent.com/gps-cs-s/AB5caB8oMzpr4pLQB7hqTCO0dT53PhsTjAkTvjCyq34wTFvdLGvETNPv6_aBff7Mtp0-7vlFQH2K4ZFI0E_6AEZQ6QMKIW3xfxJ1YMdvWxD0zIzNs1orHnsw_Kwn906XBXoAIFzQYZ5T=s1360-w1360-h1020"
-//                )
-//            ),
-//            Place(
-//                name = "Starbucks",
-//                rating = 4.1,
-//                distance = "0.5 mi",
-//                coverImageUrl = "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
-//                aboutText = "Famous coffeehouse chain offering specialty coffees, teas, & light bites...",
-//                thumbnailUrls = listOf(
-//                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
-//                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG"
-//                )
-//            )
-//        )
         HomeScreen(
             places,
             onNavigateToProfile = { onNavigateToProfile() }
@@ -138,11 +116,12 @@ fun HomeScreen(
 
 @Composable
 fun TopBarCategories() {
-    // Keep track of which category is selected
-    var selectedCategory = remember { mutableStateOf("Food") }
+    val placesViewModel: PlacesViewModel = hiltViewModel()
+    val selectedCategory by placesViewModel.selectedCategory.collectAsState()
+//    var selectedCategory = remember { mutableStateOf("Food") }
 
     // List of category labels
-    val categories = listOf("Food", "Bars", "Adventures", "Parks", "Activities")
+    val categories = listOf("Food", "Bars", "Entertainment")
 
     Surface(
         color = Color.White,
@@ -181,14 +160,14 @@ fun TopBarCategories() {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     categories.forEach { category ->
-                        if (category == selectedCategory.value) {
+                        if (category == selectedCategory) {
                             // Selected category: Blue pill
                             Box(
                                 modifier =
                                     Modifier
                                         .clip(RoundedCornerShape(16.dp))
                                         .background(Color(0xFFE8F0FE))
-                                        .clickable { selectedCategory.value = category },
+                                        .clickable { placesViewModel.setSelectedCategory(category)},
                             ) {
                                 Text(
                                     text = category,
@@ -205,7 +184,7 @@ fun TopBarCategories() {
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier =
                                     Modifier
-                                        .clickable { selectedCategory.value = category }
+                                        .clickable { placesViewModel.setSelectedCategory(category)}
                                         .padding(horizontal = 8.dp, vertical = 8.dp),
                             )
                         }
