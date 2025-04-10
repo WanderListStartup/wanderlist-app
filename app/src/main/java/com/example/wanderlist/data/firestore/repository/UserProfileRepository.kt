@@ -39,4 +39,14 @@ class UserProfileRepository @Inject constructor(
             .update(updatedFields)
             .await()
     }
+
+    // New function to update quests in the user's subcollection
+    suspend fun updateQuests(uid: String, questId: String, isCompleted: Boolean) {
+        firestore.collection("user_profiles")
+            .document(uid)
+            .collection("userQuests")
+            .document(questId)
+            .update(mapOf("isCompleted" to isCompleted))
+            .await()
+    }
 }
