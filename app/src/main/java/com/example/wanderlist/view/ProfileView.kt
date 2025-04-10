@@ -36,7 +36,7 @@ import com.example.wanderlist.R
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.EditProfileViewModel
-
+import com.example.wanderlist.viewmodel.FindFriendsViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +46,8 @@ fun ProfileView(
     authViewModel: AuthViewModel,
     onNavigateToHome: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onNavigateToUserSettings: () -> Unit
+    onNavigateToUserSettings: () -> Unit,
+    onNavigateToFindFriends: () -> Unit
 ) {
     val selectedTab = remember { mutableIntStateOf(0)
     }
@@ -265,7 +266,7 @@ fun ProfileView(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Button(
-                                onClick = { /* Add Friend logic */ },
+                                onClick = { onNavigateToFindFriends() },
                                 shape = RoundedCornerShape(15.dp),
                                 colors = ButtonDefaults.buttonColors(Color(0xFF176FF2)),
                                 modifier = Modifier

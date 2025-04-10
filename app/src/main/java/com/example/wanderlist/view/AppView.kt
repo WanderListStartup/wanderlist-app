@@ -30,6 +30,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable object Register
 
+@Serializable object FindFriendsView
+
 @Serializable object Welcome
 @Serializable object Settings
 @Serializable object UserSettings
@@ -71,7 +73,14 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
                 onNavigateToHome = { navController.navigate(route = MainView) },
                 onNavigateToSettings = {navController.navigate(route=Settings)},
                 onNavigateToUserSettings = {navController.navigate(route=UserSettings)},
+                onNavigateToFindFriends = { navController.navigate(route = FindFriendsView) },
                 authViewModel=authViewModel
+            )
+        }
+
+        composable<FindFriendsView> {
+            FindFriendsView(
+                onBackClick = { navController.popBackStack() }
             )
         }
         navigation<RegisterLoginView>(startDestination = Landing) {
