@@ -9,9 +9,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.wanderlist.HomePageView
 import com.example.wanderlist.viewmodel.AuthState
@@ -34,6 +36,7 @@ import kotlinx.serialization.Serializable
 @Serializable object Settings
 @Serializable object UserSettings
 @Serializable object Profile
+@Serializable object ShowMore
 
 @Composable
 fun AppView(authViewModel: AuthViewModel = viewModel()) {
@@ -51,8 +54,20 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
         composable<MainView>{
             HomePageView(
                 authViewModel = authViewModel,
-                onNavigateToProfile = {navController.navigate(route = Profile)}
+                onNavigateToProfile = {navController.navigate(route = Profile)},
+                onNavigateToShowMore = { establishmentId -> navController.navigate("showMore/$establishmentId") },
             )
+        }
+        composable(
+            route = "showMore/{establishmentId}",
+            arguments = listOf(navArgument("establishmentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+                val establishmentId = backStackEntry.arguments?.getString("establishmentId") ?: ""
+                ShowMoreView(
+                    establishmentId = establishmentId,
+                    onNavigateToHomePage = {navController.navigate(route=MainView)}
+                )
+
         }
         composable<Settings> {
             SettingsView(
