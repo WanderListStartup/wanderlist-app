@@ -33,10 +33,7 @@ fun SignUpView(
     viewModel: SignUpViewModel = viewModel(),
     onBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
-    onNavigateToSettings: () -> Unit,
     onNavigateToHome: () -> Unit,
-    onNavigateToProfileSettings: () -> Unit,
-    onNavigateToProfile: () -> Unit
 ) {
     val context = LocalContext.current
     Box(
@@ -120,13 +117,13 @@ fun SignUpView(
                 shape = RoundedCornerShape(12.dp),
             )
             Spacer(modifier = Modifier.height(10.dp))
-            // The "City" field from the front end.
+            // The "username" field from the front end.
             OutlinedTextField(
-                value = viewModel.city,
-                onValueChange = { viewModel.onCityChange(it) },
+                value = viewModel.username,
+                onValueChange = { viewModel.onUsernameChange(it) },
                 label = {
                     Text(
-                        "City",
+                        "Username",
                         lineHeight = 35.sp,
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
@@ -202,9 +199,9 @@ fun SignUpView(
                     // Pass the city field as the backend location.
                     authViewModel.registerWithEmailAndPasswordAndProfile(
                         name = viewModel.name,
-                        username = "",
+                        username = viewModel.username,
                         bio = "",
-                        location = viewModel.city, // Use the city input as the location field
+                        location = "Troy, NY",
                         gender = "",
                         dob = viewModel.dob,
                         email = viewModel.email,

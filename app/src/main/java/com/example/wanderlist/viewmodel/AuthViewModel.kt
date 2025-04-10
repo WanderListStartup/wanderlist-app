@@ -53,7 +53,7 @@ class AuthViewModel @Inject constructor(
                             name = name,
                             username = username,
                             bio = bio,
-                            location = location,
+                            location = "Troy, NY",
                             gender = gender,
                             dob = dob,
                             email = email,
