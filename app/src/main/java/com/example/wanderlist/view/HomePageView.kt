@@ -35,17 +35,12 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.wanderlist.data.model.PlaceDetails
+import com.example.wanderlist.data.google.model.PlaceDetails
 import com.example.wanderlist.ui.theme.wanderlistBlue
-import com.example.wanderlist.view.ProfileView
 import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.PlacesViewModel
 import com.example.wanderlist.viewmodel.ProfileViewModel
@@ -71,6 +66,12 @@ fun HomePageView(
     onNavigateToProfile: () -> Unit
 
 ) {
+    // ONE-TIME SEED (debug builds only)
+//    if (BuildConfig.DEBUG) {
+//        LaunchedEffect(Unit) {
+//            placesViewModel.seedEstablishments()
+//        }
+//    }
     val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
         HomeScreen(
