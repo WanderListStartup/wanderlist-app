@@ -48,6 +48,8 @@ import com.example.wanderlist.view.ProfileView
 import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.PlacesViewModel
 import com.example.wanderlist.viewmodel.ProfileViewModel
+import androidx.compose.runtime.LaunchedEffect
+import com.example.wanderlist.BuildConfig
 // 1) Simple data class
 // data class Place(
 //    val name: String,
@@ -67,6 +69,12 @@ fun HomePageView(
     onNavigateToProfile: () -> Unit
 
 ) {
+    // ONE-TIME SEED (debug builds only)
+//    if (BuildConfig.DEBUG) {
+//        LaunchedEffect(Unit) {
+//            placesViewModel.seedEstablishments()
+//        }
+//    }
     val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
         // Example places with actual direct image URLs
