@@ -3,7 +3,7 @@ pluginManagement {
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.googlemaps.*")
+                includeGroupByRegex("com\\.google.*")
                 includeGroupByRegex("androidx.*")
             }
         }

@@ -2,10 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("com.googlemaps.gms.googlemaps-services")
+    id("com.google.gms.google-services")
     id("kotlin-kapt")
-    id("com.googlemaps.dagger.hilt.android")
-    id("com.googlemaps.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("com.google.dagger.hilt.android")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     kotlin("plugin.serialization") version "2.0.21"
 }
 
@@ -69,7 +69,6 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.crashlytics.buildtools)
-    implementation(libs.firebase.vertexai)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
