@@ -258,14 +258,14 @@ fun SignUpView(
             OutlinedButton(
                 onClick = {
                     authViewModel.googleOAuth { result ->
-                    when (result) {
-                        is AuthDataStore.Result.Success -> onNavigateToHome()
-                        // need to implement an error page
-                        is AuthDataStore.Result.Error -> {
-                            Toast.makeText(context, result.exception.message, Toast.LENGTH_SHORT).show()
+                        when (result) {
+                            is AuthDataStore.Result.Success -> onNavigateToHome()
+                            // need to implement an error page
+                            is AuthDataStore.Result.Error -> {
+                                Toast.makeText(context, result.exception.message, Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
-                }
                 },
                 modifier =
                     Modifier
