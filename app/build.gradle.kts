@@ -89,6 +89,7 @@ dependencies {
     implementation(libs.google.services)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.firebase.vertexai)
+    implementation(platform(libs.firebase.bom.v3390))
 }
 
 kapt {

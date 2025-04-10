@@ -52,12 +52,7 @@ fun HomePageView(
     onNavigateToProfile: () -> Unit
 
 ) {
-    // ONE-TIME SEED (debug builds only)
-//    if (BuildConfig.DEBUG) {
-//        LaunchedEffect(Unit) {
-//            placesViewModel.seedEstablishments()
-//        }
-//    }
+
     val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
         // Example places with actual direct image URLs
