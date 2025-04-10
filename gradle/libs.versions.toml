@@ -27,6 +27,7 @@ secretsGradlePlugin = "2.0.1"
 firebaseAuthKtx = "23.2.0"
 firebaseCrashlyticsBuildtools = "3.0.3"
 runtimeLivedata = "1.7.8"
+vertexai = "16.0.0"
 
 [libraries]
 androidx-compose-foundation-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
@@ -70,6 +71,7 @@ secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.se
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+firebase-vertexai = { module = "com.google.firebase:firebase-vertexai", version.ref = "vertexai"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
