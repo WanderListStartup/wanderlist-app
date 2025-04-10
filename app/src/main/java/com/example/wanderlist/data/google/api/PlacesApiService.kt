@@ -1,4 +1,4 @@
-package com.example.wanderlist.data.googlemaps.api
+package com.example.wanderlist.data.google.api
 
 import android.content.Context
 import android.net.Uri

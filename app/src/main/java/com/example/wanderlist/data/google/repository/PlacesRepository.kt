@@ -1,11 +1,11 @@
-package com.example.wanderlist.data.googlemaps.repository
+package com.example.wanderlist.data.google.repository
 
 import android.content.Context
 import android.util.Log
 import com.example.wanderlist.BuildConfig
 import com.example.wanderlist.R
-import com.example.wanderlist.data.googlemaps.api.PlacesApiService
-import com.example.wanderlist.data.googlemaps.model.PlaceDetails
+import com.example.wanderlist.data.google.api.PlacesApiService
+import com.example.wanderlist.data.google.model.PlaceDetails
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.InputStreamReader

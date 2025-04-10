@@ -4,8 +4,8 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wanderlist.data.googlemaps.model.PlaceDetails
-import com.example.wanderlist.data.googlemaps.repository.PlacesRepository
+import com.example.wanderlist.data.google.model.PlaceDetails
+import com.example.wanderlist.data.google.repository.PlacesRepository
 import com.example.wanderlist.data.firestore.repository.EstablishmentDetailsRepository  // ← ADDED
 import com.google.firebase.firestore.FirebaseFirestore                      // ← ADDED
 import kotlinx.coroutines.Dispatchers

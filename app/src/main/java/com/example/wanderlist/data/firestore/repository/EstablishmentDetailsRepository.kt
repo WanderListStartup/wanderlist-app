@@ -1,7 +1,7 @@
 package com.example.wanderlist.data.firestore.repository
 
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
-import com.example.wanderlist.data.googlemaps.model.PlaceDetails
+import com.example.wanderlist.data.google.model.PlaceDetails
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
