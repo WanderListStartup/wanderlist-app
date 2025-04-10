@@ -1,4 +1,4 @@
-package com.example.wanderlist.data.google.model
+package com.example.wanderlist.data.googlemaps.model
 
 import com.google.android.gms.maps.model.LatLng
 

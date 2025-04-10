@@ -38,7 +38,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.example.wanderlist.data.google.model.PlaceDetails
+import com.example.wanderlist.data.googlemaps.model.PlaceDetails
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.PlacesViewModel
@@ -52,12 +52,7 @@ fun HomePageView(
     onNavigateToProfile: () -> Unit
 
 ) {
-    // ONE-TIME SEED (debug builds only)
-//    if (BuildConfig.DEBUG) {
-//        LaunchedEffect(Unit) {
-//            placesViewModel.seedEstablishments()
-//        }
-//    }
+
     val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
         // Example places with actual direct image URLs
