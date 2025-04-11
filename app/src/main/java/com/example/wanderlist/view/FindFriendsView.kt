@@ -174,7 +174,7 @@ fun FindFriendsView(
 @Composable
 fun FriendListItem(
     userProfile: UserProfile,
-    isIncomingRequest: Boolean = false,  // <-- new parameter
+    isIncomingRequest: Boolean = false,
     onAddFriendClick: () -> Unit
 ) {
     // Top spacer + divider
@@ -202,7 +202,8 @@ fun FriendListItem(
                 contentDescription = "Profile Image",
                 modifier = Modifier
                     .size(50.dp)
-                    .clip(CircleShape)
+                    .clip(CircleShape),        // Round the image
+                contentScale = ContentScale.Crop  // Crop image within circle properly
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -212,13 +213,11 @@ fun FriendListItem(
                 modifier = Modifier.weight(1f),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
                 // LEFT COLUMN: Name / @username
                 Column(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    // Name (with a minimal “(Incoming)” label if needed)
                     val nameText = if (isIncomingRequest) {
                         "${userProfile.name} (Incoming)"
                     } else {
@@ -250,7 +249,7 @@ fun FriendListItem(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    // Location
+                    // Location row
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
                             painter = rememberAsyncImagePainter(R.drawable.distance),
@@ -258,6 +257,7 @@ fun FriendListItem(
                             modifier = Modifier
                                 .width(14.dp)
                                 .height(14.dp),
+                            contentScale = ContentScale.Fit
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
@@ -283,7 +283,7 @@ fun FriendListItem(
             // Add Friend icon on the far right
             IconButton(onClick = onAddFriendClick) {
                 Icon(
-                    imageVector = Icons.Default.PersonAdd, // same icon
+                    imageVector = Icons.Default.PersonAdd,
                     contentDescription = "Add Friend",
                     tint = Color.Gray
                 )
