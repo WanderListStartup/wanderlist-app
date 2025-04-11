@@ -1,16 +1,23 @@
 package com.example.wanderlist
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
@@ -38,18 +45,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.example.wanderlist.components.PhotoGridView
 import com.example.wanderlist.components.TopThreePhotos
-import com.example.wanderlist.data.googlemaps.model.PlaceDetails
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.AuthViewModel
-import com.example.wanderlist.viewmodel.PlacesViewModel
-import com.example.wanderlist.viewmodel.ProfileViewModel
-import com.google.android.libraries.places.api.model.Place
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.input.pointer.pointerInput
 import com.example.wanderlist.data.firestore.model.Category
+import com.example.wanderlist.data.firestore.model.EstablishmentDetails
 
 // 1) Simple data class
 // data class Place(
@@ -61,6 +66,10 @@ import com.example.wanderlist.data.firestore.model.Category
 //    val thumbnailUrls: List<String>
 // )
 import com.example.wanderlist.viewmodel.EstablishmentIdHoldViewModel
+import com.example.wanderlist.viewmodel.HomePageViewModel
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -68,16 +77,18 @@ fun HomePageView(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
     onNavigateToShowMore: (String) -> Unit,
-    placesViewModel: PlacesViewModel = hiltViewModel(),
+    homePageViewModel: HomePageViewModel = hiltViewModel(),
     onNavigateToProfile: () -> Unit
 
-    ) {
+) {
 
-    val places = placesViewModel.places.collectAsState().value
+    val places = homePageViewModel.establishments.collectAsState().value
+    val loading = homePageViewModel.isLoading.collectAsState().value
     MaterialTheme {
 
             HomeScreen(
                 places = places,
+                loading = loading,
                 onNavigateToProfile = { onNavigateToProfile() },
                 onNavigateToShowMore = { establishmentId ->
                     onNavigateToShowMore(establishmentId)
@@ -88,13 +99,11 @@ fun HomePageView(
 
 @Composable
 fun HomeScreen(
-    places: List<PlaceDetails>,
+    places: List<EstablishmentDetails>,
+    loading: Boolean,
     onNavigateToProfile: () -> Unit,
     onNavigateToShowMore: (String) -> Unit,
 ) {
-    val state = rememberLazyListState()
-    val placesViewModel: PlacesViewModel = hiltViewModel()
-    val loading = placesViewModel.isLoading.collectAsState().value
     Scaffold(
         topBar = { TopBarCategories() },
         bottomBar = { BottomNavigationBar(onNavigateToProfile = onNavigateToProfile) },
@@ -106,7 +115,7 @@ fun HomeScreen(
                     .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
-            if(loading){
+            if(loading || places.isEmpty()){
                 CircularProgressIndicator(
                     modifier = Modifier.size(64.dp),
                     color = MaterialTheme.colorScheme.secondary,
@@ -115,19 +124,12 @@ fun HomeScreen(
             }
             // Horizontal scroll for multiple places
             else {
-                LazyRow(
-                    modifier = Modifier.fillMaxSize(),
-                    state = state,
-                    flingBehavior = rememberSnapFlingBehavior(lazyListState = state),
-                ) {
-                    items(places) { place ->
-                        // Each place item takes the full screen width
-                        Box(modifier = Modifier.fillParentMaxSize()) {
-                            PlaceContent(
-                                place,
-                                onNavigateToShowMore = onNavigateToShowMore,
-                            )
-                        }
+                places.firstOrNull()?.let { currentPlace ->
+                    key(currentPlace.id) {
+                        PlaceContent(
+                            place = currentPlace,
+                            onNavigateToShowMore = onNavigateToShowMore,
+                        )
                     }
                 }
             }
@@ -137,7 +139,7 @@ fun HomeScreen(
 
 @Composable
 fun TopBarCategories() {
-    val placesViewModel: PlacesViewModel = hiltViewModel()
+    val placesViewModel: HomePageViewModel = hiltViewModel()
     val selectedCategory by placesViewModel.selectedCategory.collectAsState()
 //    var selectedCategory = remember { mutableStateOf("Food") }
 
@@ -188,7 +190,7 @@ fun TopBarCategories() {
                                     Modifier
                                         .clip(RoundedCornerShape(16.dp))
                                         .background(Color(0xFFE8F0FE))
-                                        .clickable { placesViewModel.setSelectedCategory(category)},
+                                        .clickable { placesViewModel.setSelectedCategory(category) },
                             ) {
                                 Text(
                                     text = category.displayName,
@@ -205,7 +207,7 @@ fun TopBarCategories() {
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier =
                                     Modifier
-                                        .clickable { placesViewModel.setSelectedCategory(category)}
+                                        .clickable { placesViewModel.setSelectedCategory(category) }
                                         .padding(horizontal = 8.dp, vertical = 8.dp),
                             )
                         }
@@ -294,13 +296,47 @@ fun AboutTextWithShowMore(
 
 @Composable
 fun PlaceContent(
-    place: PlaceDetails,
+    place: EstablishmentDetails,
     onNavigateToShowMore: (String) -> Unit,
 ) {
+
+    val homePageViewModel: HomePageViewModel = hiltViewModel()
     val scrollState = rememberScrollState()
 
-    Column(
-        modifier =
+    val offsetX = remember { Animatable(0f) }
+
+    val scope = rememberCoroutineScope()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onHorizontalDrag = { _, dragAmount ->
+                        scope.launch {
+                            offsetX.snapTo(offsetX.value + dragAmount)
+                        }
+                    },
+                    onDragEnd = {
+                        if (offsetX.value <= -300f) {
+                            Log.d("NGAGA", "PlaceContent: ${place.id}")
+                            homePageViewModel.addLikedEstablishment(place.id)
+                            homePageViewModel.removeSwipedEstablishment()
+
+                        } else if (offsetX.value >= 300f) {
+                            Log.d("NGAGA", "PlaceContent: DISLIKE ${place.id}")
+                            homePageViewModel.addDislikedEstablishment(place.id)
+                            homePageViewModel.removeSwipedEstablishment()
+                        }
+                        scope.launch {
+                            offsetX.animateTo(0f)
+                        }
+                    }
+                )
+            }
+    ) {
+        Column(
+            modifier =
             Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
@@ -349,22 +385,26 @@ fun PlaceContent(
         }
 
 
-        Spacer(modifier = Modifier.height(8.dp))
-        // Cover image
-        Box(
-            modifier =
+            Spacer(modifier = Modifier.height(8.dp))
+            // Cover image
+            Box(
+                modifier =
                 Modifier
                     .padding(horizontal = 30.dp)
                     .height(345.dp)
                     .clip(RoundedCornerShape(32.dp)),
-        ) {
-            Image(
-                painter = rememberAsyncImagePainter(if (place.photoURIs?.size!! > 0) place.photoURIs.get(0) else ""),
-                contentDescription = place.displayName,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        if (place.photoURIs?.size!! > 0) place.photoURIs.get(
+                            0
+                        ) else ""
+                    ),
+                    contentDescription = place.displayName,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
 
         // About section
         Spacer(modifier = Modifier.height(16.dp))
@@ -395,6 +435,85 @@ fun PlaceContent(
         }
 
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+        }
+
+
+        val heartAlpha = ((-offsetX.value) / 300f).coerceIn(0f, 1f)
+        Icon(
+            imageVector = Icons.Default.Favorite,
+            contentDescription = "Heart",
+            tint = Color.Red.copy(alpha = heartAlpha),
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 32.dp)
+                .size(48.dp)
+        )
+
+        val xAlpha = (offsetX.value / 300f).coerceIn(0f, 1f)
+        Icon(
+            imageVector = Icons.Default.Close,
+            contentDescription = "X",
+            tint = Color.Black.copy(alpha = xAlpha),
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 32.dp)
+                .size(48.dp)
+        )
     }
+
+
 }
+
+
+
+
+//@Preview(showBackground = true)
+//@Composable
+//fun HomeScreenPreview() {
+//    val mockPlaces = listOf(
+//        EstablishmentDetails(
+//            id = "ChIJfQn6654P3okRAlMf2xMrWaU",
+//            displayName = "Rensselaer Polytechnic Institute",
+//            distance = 0.3576893437173981,
+//            rating = 4.4,
+//            photoURIs = listOf(
+//            ),
+//            location = LatLng(
+//                42.7297628,
+//                -73.6788884
+//            ),
+//            nationalPhoneNumber = "(518) 276-6000",
+//            openingHours = "LMAO",
+//            websiteUri = "http://www.rpi.edu/",
+//            formattedAddress = "NOTHING",
+//            editorialSummary = "NOTHING"
+//        ),
+//        PlaceDetails(
+//            id = "ChIJm0I2GKYP3okRmnb0byFKApY",
+//            displayName = "Dinosaur Bar-B-Que",
+//            distance = 0.642556136738271,
+//            rating = null, // You can add if available
+//            photoURIs = listOf(
+//            ),
+//            location = LatLng(
+//                42.734568,
+//                -73.689239
+//            ),
+//            nationalPhoneNumber = "(518) 308-0400",
+//            websiteUri = null,
+//            openingHours = "NOTHING",
+//            formattedAddress = "NOTHING",
+//            editorialSummary ="NOTHING" // None listed in snippet
+//        )
+//    )
+//    MaterialTheme {
+//        HomeScreen(
+//            places = mockPlaces,
+//            loading = false,
+//            onNavigateToProfile = {},
+//            onNavigateToShowMore = {}
+//        )
+//    }
+//}

@@ -72,10 +72,10 @@ class PlacesRepository @Inject constructor(
         /* Check if the places data is already stored locally.
          * If it is, return it immediately without making an API call.
          */
-//        if (BuildConfig.DEBUG) {
-//            Log.d(TAG, "fetchAndStorePlaces: NOT FETCHING APIS!!!! using test data from res/raw/places.json")
-//            return parseJsonToPlaces(context)
-//        }
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "fetchAndStorePlaces: NOT FETCHING APIS!!!! using test data from res/raw/places.json")
+            return parseJsonToPlaces(context)
+        }
         Log.d(TAG, "fetchAndStorePlaces: starting getNearbyPlaces")
         val places = apiService.getNearbyPlaces(filters)
         Log.d(TAG, "fetchAndStorePlaces: after getNearbyPlaces got: $places")

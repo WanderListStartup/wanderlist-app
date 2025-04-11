@@ -3,21 +3,35 @@ package com.example.wanderlist.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.wanderlist.data.firestore.model.Category
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
 import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.data.firestore.repository.EstablishmentDetailsRepository
 import com.example.wanderlist.data.firestore.repository.UserProfileRepository
+import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomePageViewModel(
+
+@HiltViewModel
+class HomePageViewModel @Inject constructor(
     private val establishmentRepository: EstablishmentDetailsRepository,
-    private val userProfileRepository: UserProfileRepository
+    private val userProfileRepository: UserProfileRepository,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
-    // Holds the list of establishments to show.
     private val _establishments = MutableStateFlow<List<EstablishmentDetails>>(emptyList())
     val establishments: StateFlow<List<EstablishmentDetails>> get() = _establishments
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+    private val _selectedCategory = MutableStateFlow(Category.FOOD)
+    val selectedCategory: StateFlow<Category> = _selectedCategory
+    private val _currentPlace = MutableStateFlow<EstablishmentDetails?>(null)
+    val currentPlace : StateFlow<EstablishmentDetails?> = _currentPlace
+
+    private val TAG = "HomePageViewModel"
 
     // Holds the current user profile (used for filtering queries).
     // This is loaded once but will not be updated on swipes.
@@ -26,8 +40,13 @@ class HomePageViewModel(
 
     init {
         viewModelScope.launch {
-            // Replace "user123" with the current user's UID from your authentication system.
-            val profile = userProfileRepository.getUserProfile("user123")
+            Log.d(TAG, ": Launching init ")
+            val uid = auth.uid
+            if (uid == null){
+                Log.e(TAG, "INVALID USER: CHECK CREDENTIALS ", )
+                throw RuntimeException("INVALID USER IN HOMEPAGEVIEWMODEL")
+            }
+            val profile = userProfileRepository.getUserProfile(uid)
             _userProfile.value = profile
             loadMoreEstablishments()
         }
@@ -49,6 +68,8 @@ class HomePageViewModel(
      */
     fun loadMoreEstablishments() {
         viewModelScope.launch {
+            Log.d(TAG, "loadMoreEstablishments: starting")
+            _isLoading.value = true
             refreshUserProfile()
 
             // Gather IDs of already loaded establishments.
@@ -61,13 +82,25 @@ class HomePageViewModel(
             // Combine IDs that should be excluded.
             val excludeIds = (loadedIds + profileExcludeIds).distinct()
 
-            establishmentRepository.getEstablishmentsExcluding(
+            Log.d(TAG, "loadMoreEstablishments: filter is ${_selectedCategory.value.displayName}")
+            val newPlaces = establishmentRepository.getEstablishmentsExcluding(
                 excludedIds = excludeIds,
-                limit = 5
-            ) { newPlaces ->
-                _establishments.value += newPlaces
-            }
+                limit = 5,
+                withFilter = _selectedCategory.value.displayName
+            )
+            Log.d(TAG, "loadMoreEstablishments: Got ${newPlaces}")
+           _establishments.value += newPlaces
+            Log.d(TAG, "loadMoreEstablishments: done loading establishments")
+            _isLoading.value = false
         }
+    }
+
+    fun setSelectedCategory(category: Category) {
+        Log.d(TAG, "setSelectedCategory: setting selected category")
+        _selectedCategory.value = category
+        _establishments.value = emptyList()
+        loadMoreEstablishments()
+        Log.d(TAG, "setSelectedCategory: done setting selected category")
     }
 
     /**
@@ -77,12 +110,14 @@ class HomePageViewModel(
      */
     fun removeSwipedEstablishment() {
         viewModelScope.launch {
+            Log.d(TAG, "removeSwipedEstablishment: removing")
             if (_establishments.value.isNotEmpty()) {
                 _establishments.value = _establishments.value.drop(1)
                 if (_establishments.value.size < 2) {
                     loadMoreEstablishments()
                 }
             }
+            Log.d(TAG, "removeSwipedEstablishment: done removing")
         }
     }
 
@@ -92,6 +127,8 @@ class HomePageViewModel(
      */
     fun addLikedEstablishment(establishmentId: String) {
         viewModelScope.launch {
+            Log.d(TAG, "addLikedEstablishment: adding liked")
+            refreshUserProfile()
             val profile = _userProfile.value
             if (profile == null) {
                 Log.e("HomePageViewModel", "User profile is null")
@@ -104,6 +141,7 @@ class HomePageViewModel(
                     mapOf("likedEstablishments" to updatedLiked)
                 )
             }
+            Log.d(TAG, "addLikedEstablishment: done adding liked")
         }
     }
 
@@ -113,6 +151,9 @@ class HomePageViewModel(
      */
     fun addDislikedEstablishment(establishmentId: String) {
         viewModelScope.launch {
+            Log.d(TAG, "addDislikedEstablishment: adding disliked")
+
+            refreshUserProfile()
             val profile = _userProfile.value
             if (profile == null) {
                 Log.e("HomePageViewModel", "User profile is null")
@@ -125,6 +166,7 @@ class HomePageViewModel(
                     mapOf("dislikedEstablishments" to updatedDisliked)
                 )
             }
+            Log.d(TAG, "addDislikedEstablishment: done adding disliked")
         }
     }
 }
