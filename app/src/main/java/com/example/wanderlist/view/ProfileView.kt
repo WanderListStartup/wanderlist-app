@@ -39,6 +39,9 @@ import com.example.wanderlist.components.LikedPlacesGrid
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.EditProfileViewModel
+import com.example.wanderlist.viewmodel.ProfileViewModel
+
+import com.example.wanderlist.viewmodel.FindFriendsViewModel
 import com.example.wanderlist.viewmodel.PlacesViewModel
 import com.google.android.gms.maps.model.Circle
 
@@ -47,10 +50,12 @@ import com.google.android.gms.maps.model.Circle
 @Composable
 fun ProfileView(
     viewModel: EditProfileViewModel = hiltViewModel(),
+    profileViewModel: ProfileViewModel = hiltViewModel(),
     authViewModel: AuthViewModel,
     onNavigateToHome: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit,
+    onNavigateToFindFriends: () -> Unit
     placesViewModel: PlacesViewModel = viewModel()
 ) {
     val selectedTab = remember { mutableIntStateOf(0)
@@ -279,8 +284,9 @@ fun ProfileView(
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            // "Add Friend" button (unchanged)
                             Button(
-                                onClick = { /* Add Friend logic */ },
+                                onClick = { onNavigateToFindFriends() },
                                 shape = RoundedCornerShape(15.dp),
                                 colors = ButtonDefaults.buttonColors(Color(0xFF176FF2)),
                                 modifier = Modifier
@@ -297,68 +303,34 @@ fun ProfileView(
                                 color = Color.Gray.copy(alpha = 0.2f)
                             )
                         }
+
+                        // Now replace the hardcoded "UserRow"s with a loop of your real friendProfiles
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(PaddingValues(top = 60.dp))
                         ) {
-                            UserRow(
-                                imageUrl = "https://example.com/logan_paul.jpg",
-                                name = "Logan Paul",
-                                handle = "@lPaul_45",
-                                location = "Los Angeles, CA",
-                                level = "Lvl: 2"
-                            )
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .padding(horizontal = 40.dp)
-                                    .fillMaxWidth(),
-                                thickness = 1.dp,
-                                color = Color.Gray.copy(alpha = 0.2f)
-                            )
-                            UserRow(
-                                imageUrl = "https://example.com/walter_white.jpg",
-                                name = "Walter White",
-                                handle = "@heisenberg",
-                                location = "Albuquerque, NM",
-                                level = "Lvl: 999"
-                            )
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .padding(horizontal = 40.dp)
-                                    .fillMaxWidth(),
-                                thickness = 1.dp,
-                                color = Color.Gray.copy(alpha = 0.2f)
-                            )
-                            UserRow(
-                                imageUrl = "https://example.com/angel_reese.jpg",
-                                name = "Angel Reese",
-                                handle = "@AngBricks",
-                                location = "Chicago, IL",
-                                level = "Lvl: 22"
-                            )
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .padding(horizontal = 40.dp)
-                                    .fillMaxWidth(),
-                                thickness = 1.dp,
-                                color = Color.Gray.copy(alpha = 0.2f)
-                            )
-                            UserRow(
-                                imageUrl = "https://example.com/lebron_james.jpg",
-                                name = "LeBron James",
-                                handle = "@LeWanderer",
-                                location = "Los Angeles, CA",
-                                level = "Lvl: 999"
-                            )
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .padding(horizontal = 40.dp)
-                                    .fillMaxWidth(),
-                                thickness = 1.dp,
-                                color = Color.Gray.copy(alpha = 0.2f)
-                            )
-                            // ... additional rows as needed
+                            val friends = profileViewModel.friendProfiles // The real friend list from your ViewModel
+                            friends.forEachIndexed { index, friend ->
+                                UserRow(
+                                    imageUrl =
+                                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
+                                    name = friend.name,
+                                    handle = "@${friend.username}",
+                                    location = friend.location,
+                                    level = "Lvl: ${friend.level}"
+                                )
+                                // Exactly the same divider
+                                if (index < friends.lastIndex) {
+                                    HorizontalDivider(
+                                        modifier = Modifier
+                                            .padding(horizontal = 40.dp)
+                                            .fillMaxWidth(),
+                                        thickness = 1.dp,
+                                        color = Color.Gray.copy(alpha = 0.2f)
+                                    )
+                                }
+                            }
                         }
                         Spacer(modifier = Modifier.height(24.dp))
                     }
