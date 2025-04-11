@@ -3,16 +3,11 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.AnchoredDraggableState
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
-import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -31,7 +26,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,24 +46,12 @@ import com.example.wanderlist.viewmodel.AuthViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import com.example.wanderlist.data.firestore.model.Category
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
-
-// 1) Simple data class
-// data class Place(
-//    val name: String,
-//    val rating: Double,
-//    val distance: String,
-//    val coverImageUrl: String,
-//    val aboutText: String,
-//    val thumbnailUrls: List<String>
-// )
-import com.example.wanderlist.viewmodel.EstablishmentIdHoldViewModel
 import com.example.wanderlist.viewmodel.HomePageViewModel
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 
 @Composable
@@ -440,27 +422,41 @@ fun PlaceContent(
         }
 
 
-        val heartAlpha = ((-offsetX.value) / 300f).coerceIn(0f, 1f)
-        Icon(
-            imageVector = Icons.Default.Favorite,
-            contentDescription = "Heart",
-            tint = Color.Red.copy(alpha = heartAlpha),
+        val heartAlpha = (offsetX.value / 300f).coerceIn(0f, 1f)
+        Box(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(end = 32.dp)
                 .size(48.dp)
-        )
+                .graphicsLayer { alpha = heartAlpha }
+                .background(Color.White, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                contentDescription = "Heart",
+                tint = Color.Red.copy(alpha = heartAlpha),
+                modifier = Modifier.size(24.dp)
+            )
+        }
 
-        val xAlpha = (offsetX.value / 300f).coerceIn(0f, 1f)
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = "X",
-            tint = Color.Black.copy(alpha = xAlpha),
+        val xAlpha = (-offsetX.value / 300f).coerceIn(0f, 1f)
+        Box(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .padding(start = 32.dp)
                 .size(48.dp)
-        )
+                .graphicsLayer { alpha = xAlpha }
+                .background(Color.White, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "X",
+                tint = Color.Black.copy(alpha = xAlpha),
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
 
 
