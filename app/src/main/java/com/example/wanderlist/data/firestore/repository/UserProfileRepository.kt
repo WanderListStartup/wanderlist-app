@@ -4,6 +4,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import com.example.wanderlist.data.firestore.model.UserProfile
+import com.google.firebase.firestore.toObject
 
 
 class UserProfileRepository @Inject constructor(
@@ -14,6 +15,17 @@ class UserProfileRepository @Inject constructor(
             .document(userProfile.uid)
             .set(userProfile)
             .await()
+    }
+
+    suspend fun getAllUserProfiles(): List<UserProfile> {
+        val snapshot = firestore.collection("user_profiles").get().await()
+        val list = mutableListOf<UserProfile>()
+        for (document in snapshot.documents) {
+            document.toObject<UserProfile>()?.let { userProfile ->
+                list.add(userProfile)
+            }
+        }
+        return list
     }
 
     suspend fun getUserProfile(uid: String): UserProfile? {

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,26 +32,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.R
+import com.example.wanderlist.components.LikedPlacesGrid
 import com.example.wanderlist.ui.theme.wanderlistBlue
-import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.EditProfileViewModel
-
+import com.example.wanderlist.viewmodel.ProfileViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileView(
     viewModel: EditProfileViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel,
+    profileViewModel: ProfileViewModel = hiltViewModel(),
     onNavigateToHome: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onNavigateToUserSettings: () -> Unit
+    onNavigateToUserSettings: () -> Unit,
+    onNavigateToFindFriends: () -> Unit,
 ) {
-    val selectedTab = remember { mutableIntStateOf(0)
-    }
-    val context = LocalContext.current
+    val selectedTab = remember { mutableIntStateOf(0) }
+
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -162,6 +164,7 @@ fun ProfileView(
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
+
                 Box(
                     modifier = Modifier
                         .width(250.dp)
@@ -178,6 +181,7 @@ fun ProfileView(
                 }
                 Spacer(modifier = Modifier.width(4.dp))
             }
+
             Text(
                 text = viewModel.bio,
                 style = MaterialTheme.typography.bodyMedium,
@@ -194,20 +198,30 @@ fun ProfileView(
             ) {
                 Button(
                     onClick = { onNavigateToUserSettings() },
-                    modifier = Modifier.shadow(elevation=6.dp, shape= RoundedCornerShape(20.dp)),
+                    modifier = Modifier
+                        .height(33.dp)
+                        .shadow(elevation=6.dp, shape= RoundedCornerShape(20.dp))
+                        .width(240.dp),
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
-                    Text(text = "Edit Profile", color = Color.Black)
+                    Text(text = "Edit Profile", color = Color.Black,
+                        modifier = Modifier.align(Alignment.CenterVertically),)
                 }
                 IconButton(
                     onClick = { onNavigateToSettings() },
-                    colors = IconButtonDefaults.iconButtonColors(contentColor = Color.Black),
+                    colors = IconButtonDefaults.iconButtonColors(contentColor = Color.Black)
                 ) {
                    Icon(Icons.Rounded.Settings, contentDescription = "Settings")
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.width(350.dp).align(Alignment.CenterHorizontally)
+            )
+            {
+                HorizontalDivider(modifier = Modifier.padding(top=15.dp, bottom=10.dp))
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -242,13 +256,9 @@ fun ProfileView(
             ) {
                 when (selectedTab.intValue) {
                     0 -> {
-                        Text(
-                            text = "Liked tab content here",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            textAlign = TextAlign.Center
-                        )
+                        // replace Places with
+                        // List<PlaceDetails> userLikedPlaces = [place, place2, ... ]
+
                     }
                     1 -> {
                         Text(
@@ -264,8 +274,9 @@ fun ProfileView(
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            // "Add Friend" button (unchanged)
                             Button(
-                                onClick = { /* Add Friend logic */ },
+                                onClick = { onNavigateToFindFriends() },
                                 shape = RoundedCornerShape(15.dp),
                                 colors = ButtonDefaults.buttonColors(Color(0xFF176FF2)),
                                 modifier = Modifier
@@ -282,68 +293,34 @@ fun ProfileView(
                                 color = Color.Gray.copy(alpha = 0.2f)
                             )
                         }
+
+                        // Now replace the hardcoded "UserRow"s with a loop of your real friendProfiles
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(PaddingValues(top = 60.dp))
                         ) {
-                            UserRow(
-                                imageUrl = "https://example.com/logan_paul.jpg",
-                                name = "Logan Paul",
-                                handle = "@lPaul_45",
-                                location = "Los Angeles, CA",
-                                level = "Lvl: 2"
-                            )
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .padding(horizontal = 40.dp)
-                                    .fillMaxWidth(),
-                                thickness = 1.dp,
-                                color = Color.Gray.copy(alpha = 0.2f)
-                            )
-                            UserRow(
-                                imageUrl = "https://example.com/walter_white.jpg",
-                                name = "Walter White",
-                                handle = "@heisenberg",
-                                location = "Albuquerque, NM",
-                                level = "Lvl: 999"
-                            )
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .padding(horizontal = 40.dp)
-                                    .fillMaxWidth(),
-                                thickness = 1.dp,
-                                color = Color.Gray.copy(alpha = 0.2f)
-                            )
-                            UserRow(
-                                imageUrl = "https://example.com/angel_reese.jpg",
-                                name = "Angel Reese",
-                                handle = "@AngBricks",
-                                location = "Chicago, IL",
-                                level = "Lvl: 22"
-                            )
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .padding(horizontal = 40.dp)
-                                    .fillMaxWidth(),
-                                thickness = 1.dp,
-                                color = Color.Gray.copy(alpha = 0.2f)
-                            )
-                            UserRow(
-                                imageUrl = "https://example.com/lebron_james.jpg",
-                                name = "LeBron James",
-                                handle = "@LeWanderer",
-                                location = "Los Angeles, CA",
-                                level = "Lvl: 999"
-                            )
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .padding(horizontal = 40.dp)
-                                    .fillMaxWidth(),
-                                thickness = 1.dp,
-                                color = Color.Gray.copy(alpha = 0.2f)
-                            )
-                            // ... additional rows as needed
+                            val friends = profileViewModel.friendProfiles // The real friend list from your ViewModel
+                            friends.forEachIndexed { index, friend ->
+                                UserRow(
+                                    imageUrl =
+                                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
+                                    name = friend.name,
+                                    handle = "@${friend.username}",
+                                    location = friend.location,
+                                    level = "Lvl: ${friend.level}"
+                                )
+                                // Exactly the same divider
+                                if (index < friends.lastIndex) {
+                                    HorizontalDivider(
+                                        modifier = Modifier
+                                            .padding(horizontal = 40.dp)
+                                            .fillMaxWidth(),
+                                        thickness = 1.dp,
+                                        color = Color.Gray.copy(alpha = 0.2f)
+                                    )
+                                }
+                            }
                         }
                         Spacer(modifier = Modifier.height(24.dp))
                     }
@@ -447,4 +424,5 @@ fun UserRow(
         }
     }
 }
+
 
