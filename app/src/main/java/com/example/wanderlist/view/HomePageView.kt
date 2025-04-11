@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.components.PhotoGridView
+import com.example.wanderlist.components.TopThreePhotos
 import com.example.wanderlist.data.googlemaps.model.PlaceDetails
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.AuthViewModel
@@ -324,7 +325,6 @@ fun PlaceContent(
             modifier =
                 Modifier
                     .padding(horizontal = 30.dp)
-                    .width(350.dp)
                     .height(345.dp)
                     .clip(RoundedCornerShape(32.dp)),
         ) {
@@ -355,9 +355,14 @@ fun PlaceContent(
             )
         }
 
-        // Thumbnails
-        PhotoGridView((place.photoURIs?: "") as List<String>)
-
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TopThreePhotos((place.photoURIs ?: "") as List<String>)
+        }
 
 
         Spacer(modifier = Modifier.height(16.dp))
