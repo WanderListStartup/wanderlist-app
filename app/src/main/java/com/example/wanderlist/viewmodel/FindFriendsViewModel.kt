@@ -8,41 +8,109 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.data.firestore.repository.UserProfileRepository
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 @HiltViewModel
 class FindFriendsViewModel @Inject constructor(
     private val userProfileRepository: UserProfileRepository
 ) : ViewModel() {
 
-    // Text in the search bar
-    var searchQuery by mutableStateOf("Logan Pa")
+    // Already present
+    var searchQuery by mutableStateOf("")
         private set
 
-    // All user profiles from Firestore
     var allProfiles by mutableStateOf<List<UserProfile>>(emptyList())
         private set
 
-    // Initialization: fetch all user profiles
+    // Suppose we store the current user’s UID from FirebaseAuth
+    var currentUserUid: String? = null
+        private set
+
     init {
+        // 1) Load current user’s UID (example from FirebaseAuth)
+        currentUserUid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+
+        // 2) Load all profiles
         viewModelScope.launch {
             allProfiles = userProfileRepository.getAllUserProfiles()
         }
     }
 
-    // Called whenever the search text changes
     fun onSearchQueryChange(newQuery: String) {
         searchQuery = newQuery
     }
 
-    // Return the filtered profiles based on name or username
+    // Return the entire list filtered by name/username
     fun filteredProfiles(): List<UserProfile> {
-        val query = searchQuery.trim().lowercase()
-        return allProfiles.filter { profile ->
-            profile.name.lowercase().contains(query) ||
-                    profile.username.lowercase().contains(query)
+        val q = searchQuery.trim().lowercase()
+        return allProfiles.filter {
+            it.name.lowercase().contains(q) || it.username.lowercase().contains(q)
+        }
+    }
+
+    // Returns my current user object, if present
+    private fun getCurrentUserProfile(): UserProfile? {
+        val me = currentUserUid ?: return null
+        return allProfiles.firstOrNull { it.uid == me }
+    }
+
+    // -- FRIEND REQUEST LOGIC --
+
+    // The profiles that are in my incomingRequests
+    fun incomingRequestProfiles(): List<UserProfile> {
+        val me = getCurrentUserProfile() ?: return emptyList()
+        val requestUids = me.incomingRequests
+        return filteredProfiles().filter { it.uid in requestUids }
+    }
+
+    // The rest of the profiles (excluding me + those in my incomingRequests)
+    fun otherProfilesExcludingRequests(): List<UserProfile> {
+        val me = getCurrentUserProfile() ?: return emptyList()
+        val requestUids = me.incomingRequests
+        return filteredProfiles().filter {
+            it.uid != me.uid && it.uid !in requestUids
+        }
+    }
+
+    // When I tap "Add Friend" on a user who is NOT an incoming request
+    // This sends a request to that user
+    fun sendFriendRequest(target: UserProfile) {
+        val me = currentUserUid ?: return
+        viewModelScope.launch {
+            userProfileRepository.updateUserProfile(
+                uid = target.uid,
+                updatedFields = mapOf(
+                    "incomingRequests" to com.google.firebase.firestore.FieldValue.arrayUnion(me)
+                )
+            )
+        }
+    }
+
+    // When I tap "Add Friend" on an incoming request user
+    // This effectively "accepts" that request
+    fun acceptFriendRequest(requesterUid: String) {
+        val me = currentUserUid ?: return
+        viewModelScope.launch {
+            // 1) Remove requester from MY incomingRequests, add them to my friends
+            userProfileRepository.updateUserProfile(
+                uid = me,
+                updatedFields = mapOf(
+                    "incomingRequests" to com.google.firebase.firestore.FieldValue.arrayRemove(requesterUid),
+                    "friends" to com.google.firebase.firestore.FieldValue.arrayUnion(requesterUid)
+                )
+            )
+
+            // 2) Add ME to the requester’s friends
+            userProfileRepository.updateUserProfile(
+                uid = requesterUid,
+                updatedFields = mapOf(
+                    "friends" to com.google.firebase.firestore.FieldValue.arrayUnion(me)
+                )
+            )
         }
     }
 }
+
