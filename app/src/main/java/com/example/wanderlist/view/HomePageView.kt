@@ -38,6 +38,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
+import com.example.wanderlist.components.PhotoGridView
 import com.example.wanderlist.data.googlemaps.model.PlaceDetails
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.AuthViewModel
@@ -276,38 +277,46 @@ fun PlaceContent(
     ) {
         // Restaurant name, rating, distance
         Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = place.displayName ?: "no display names",
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                )
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "⭐ ${place.rating}")
-                Spacer(modifier = Modifier.width(170.dp))
+            // Display name takes up remaining space
+            Text(
+                text = place.displayName ?: "no display names",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.weight(1f)
+            )
+
+            // Rating immediately after the name
+            Text(
+                text = "⭐ ${place.rating}",
+                modifier = Modifier.padding(start = 8.dp)
+            )
+
+            // Location block: text + icon, aligned on the right
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 8.dp)
+            ) {
                 Text(
                     text = "${String.format("%.1f", place.distance)} mi",
-                    color = Color(0xFF176FF2),
+                    color = Color(0xFF176FF2)
                 )
+                Spacer(modifier = Modifier.width(4.dp))
                 Image(
                     painter = rememberAsyncImagePainter(R.drawable.distance),
                     contentDescription = "Distance Icon",
-                    modifier =
-                        Modifier
-                            .width(40.dp)
-                            .height(40.dp),
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(40.dp)
                 )
             }
         }
+
 
         Spacer(modifier = Modifier.height(8.dp))
         // Cover image
@@ -338,36 +347,17 @@ fun PlaceContent(
         // Only "Show More" is clickable here
         Box(modifier = Modifier.padding(start = 40.dp, bottom = 8.dp)) {
             AboutTextWithShowMore(
-                text = place.editorialSummary ?: place.id,
+                text = place.editorialSummary ?: "",
                 maxLines = 4,
                 onShowMoreClick = {
-
                     onNavigateToShowMore(place.id)
                 },
             )
         }
 
         // Thumbnails
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            place.photoURIs?.forEach { thumbUrl ->
-                Image(
-                    painter = rememberAsyncImagePainter(thumbUrl),
-                    contentDescription = null,
-                    modifier =
-                        Modifier
-                            .width(110.dp)
-                            .height(95.dp)
-                            .clip(RoundedCornerShape(15.dp)),
-                    contentScale = ContentScale.Crop,
-                )
-            }
-        }
+        PhotoGridView((place.photoURIs?: "") as List<String>)
+
 
 
         Spacer(modifier = Modifier.height(16.dp))
