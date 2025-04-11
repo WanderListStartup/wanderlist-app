@@ -203,24 +203,28 @@ fun ProfileView(
             ) {
                 Button(
                     onClick = { onNavigateToUserSettings() },
-                    modifier = Modifier.shadow(elevation=6.dp, shape= RoundedCornerShape(20.dp)),
+                    modifier = Modifier
+                        .height(33.dp)
+                        .shadow(elevation=6.dp, shape= RoundedCornerShape(20.dp))
+                        .width(240.dp),
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
-                    Text(text = "Edit Profile", color = Color.Black)
+                    Text(text = "Edit Profile", color = Color.Black,
+                        modifier = Modifier.align(Alignment.CenterVertically),)
                 }
                 IconButton(
                     onClick = { onNavigateToSettings() },
-                    colors = IconButtonDefaults.iconButtonColors(contentColor = Color.Black),
+                    colors = IconButtonDefaults.iconButtonColors(contentColor = Color.Black)
                 ) {
                    Icon(Icons.Rounded.Settings, contentDescription = "Settings")
                 }
             }
-            Row(modifier = Modifier.clip(CircleShape).size(36.dp).align(Alignment.CenterHorizontally)
-                )
+            Row(
+                modifier = Modifier.width(350.dp).align(Alignment.CenterHorizontally)
+            )
             {
-                HorizontalDivider(modifier = Modifier.padding(top=15.dp))
-
+                HorizontalDivider(modifier = Modifier.padding(top=15.dp, bottom=10.dp))
             }
 
             Row(
