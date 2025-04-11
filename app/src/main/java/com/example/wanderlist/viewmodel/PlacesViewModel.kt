@@ -12,8 +12,6 @@ import com.example.wanderlist.data.firestore.repository.EstablishmentDetailsRepo
 import com.example.wanderlist.data.firestore.repository.QuestsRepository
 import com.example.wanderlist.data.gemini.repository.GeminiRepository
 import com.google.firebase.firestore.FirebaseFirestore                      // ← ADDED
-import com.example.wanderlist.data.model.PlaceDetails
-import com.example.wanderlist.data.repository.PlacesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
