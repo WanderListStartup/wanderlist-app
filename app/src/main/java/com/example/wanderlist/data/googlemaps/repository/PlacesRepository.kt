@@ -81,30 +81,31 @@ class PlacesRepository @Inject constructor(
         Log.d(TAG, "fetchAndStorePlaces: after getNearbyPlaces got: $places")
         val placeDetailsList =
             places.map { place ->
-                PlaceDetails(
-                    id = place.id ?: "",
-                    displayName = place.displayName,
-                    openingHours = place.openingHours?.toString(),
-                    rating = place.rating,
-                    location = place.location,
-                    distance =
+                     PlaceDetails(
+                        id = place.id ?: "",
+                        displayName = place.displayName,
+                        openingHours = place.openingHours?.toString(),
+                        rating = place.rating,
+                        location = place.location,
+                        distance =
                         place.location?.let {
                             place.location?.let { it1 ->
                                 haversineDistance(42.731544, -73.682535, it.latitude, it1.longitude)
                             }
                         },
-                    formattedAddress = place.formattedAddress,
-                    editorialSummary = place.editorialSummary,
-                    nationalPhoneNumber = place.nationalPhoneNumber,
-                    photoURIs =
-                        place.photoMetadatas?.map { photo ->
+                        formattedAddress = place.formattedAddress,
+                        editorialSummary = place.editorialSummary,
+                        nationalPhoneNumber = place.nationalPhoneNumber,
+                        photoURIs =
+                        place.photoMetadatas?.take(4)?.map { photo ->
                             Log.d(TAG, "fetchAndStorePlaces: before metadatatouri")
                             val r = apiService.photoMetaDataToURI(photo)
                             Log.d(TAG, "fetchAndStorePlaces: after photoMetaDatatouri got: $r")
                             r.toString()
                         },
-                    websiteUri = place.websiteUri?.toString(),
-                )
+                        websiteUri = place.websiteUri?.toString(),
+                    )
+
             }
 
         return placeDetailsList

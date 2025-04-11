@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -46,6 +47,7 @@ import com.example.wanderlist.viewmodel.PlacesViewModel
 import com.example.wanderlist.viewmodel.ProfileViewModel
 import com.google.android.libraries.places.api.model.Place
 import androidx.compose.runtime.getValue
+import com.example.wanderlist.data.firestore.model.Category
 
 // 1) Simple data class
 // data class Place(
@@ -70,14 +72,34 @@ fun HomePageView(
 ) {
 
     val places = placesViewModel.places.collectAsState().value
+    val loading = placesViewModel.isLoading.collectAsState().value
     MaterialTheme {
-        HomeScreen(
-            places = places,
-            onNavigateToProfile = { onNavigateToProfile() },
-            onNavigateToShowMore = { establishmentId ->
-                onNavigateToShowMore(establishmentId)
-            },
-        )
+
+        if (!loading) {
+            HomeScreen(
+                places = places,
+                onNavigateToProfile = { onNavigateToProfile() },
+                onNavigateToShowMore = { establishmentId ->
+                    onNavigateToShowMore(establishmentId)
+                },
+            )
+        }
+        else {
+            Scaffold { padding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(64.dp),
+                        color = MaterialTheme.colorScheme.secondary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -125,7 +147,7 @@ fun TopBarCategories() {
 //    var selectedCategory = remember { mutableStateOf("Food") }
 
     // List of category labels
-    val categories = listOf("Food", "Bars", "Entertainment")
+    val categories = listOf(Category.FOOD, Category.BARS, Category.ENTERTAINMENT)
 
     Surface(
         color = Color.White,
@@ -174,7 +196,7 @@ fun TopBarCategories() {
                                         .clickable { placesViewModel.setSelectedCategory(category)},
                             ) {
                                 Text(
-                                    text = category,
+                                    text = category.displayName,
                                     color = Color(0xFF176FF2),
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -183,7 +205,7 @@ fun TopBarCategories() {
                         } else {
                             // Non-selected category: Gray text
                             Text(
-                                text = category,
+                                text = category.displayName,
                                 color = Color.Gray,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier =
