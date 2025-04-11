@@ -46,10 +46,13 @@ class PlacesViewModel @Inject constructor(
         Category.ENTERTAINMENT to listOf("park", "plaza", "movie_theater", "zoo", "casino")
     )
 
-    init {
-        val initList = categoryMapping[Category.FOOD]!!
-        fetchPlaces(initList)
-    }
+//    init {
+//        KEEP COMMENTED OUT
+//        val initList = categoryMapping[Category.FOOD]!!
+//        fetchPlaces(initList)
+//        fetchPlaces(categoryMapping[Category.BARS]!!)
+//        fetchPlaces(categoryMapping[Category.ENTERTAINMENT]!!)
+//    }
 
 
     fun setSelectedCategory(category: Category) {
@@ -60,7 +63,7 @@ class PlacesViewModel @Inject constructor(
             Log.e(TAG, "setSelectedCategory: $category does not have a matching string in Category Mapping")
             filterList = categoryMapping[Category.FOOD]!!
         }
-        fetchPlaces(filterList)
+        //fetchPlaces(filterList)
     }
 
     /* Fetches places from the repository and updates the state.
