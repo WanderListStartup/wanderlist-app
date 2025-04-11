@@ -111,6 +111,7 @@ class HomePageViewModel @Inject constructor(
     fun removeSwipedEstablishment() {
         viewModelScope.launch {
             Log.d(TAG, "removeSwipedEstablishment: removing")
+            refreshUserProfile()
             if (_establishments.value.isNotEmpty()) {
                 _establishments.value = _establishments.value.drop(1)
                 if (_establishments.value.size < 2) {

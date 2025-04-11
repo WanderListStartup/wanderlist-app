@@ -69,16 +69,25 @@ class EstablishmentDetailsRepository @Inject constructor(
                     .where(Filter.equalTo("category", withFilter))
                     .limit(limit.toLong())
             } else {
-                // If more than 10, take only the first 10
+                // More than 10 excluded IDs. Query by category only,
+                // and then we'll do client-side exclusion.
+                // Increase limit so we have enough results after exclusion.
                 Log.d(TAG, "getEstablishmentsExcluding: 3 ${withFilter} exc ${excludedIds}")
                 firestore.collection("establishment_details")
                     .where(Filter.equalTo("category", withFilter))
-                    .whereNotIn("id", excludedIds.take(10))
-                    .limit(limit.toLong())
+                    // We'll fetch more than 'limit' to offset the excluded items.
+                    .limit((limit + excludedIds.size).toLong())
             }
             val snapshot = query.get().await()
             val establishments = snapshot.documents.mapNotNull { it.toObject(EstablishmentDetails::class.java) }
-            return establishments
+
+            val filteredEstablishments = if (excludedIds.size > 10) {
+                establishments.filterNot { excludedIds.contains(it.id) }
+            } else {
+                establishments
+            }
+
+            return filteredEstablishments.take(limit)
         } catch (e: Exception) {
             e.printStackTrace()
             return emptyList()
