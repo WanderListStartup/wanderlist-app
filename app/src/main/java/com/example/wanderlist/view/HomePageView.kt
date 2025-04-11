@@ -45,12 +45,6 @@ import com.example.wanderlist.viewmodel.PlacesViewModel
 import com.example.wanderlist.viewmodel.EstablishmentIdHoldViewModel
 
 
-@Preview(showBackground = true)
-@Composable
-fun HomePageViewPreview() {
-    HomePageView()
-}
-
 @Composable
 fun HomePageView(
     modifier: Modifier = Modifier,
@@ -59,11 +53,17 @@ fun HomePageView(
     onNavigateToProfile: () -> Unit,
     onNavigateToShowMore: (String) -> Unit,
 
-) {
+    ) {
 
     val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
-        HomeScreen(places)
+        HomeScreen(
+            places = places,
+            onNavigateToProfile = { onNavigateToProfile() },
+            onNavigateToShowMore = { establishmentId ->
+                onNavigateToShowMore(establishmentId)
+            },
+        )
     }
 }
 
@@ -373,5 +373,3 @@ fun PlaceContent(
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
-
-
