@@ -8,7 +8,9 @@ import com.example.wanderlist.data.googlemaps.api.PlacesApiService
 import com.example.wanderlist.data.googlemaps.model.PlaceDetails
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.InputStreamReader
+import javax.inject.Inject
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
@@ -38,8 +40,8 @@ fun haversineDistance(
     return r * c
 }
 
-class PlacesRepository(
-    private val context: Context,
+class PlacesRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
 ) {
     private val apiService = PlacesApiService(context)
     private val gson = Gson()
@@ -66,43 +68,44 @@ class PlacesRepository(
      * converts them into a list of [PlaceDetails] objects,
      * and stores them locally as a JSON file.
      */
-    suspend fun fetchAndStorePlaces(): List<PlaceDetails> {
+    suspend fun fetchAndStorePlaces(filters: List<String> = emptyList()): List<PlaceDetails> {
         /* Check if the places data is already stored locally.
          * If it is, return it immediately without making an API call.
          */
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "fetchAndStorePlaces: NOT FETCHING APIS!!!! using test data from res/raw/places.json")
-            return parseJsonToPlaces(context)
-        }
+//        if (BuildConfig.DEBUG) {
+//            Log.d(TAG, "fetchAndStorePlaces: NOT FETCHING APIS!!!! using test data from res/raw/places.json")
+//            return parseJsonToPlaces(context)
+//        }
         Log.d(TAG, "fetchAndStorePlaces: starting getNearbyPlaces")
-        val places = apiService.getNearbyPlaces()
+        val places = apiService.getNearbyPlaces(filters)
         Log.d(TAG, "fetchAndStorePlaces: after getNearbyPlaces got: $places")
         val placeDetailsList =
             places.map { place ->
-                PlaceDetails(
-                    id = place.id ?: "",
-                    displayName = place.displayName,
-                    openingHours = place.openingHours?.toString(),
-                    rating = place.rating,
-                    location = place.location,
-                    distance =
+                     PlaceDetails(
+                        id = place.id ?: "",
+                        displayName = place.displayName,
+                        openingHours = place.openingHours?.toString(),
+                        rating = place.rating,
+                        location = place.location,
+                        distance =
                         place.location?.let {
                             place.location?.let { it1 ->
                                 haversineDistance(42.731544, -73.682535, it.latitude, it1.longitude)
                             }
                         },
-                    formattedAddress = place.formattedAddress,
-                    editorialSummary = place.editorialSummary,
-                    nationalPhoneNumber = place.nationalPhoneNumber,
-                    photoURIs =
-                        place.photoMetadatas?.map { photo ->
+                        formattedAddress = place.formattedAddress,
+                        editorialSummary = place.editorialSummary,
+                        nationalPhoneNumber = place.nationalPhoneNumber,
+                        photoURIs =
+                        place.photoMetadatas?.take(4)?.map { photo ->
                             Log.d(TAG, "fetchAndStorePlaces: before metadatatouri")
                             val r = apiService.photoMetaDataToURI(photo)
                             Log.d(TAG, "fetchAndStorePlaces: after photoMetaDatatouri got: $r")
                             r.toString()
                         },
-                    websiteUri = place.websiteUri?.toString(),
-                )
+                        websiteUri = place.websiteUri?.toString(),
+                    )
+
             }
 
         return placeDetailsList

@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.components.PhotoGridView
@@ -44,6 +46,20 @@ import com.example.wanderlist.data.googlemaps.model.PlaceDetails
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.PlacesViewModel
+import com.example.wanderlist.viewmodel.ProfileViewModel
+import com.google.android.libraries.places.api.model.Place
+import androidx.compose.runtime.getValue
+import com.example.wanderlist.data.firestore.model.Category
+
+// 1) Simple data class
+// data class Place(
+//    val name: String,
+//    val rating: Double,
+//    val distance: String,
+//    val coverImageUrl: String,
+//    val aboutText: String,
+//    val thumbnailUrls: List<String>
+// )
 import com.example.wanderlist.viewmodel.EstablishmentIdHoldViewModel
 
 
@@ -51,21 +67,22 @@ import com.example.wanderlist.viewmodel.EstablishmentIdHoldViewModel
 fun HomePageView(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
-    placesViewModel: PlacesViewModel = viewModel(),
-    onNavigateToProfile: () -> Unit,
     onNavigateToShowMore: (String) -> Unit,
+    placesViewModel: PlacesViewModel = hiltViewModel(),
+    onNavigateToProfile: () -> Unit
 
     ) {
 
     val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
-        HomeScreen(
-            places = places,
-            onNavigateToProfile = { onNavigateToProfile() },
-            onNavigateToShowMore = { establishmentId ->
-                onNavigateToShowMore(establishmentId)
-            },
-        )
+
+            HomeScreen(
+                places = places,
+                onNavigateToProfile = { onNavigateToProfile() },
+                onNavigateToShowMore = { establishmentId ->
+                    onNavigateToShowMore(establishmentId)
+                },
+            )
     }
 }
 
@@ -76,6 +93,8 @@ fun HomeScreen(
     onNavigateToShowMore: (String) -> Unit,
 ) {
     val state = rememberLazyListState()
+    val placesViewModel: PlacesViewModel = hiltViewModel()
+    val loading = placesViewModel.isLoading.collectAsState().value
     Scaffold(
         topBar = { TopBarCategories() },
         bottomBar = { BottomNavigationBar(onNavigateToProfile = onNavigateToProfile) },
@@ -85,20 +104,30 @@ fun HomeScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
+            contentAlignment = Alignment.Center
         ) {
+            if(loading){
+                CircularProgressIndicator(
+                    modifier = Modifier.size(64.dp),
+                    color = MaterialTheme.colorScheme.secondary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            }
             // Horizontal scroll for multiple places
-            LazyRow(
-                modifier = Modifier.fillMaxSize(),
-                state = state,
-                flingBehavior = rememberSnapFlingBehavior(lazyListState = state),
-            ) {
-                items(places) { place ->
-                    // Each place item takes the full screen width
-                    Box(modifier = Modifier.fillParentMaxSize()) {
-                        PlaceContent(
-                            place,
-                            onNavigateToShowMore = onNavigateToShowMore,
-                        )
+            else {
+                LazyRow(
+                    modifier = Modifier.fillMaxSize(),
+                    state = state,
+                    flingBehavior = rememberSnapFlingBehavior(lazyListState = state),
+                ) {
+                    items(places) { place ->
+                        // Each place item takes the full screen width
+                        Box(modifier = Modifier.fillParentMaxSize()) {
+                            PlaceContent(
+                                place,
+                                onNavigateToShowMore = onNavigateToShowMore,
+                            )
+                        }
                     }
                 }
             }
@@ -108,11 +137,12 @@ fun HomeScreen(
 
 @Composable
 fun TopBarCategories() {
-    // Keep track of which category is selected
-    var selectedCategory = remember { mutableStateOf("Food") }
+    val placesViewModel: PlacesViewModel = hiltViewModel()
+    val selectedCategory by placesViewModel.selectedCategory.collectAsState()
+//    var selectedCategory = remember { mutableStateOf("Food") }
 
     // List of category labels
-    val categories = listOf("Food", "Bars", "Adventures", "Parks", "Activities")
+    val categories = listOf(Category.FOOD, Category.BARS, Category.ENTERTAINMENT)
 
     Surface(
         color = Color.White,
@@ -151,17 +181,17 @@ fun TopBarCategories() {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     categories.forEach { category ->
-                        if (category == selectedCategory.value) {
+                        if (category == selectedCategory) {
                             // Selected category: Blue pill
                             Box(
                                 modifier =
                                     Modifier
                                         .clip(RoundedCornerShape(16.dp))
                                         .background(Color(0xFFE8F0FE))
-                                        .clickable { selectedCategory.value = category },
+                                        .clickable { placesViewModel.setSelectedCategory(category)},
                             ) {
                                 Text(
-                                    text = category,
+                                    text = category.displayName,
                                     color = Color(0xFF176FF2),
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -170,12 +200,12 @@ fun TopBarCategories() {
                         } else {
                             // Non-selected category: Gray text
                             Text(
-                                text = category,
+                                text = category.displayName,
                                 color = Color.Gray,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier =
                                     Modifier
-                                        .clickable { selectedCategory.value = category }
+                                        .clickable { placesViewModel.setSelectedCategory(category)}
                                         .padding(horizontal = 8.dp, vertical = 8.dp),
                             )
                         }
