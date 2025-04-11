@@ -72,10 +72,8 @@ fun HomePageView(
 ) {
 
     val places = placesViewModel.places.collectAsState().value
-    val loading = placesViewModel.isLoading.collectAsState().value
     MaterialTheme {
 
-        if (!loading) {
             HomeScreen(
                 places = places,
                 onNavigateToProfile = { onNavigateToProfile() },
@@ -83,23 +81,6 @@ fun HomePageView(
                     onNavigateToShowMore(establishmentId)
                 },
             )
-        }
-        else {
-            Scaffold { padding ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(64.dp),
-                        color = MaterialTheme.colorScheme.secondary,
-                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                    )
-                }
-            }
-        }
     }
 }
 
@@ -110,6 +91,8 @@ fun HomeScreen(
     onNavigateToShowMore: (String) -> Unit,
 ) {
     val state = rememberLazyListState()
+    val placesViewModel: PlacesViewModel = hiltViewModel()
+    val loading = placesViewModel.isLoading.collectAsState().value
     Scaffold(
         topBar = { TopBarCategories() },
         bottomBar = { BottomNavigationBar(onNavigateToProfile = onNavigateToProfile) },
@@ -120,19 +103,28 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(innerPadding),
         ) {
+            if(loading){
+                CircularProgressIndicator(
+                    modifier = Modifier.size(64.dp),
+                    color = MaterialTheme.colorScheme.secondary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            }
             // Horizontal scroll for multiple places
-            LazyRow(
-                modifier = Modifier.fillMaxSize(),
-                state = state,
-                flingBehavior = rememberSnapFlingBehavior(lazyListState = state),
-            ) {
-                items(places) { place ->
-                    // Each place item takes the full screen width
-                    Box(modifier = Modifier.fillParentMaxSize()) {
-                        PlaceContent(
-                            place,
-                            onNavigateToShowMore = onNavigateToShowMore,
-                        )
+            else {
+                LazyRow(
+                    modifier = Modifier.fillMaxSize(),
+                    state = state,
+                    flingBehavior = rememberSnapFlingBehavior(lazyListState = state),
+                ) {
+                    items(places) { place ->
+                        // Each place item takes the full screen width
+                        Box(modifier = Modifier.fillParentMaxSize()) {
+                            PlaceContent(
+                                place,
+                                onNavigateToShowMore = onNavigateToShowMore,
+                            )
+                        }
                     }
                 }
             }
