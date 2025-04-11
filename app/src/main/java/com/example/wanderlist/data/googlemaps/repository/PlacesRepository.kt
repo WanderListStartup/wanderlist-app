@@ -44,8 +44,6 @@ class PlacesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
     private val apiService = PlacesApiService(context)
-    private val gson = Gson()
-    private val fileName = "places_data.json"
 
     private fun readJsonFromRaw(
         context: Context,
