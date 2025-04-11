@@ -83,7 +83,7 @@ class PlacesViewModel @Inject constructor(
 
             // ONLY RUN SEED ESTABLISHMENTS IF WE CHANGE THE JSON FILE.
             // FUTURE FIX IS TO NOT PUT IN JSON AND UPDATE FIRESTORE DIRECTLY
-//            seedEstablishments(category = selectedCategory.value)
+            seedEstablishments(category = selectedCategory.value)
             generateQuests()
 
         }

@@ -102,6 +102,7 @@ fun HomeScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
+            contentAlignment = Alignment.Center
         ) {
             if(loading){
                 CircularProgressIndicator(
