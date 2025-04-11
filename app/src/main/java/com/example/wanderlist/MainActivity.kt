@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.wanderlist.ui.theme.WanderlistTheme
 import com.example.wanderlist.view.AppView
+import com.example.wanderlist.view.PlacesScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -27,6 +28,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     WanderlistTheme {
-        AppView()
+        PlacesScreen()
     }
 }
