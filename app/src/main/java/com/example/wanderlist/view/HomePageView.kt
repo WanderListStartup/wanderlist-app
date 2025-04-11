@@ -58,7 +58,6 @@ import com.example.wanderlist.data.firestore.model.Category
 //    val aboutText: String,
 //    val thumbnailUrls: List<String>
 // )
-import com.example.wanderlist.viewmodel.EstablishmentIdHoldViewModel
 
 
 @Composable
