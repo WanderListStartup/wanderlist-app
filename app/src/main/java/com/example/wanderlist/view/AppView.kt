@@ -89,7 +89,6 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
                 onNavigateToSettings = {navController.navigate(route=Settings)},
                 onNavigateToUserSettings = {navController.navigate(route=UserSettings)},
                 onNavigateToFindFriends = { navController.navigate(route = FindFriendsView) },
-                authViewModel=authViewModel
             )
         }
 

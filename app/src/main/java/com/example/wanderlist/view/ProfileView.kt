@@ -37,13 +37,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.R
 import com.example.wanderlist.components.LikedPlacesGrid
 import com.example.wanderlist.ui.theme.wanderlistBlue
-import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.EditProfileViewModel
 import com.example.wanderlist.viewmodel.ProfileViewModel
-
-import com.example.wanderlist.viewmodel.FindFriendsViewModel
-import com.example.wanderlist.viewmodel.PlacesViewModel
-import com.google.android.gms.maps.model.Circle
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,17 +46,12 @@ import com.google.android.gms.maps.model.Circle
 fun ProfileView(
     viewModel: EditProfileViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel,
     onNavigateToHome: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit,
-    onNavigateToFindFriends: () -> Unit
-    placesViewModel: PlacesViewModel = viewModel()
+    onNavigateToFindFriends: () -> Unit,
 ) {
-    val selectedTab = remember { mutableIntStateOf(0)
-    }
-    val context = LocalContext.current
-    val places = placesViewModel.places.collectAsState().value
+    val selectedTab = remember { mutableIntStateOf(0) }
 
     Scaffold(
         containerColor = Color.White,
@@ -268,7 +258,7 @@ fun ProfileView(
                     0 -> {
                         // replace Places with
                         // List<PlaceDetails> userLikedPlaces = [place, place2, ... ]
-                        LikedPlacesGrid(places)
+
                     }
                     1 -> {
                         Text(
