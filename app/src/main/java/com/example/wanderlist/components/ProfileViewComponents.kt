@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.wanderlist.data.googlemaps.model.PlaceDetails
-import com.example.wanderlist.viewmodel.PlacesViewModel
 
 
 @Composable
