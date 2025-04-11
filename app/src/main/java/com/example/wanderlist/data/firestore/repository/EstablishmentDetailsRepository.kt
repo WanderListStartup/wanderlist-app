@@ -48,4 +48,30 @@ class EstablishmentDetailsRepository @Inject constructor(
             null
         }
     }
+
+    suspend fun getEstablishmentsExcluding(
+        excludedIds: List<String>, limit: Int, callback: (List<EstablishmentDetails>) -> Unit
+    ) {
+        try {
+            // Use whereNotIn only if there are fewer than or equal to 10 IDs to filter out.
+            val query = if (excludedIds.isEmpty()) {
+                firestore.collection("establishment_details").limit(limit.toLong())
+            } else if (excludedIds.size <= 10) {
+                firestore.collection("establishment_details")
+                    .whereNotIn("id", excludedIds)
+                    .limit(limit.toLong())
+            } else {
+                // If more than 10, take only the first 10
+                firestore.collection("establishment_details")
+                    .whereNotIn("id", excludedIds.take(10))
+                    .limit(limit.toLong())
+            }
+            val snapshot = query.get().await()
+            val establishments = snapshot.documents.mapNotNull { it.toObject(EstablishmentDetails::class.java) }
+            callback(establishments)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            callback(emptyList())
+        }
+    }
 }
