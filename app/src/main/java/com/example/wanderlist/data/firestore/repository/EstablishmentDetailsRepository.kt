@@ -1,5 +1,6 @@
 package com.example.wanderlist.data.firestore.repository
 
+import com.example.wanderlist.data.firestore.model.Category
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
 import com.example.wanderlist.data.googlemaps.model.PlaceDetails
 import com.google.firebase.firestore.FirebaseFirestore
@@ -13,7 +14,7 @@ class EstablishmentDetailsRepository @Inject constructor(
     /**
      * Batch‑writes a list of PlaceDetails into "establishment_details".
      */
-    suspend fun batchUpload(establishments: List<PlaceDetails>) {
+    suspend fun batchUpload(establishments: List<PlaceDetails>, category: Category) {
         val batch = firestore.batch()
         establishments.forEach { est ->
             val docRef = firestore.collection("establishment_details").document(est.id)
@@ -29,7 +30,8 @@ class EstablishmentDetailsRepository @Inject constructor(
                 editorialSummary = est.editorialSummary,
                 nationalPhoneNumber = est.nationalPhoneNumber,
                 photoURIs = est.photoURIs as List<String>?,
-                websiteUri = est.websiteUri
+                websiteUri = est.websiteUri,
+                category = category.displayName
             )
             batch.set(docRef, ef)
         }
