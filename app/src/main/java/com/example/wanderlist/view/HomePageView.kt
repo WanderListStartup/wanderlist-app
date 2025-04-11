@@ -45,6 +45,12 @@ import com.example.wanderlist.viewmodel.PlacesViewModel
 import com.example.wanderlist.viewmodel.EstablishmentIdHoldViewModel
 
 
+@Preview(showBackground = true)
+@Composable
+fun HomePageViewPreview() {
+    HomePageView()
+}
+
 @Composable
 fun HomePageView(
     modifier: Modifier = Modifier,
@@ -57,39 +63,7 @@ fun HomePageView(
 
     val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
-        // Example places with actual direct image URLs
-//        val places = listOf(
-//            Place(
-//                name = "Naughters",
-//                rating = 3.2,
-//                distance = "0.3 mi",
-//                coverImageUrl = "https://i0.wp.com/www.troyrecord.com/wp-content/uploads/2022/02/DSC_5566.jpg?fit=620,9999px&ssl=1&tbnid=NVplyHZxBYgiaM&vet=1",
-//                aboutText = "Naughter's in Troy, New York is a diner and coffee shop ...",
-//                thumbnailUrls = listOf(
-//                    "https://lh3.googleusercontent.com/gps-cs-s/AB5caB-vaLr7eVC5t8VNIa79Jo4DK4wA4_7ki93JfMFFEbdmyeYNrPBHJX99IEokroqFu_dmCMI-QDJqW_WNJJcnSB9wwqKH_Y0saD3-9vSssDfK--d5b4bUrMZgGSr3tPqm_U_xM3pm=s1360-w1360-h1020",
-//                    "https://lh3.googleusercontent.com/p/AF1QipO7FgCa3IkHZjpWSE8erilXu8TQYCIkrXeaFK2W=s1360-w1360-h1020",
-//                    "https://lh3.googleusercontent.com/gps-cs-s/AB5caB8oMzpr4pLQB7hqTCO0dT53PhsTjAkTvjCyq34wTFvdLGvETNPv6_aBff7Mtp0-7vlFQH2K4ZFI0E_6AEZQ6QMKIW3xfxJ1YMdvWxD0zIzNs1orHnsw_Kwn906XBXoAIFzQYZ5T=s1360-w1360-h1020"
-//                )
-//            ),
-//            Place(
-//                name = "Starbucks",
-//                rating = 4.1,
-//                distance = "0.5 mi",
-//                coverImageUrl = "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
-//                aboutText = "Famous coffeehouse chain offering specialty coffees, teas, & light bites...",
-//                thumbnailUrls = listOf(
-//                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
-//                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG"
-//                )
-//            )
-//        )
-        HomeScreen(
-            places = places,
-            onNavigateToProfile = { onNavigateToProfile() },
-            onNavigateToShowMore = { establishmentId ->
-                onNavigateToShowMore(establishmentId)
-            },
-        )
+        HomeScreen(places)
     }
 }
 
@@ -395,48 +369,9 @@ fun PlaceContent(
             }
         }
 
-        // Additional details for "Naughters" (example data)
-        if (place.displayName == "Naughters") {
-            AdditionalDetailsSection()
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
-@Composable
-fun AdditionalDetailsSection() {
-    Column(
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
-    ) {
-        Text("Menu", style = MaterialTheme.typography.titleLarge)
-        Text("http://naughters.com", style = MaterialTheme.typography.bodyMedium)
-        Spacer(modifier = Modifier.height(8.dp))
 
-        Text("Address/Contact", style = MaterialTheme.typography.titleLarge)
-        Text(
-            text = "136 2nd St, Troy, NY 12180\n(518) 238-3130",
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Hour of Operations", style = MaterialTheme.typography.titleLarge)
-        Text(
-            text =
-                """
-                Monday 6AM–3PM
-                Tuesday 6AM–3PM
-                Wednesday 6AM–3PM
-                Thursday 6AM–3PM
-                Friday 6AM–3PM
-                Saturday 8AM–5PM
-                Sunday 8AM–5PM
-                """.trimIndent(),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Accessibility", style = MaterialTheme.typography.titleLarge)
-        Text("Wheelchair Accessible", style = MaterialTheme.typography.bodyMedium)
-    }
-}
