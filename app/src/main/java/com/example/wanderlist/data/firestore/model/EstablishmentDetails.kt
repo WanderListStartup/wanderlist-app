@@ -6,6 +6,7 @@ enum class Category(val displayName: String) {
     ENTERTAINMENT("Entertainment")
 }
 
+
 data class EstablishmentDetails(
     val id: String = "",
     val displayName: String? = null,

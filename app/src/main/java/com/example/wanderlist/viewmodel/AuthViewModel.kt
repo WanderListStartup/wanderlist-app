@@ -199,8 +199,6 @@ class AuthViewModel @Inject constructor(
             }
         }
 
-        fun googleOAUTH() {
-        }
 
         fun logout() {
             authDataStore.logout()

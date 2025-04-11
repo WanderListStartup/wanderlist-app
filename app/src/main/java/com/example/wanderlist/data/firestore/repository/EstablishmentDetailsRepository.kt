@@ -1,8 +1,10 @@
 package com.example.wanderlist.data.firestore.repository
 
+import android.util.Log
 import com.example.wanderlist.data.firestore.model.Category
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
 import com.example.wanderlist.data.googlemaps.model.PlaceDetails
+import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -11,6 +13,7 @@ import javax.inject.Inject
 class EstablishmentDetailsRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
+    private val TAG = "EstablishmentDetailsRepository"
     /**
      * Batch‑writes a list of PlaceDetails into "establishment_details".
      */
@@ -48,6 +51,46 @@ class EstablishmentDetailsRepository @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             null
+        }
+    }
+
+    suspend fun getEstablishmentsExcluding(
+        excludedIds: List<String>, limit: Int, withFilter: String
+    ) : List<EstablishmentDetails>{
+        try {
+            // Use whereNotIn only if there are fewer than or equal to 10 IDs to filter out.
+            val query = if (excludedIds.isEmpty()) {
+                Log.d(TAG, "getEstablishmentsExcluding: 1 ${withFilter}")
+                firestore.collection("establishment_details").where(Filter.equalTo("category", withFilter)).limit(limit.toLong())
+            } else if (excludedIds.size <= 10) {
+                Log.d(TAG, "getEstablishmentsExcluding: 2 ${withFilter} exc ${excludedIds}")
+                firestore.collection("establishment_details")
+                    .whereNotIn("id", excludedIds)
+                    .where(Filter.equalTo("category", withFilter))
+                    .limit(limit.toLong())
+            } else {
+                // More than 10 excluded IDs. Query by category only,
+                // and then we'll do client-side exclusion.
+                // Increase limit so we have enough results after exclusion.
+                Log.d(TAG, "getEstablishmentsExcluding: 3 ${withFilter} exc ${excludedIds}")
+                firestore.collection("establishment_details")
+                    .where(Filter.equalTo("category", withFilter))
+                    // We'll fetch more than 'limit' to offset the excluded items.
+                    .limit((limit + excludedIds.size).toLong())
+            }
+            val snapshot = query.get().await()
+            val establishments = snapshot.documents.mapNotNull { it.toObject(EstablishmentDetails::class.java) }
+
+            val filteredEstablishments = if (excludedIds.size > 10) {
+                establishments.filterNot { excludedIds.contains(it.id) }
+            } else {
+                establishments
+            }
+
+            return filteredEstablishments.take(limit)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return emptyList()
         }
     }
 }

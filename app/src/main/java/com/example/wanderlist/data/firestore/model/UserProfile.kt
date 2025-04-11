@@ -20,6 +20,7 @@ data class UserProfile(
     val location: String = "Troy, NY",
 
     val likedEstablishments: List<String> = emptyList(),
+    val dislikedEstablishments: List<String> = emptyList(),
     val reviews: List<String> = emptyList(),
     val friends: List<String> = emptyList(),
     val incomingRequests: List<String> = emptyList(),
