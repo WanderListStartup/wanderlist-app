@@ -25,7 +25,6 @@ import com.example.wanderlist.components.BackCircle
 import com.example.wanderlist.components.LoginTitle
 import com.example.wanderlist.components.PhotoGridView
 import com.example.wanderlist.components.ShowMoreSectionTitle
-import com.example.wanderlist.viewmodel.EstablishmentIdHoldViewModel
 import com.example.wanderlist.viewmodel.ShowMoreViewModel
 
 
@@ -33,7 +32,6 @@ import com.example.wanderlist.viewmodel.ShowMoreViewModel
 fun ShowMoreView(
     establishmentId: String,
     viewModel: ShowMoreViewModel = hiltViewModel(),
-    establishmentIdViewModel: EstablishmentIdHoldViewModel = viewModel(),
     onNavigateToHomePage: () -> Unit,
 
     ) {
@@ -44,7 +42,6 @@ fun ShowMoreView(
 
     val uriHandler = LocalUriHandler.current
     val scrollState = rememberScrollState()
-    println("GOOK MONKEY BOY${establishmentIdViewModel.selectedEstablishmentId}")
     val extractedHours = extractWeekdayHours(viewModel.openingHours)
 
 
