@@ -19,10 +19,16 @@ class SignUpViewModel : ViewModel() {
         private set
     var city by mutableStateOf("")
         private set
+    var username by mutableStateOf("")
+        private set
 
     // Functions to update state
     fun onNameChange(newName: String) {
         name = newName
+    }
+
+    fun onUsernameChange(newUsername: String) {
+        username = newUsername
     }
 
     fun onDobChange(newDob: String) {

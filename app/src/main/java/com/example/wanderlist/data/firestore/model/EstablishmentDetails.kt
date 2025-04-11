@@ -11,6 +11,7 @@ data class EstablishmentDetails(
     val formattedAddress: String? = null,
     val editorialSummary: String? = null,
     val nationalPhoneNumber: String? = null,
-    val photoURIs: List<String?>? = null,
-    val websiteUri: String? = null
+    val photoURIs: List<String>? = null,
+    val websiteUri: String? = null,
+    val reviews: List<String?>? = null,
 )

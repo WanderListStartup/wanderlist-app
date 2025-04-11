@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.example.wanderlist.data.google.model.PlaceDetails
+import com.example.wanderlist.data.googlemaps.model.PlaceDetails
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.PlacesViewModel
@@ -56,27 +56,27 @@ import androidx.compose.runtime.getValue
 //    val aboutText: String,
 //    val thumbnailUrls: List<String>
 // )
+import com.example.wanderlist.viewmodel.EstablishmentIdHoldViewModel
 
 
 @Composable
 fun HomePageView(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
+    onNavigateToShowMore: (String) -> Unit,
     placesViewModel: PlacesViewModel = hiltViewModel(),
     onNavigateToProfile: () -> Unit
 
 ) {
-    // ONE-TIME SEED (debug builds only)
-//    if (BuildConfig.DEBUG) {
-//        LaunchedEffect(Unit) {
-//            placesViewModel.seedEstablishments()
-//        }
-//    }
+
     val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
         HomeScreen(
-            places,
-            onNavigateToProfile = { onNavigateToProfile() }
+            places = places,
+            onNavigateToProfile = { onNavigateToProfile() },
+            onNavigateToShowMore = { establishmentId ->
+                onNavigateToShowMore(establishmentId)
+            },
         )
     }
 }
@@ -84,8 +84,8 @@ fun HomePageView(
 @Composable
 fun HomeScreen(
     places: List<PlaceDetails>,
-    onNavigateToProfile: () -> Unit
-
+    onNavigateToProfile: () -> Unit,
+    onNavigateToShowMore: (String) -> Unit,
 ) {
     val state = rememberLazyListState()
     Scaffold(
@@ -107,7 +107,10 @@ fun HomeScreen(
                 items(places) { place ->
                     // Each place item takes the full screen width
                     Box(modifier = Modifier.fillParentMaxSize()) {
-                        PlaceContent(place)
+                        PlaceContent(
+                            place,
+                            onNavigateToShowMore = onNavigateToShowMore,
+                        )
                     }
                 }
             }
@@ -273,7 +276,10 @@ fun AboutTextWithShowMore(
 }
 
 @Composable
-fun PlaceContent(place: PlaceDetails) {
+fun PlaceContent(
+    place: PlaceDetails,
+    onNavigateToShowMore: (String) -> Unit,
+) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -347,10 +353,11 @@ fun PlaceContent(place: PlaceDetails) {
         // Only "Show More" is clickable here
         Box(modifier = Modifier.padding(start = 40.dp, bottom = 8.dp)) {
             AboutTextWithShowMore(
-                text = place.editorialSummary ?: "No Editorial Summary Available",
+                text = place.editorialSummary ?: place.id,
                 maxLines = 4,
                 onShowMoreClick = {
-                    // Handle "Show More" click here (e.g., expand text, navigate, etc.)
+
+                    onNavigateToShowMore(place.id)
                 },
             )
         }
@@ -377,48 +384,8 @@ fun PlaceContent(place: PlaceDetails) {
             }
         }
 
-        // Additional details for "Naughters" (example data)
-        if (place.displayName == "Naughters") {
-            AdditionalDetailsSection()
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
-@Composable
-fun AdditionalDetailsSection() {
-    Column(
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
-    ) {
-        Text("Menu", style = MaterialTheme.typography.titleLarge)
-        Text("http://naughters.com", style = MaterialTheme.typography.bodyMedium)
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Address/Contact", style = MaterialTheme.typography.titleLarge)
-        Text(
-            text = "136 2nd St, Troy, NY 12180\n(518) 238-3130",
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Hour of Operations", style = MaterialTheme.typography.titleLarge)
-        Text(
-            text =
-                """
-                Monday 6AM–3PM
-                Tuesday 6AM–3PM
-                Wednesday 6AM–3PM
-                Thursday 6AM–3PM
-                Friday 6AM–3PM
-                Saturday 8AM–5PM
-                Sunday 8AM–5PM
-                """.trimIndent(),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Accessibility", style = MaterialTheme.typography.titleLarge)
-        Text("Wheelchair Accessible", style = MaterialTheme.typography.bodyMedium)
-    }
-}

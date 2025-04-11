@@ -5,9 +5,12 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wanderlist.data.google.model.PlaceDetails
-import com.example.wanderlist.data.google.repository.PlacesRepository
+import com.example.wanderlist.BuildConfig
+import com.example.wanderlist.data.googlemaps.model.PlaceDetails
+import com.example.wanderlist.data.googlemaps.repository.PlacesRepository
 import com.example.wanderlist.data.firestore.repository.EstablishmentDetailsRepository  // ← ADDED
+import com.example.wanderlist.data.firestore.repository.QuestsRepository
+import com.example.wanderlist.data.gemini.repository.GeminiRepository
 import com.google.firebase.firestore.FirebaseFirestore                      // ← ADDED
 import com.example.wanderlist.data.model.PlaceDetails
 import com.example.wanderlist.data.repository.PlacesRepository
@@ -27,11 +30,11 @@ class PlacesViewModel @Inject constructor(
 ) : ViewModel() {
     private val _selectedCategory = MutableStateFlow("Food")
     val selectedCategory: StateFlow<String> = _selectedCategory
+    private val establishmentRepo = EstablishmentDetailsRepository(FirebaseFirestore.getInstance())
+    private val questsRepo = QuestsRepository(FirebaseFirestore.getInstance())
+    private val geminiRepo = GeminiRepository()
     private val _places = MutableStateFlow<List<PlaceDetails>>(emptyList())
     val places: StateFlow<List<PlaceDetails>> = _places
-    private val establishmentRepo = EstablishmentDetailsRepository(
-        FirebaseFirestore.getInstance()
-    )
     private val categoryMapping = mapOf(
         "Food" to "restaurant",
         "Bars" to "bar",
@@ -55,8 +58,6 @@ class PlacesViewModel @Inject constructor(
         fetchPlaces(filterList)
     }
 
-    private fun fetchPlaces() {
-        Log.d(TAG, "fetchPlaces: starting fetch")
     /* Fetches places from the repository and updates the state.
      * This function is called when the ViewModel is initialized.
      * It runs in a coroutine to avoid blocking the main thread.
@@ -72,18 +73,15 @@ class PlacesViewModel @Inject constructor(
             launch(Dispatchers.Main) {
                 _places.value = placeDetails
 
-                // ← ADDED: once we have data, seed Firestore
-                seedEstablishments()
+                // ONLY RUN SEED ESTABLISHMENTS IF WE CHANGE THE JSON FILE.
+                // FUTURE FIX IS TO NOT PUT IN JSON AND UPDATE FIRESTORE DIRECTLY
+                // seedEstablishments()
+                generateQuests()
             }
         }
     }
 
-    /**
-     * ← ADDED:
-     * One‑time batch upload of all current PlaceDetails into
-     * the 'establishment_details' collection.
-     */
-    fun seedEstablishments() {
+    private fun seedEstablishments() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val list = _places.value
@@ -95,6 +93,35 @@ class PlacesViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "seedEstablishments: error uploading establishments", e)
+            }
+        }
+    }
+
+    private fun generateQuests() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val establishments = _places.value
+                if (establishments.isNotEmpty()) {
+                    for (establishment in establishments) {
+                        if (!questsRepo.checkHasQuests(establishment.id)) {
+                            val quests = geminiRepo.generateQuests(establishment.displayName)
+                            if (quests != null) {
+                                Log.d(TAG, "generateQuests: generated quests for ${establishment.displayName}: $quests")
+                                for (quest in quests) {
+                                    questsRepo.addQuest(establishment.id, quest)
+                                }
+                            } else {
+                                Log.w(TAG, "generateQuests: no quests generated for ${establishment.displayName}")
+                            }
+                        }
+
+                    }
+                } else {
+                    Log.w(TAG, "generateQuests: no establishments to generate quests for")
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "generateQuests: error generating quests", e)
             }
         }
     }
