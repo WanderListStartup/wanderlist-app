@@ -43,20 +43,14 @@ class PlacesViewModel(
             launch(Dispatchers.Main) {
                 _places.value = placeDetails
 
-                // ONE-TIME SEED (debug builds only)
-                if (BuildConfig.DEBUG) {
-                    seedEstablishments()
-                    generateQuests()
-                }
+                // ONLY RUN SEED ESTABLISHMENTS IF WE CHANGE THE JSON FILE.
+                // FUTURE FIX IS TO NOT PUT IN JSON AND UPDATE FIRESTORE DIRECTLY
+                // seedEstablishments()
+                generateQuests()
             }
         }
     }
 
-    /**
-     * ← ADDED:
-     * One‑time batch upload of all current PlaceDetails into
-     * the 'establishment_details' collection.
-     */
     private fun seedEstablishments() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -79,15 +73,18 @@ class PlacesViewModel(
                 val establishments = _places.value
                 if (establishments.isNotEmpty()) {
                     for (establishment in establishments) {
-                        val quests = geminiRepo.generateQuests(establishment.displayName)
-                        if (quests != null) {
-                            Log.d(TAG, "generateQuests: generated quests for ${establishment.displayName}: $quests")
-                            for (quest in quests) {
-                                questsRepo.addQuest(establishment.id, quest)
+                        if (!questsRepo.checkHasQuests(establishment.id)) {
+                            val quests = geminiRepo.generateQuests(establishment.displayName)
+                            if (quests != null) {
+                                Log.d(TAG, "generateQuests: generated quests for ${establishment.displayName}: $quests")
+                                for (quest in quests) {
+                                    questsRepo.addQuest(establishment.id, quest)
+                                }
+                            } else {
+                                Log.w(TAG, "generateQuests: no quests generated for ${establishment.displayName}")
                             }
-                        } else {
-                            Log.w(TAG, "generateQuests: no quests generated for ${establishment.displayName}")
                         }
+
                     }
                 } else {
                     Log.w(TAG, "generateQuests: no establishments to generate quests for")

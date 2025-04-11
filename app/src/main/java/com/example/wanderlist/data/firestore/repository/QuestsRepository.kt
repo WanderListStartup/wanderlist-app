@@ -19,4 +19,13 @@ class QuestsRepository @Inject constructor (
         )
         newQuestRef.set(questData).await()
     }
+
+    suspend fun checkHasQuests(establishmentId: String): Boolean {
+        val snapshot = firestore.collection("quests")
+            .whereEqualTo("establishmentId", establishmentId)
+            .get()
+            .await()
+
+        return !snapshot.isEmpty
+    }
 }
