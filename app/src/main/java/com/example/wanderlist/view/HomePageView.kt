@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -36,70 +37,61 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.example.wanderlist.data.google.model.PlaceDetails
+import com.example.wanderlist.data.googlemaps.model.PlaceDetails
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.AuthViewModel
 import com.example.wanderlist.viewmodel.PlacesViewModel
+import com.example.wanderlist.viewmodel.ProfileViewModel
+import com.google.android.libraries.places.api.model.Place
+import androidx.compose.runtime.getValue
+import com.example.wanderlist.data.firestore.model.Category
+
+// 1) Simple data class
+// data class Place(
+//    val name: String,
+//    val rating: Double,
+//    val distance: String,
+//    val coverImageUrl: String,
+//    val aboutText: String,
+//    val thumbnailUrls: List<String>
+// )
 
 
 @Composable
 fun HomePageView(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
-    placesViewModel: PlacesViewModel = viewModel(),
+    onNavigateToShowMore: (String) -> Unit,
+    placesViewModel: PlacesViewModel = hiltViewModel(),
     onNavigateToProfile: () -> Unit
 
 ) {
-    // ONE-TIME SEED (debug builds only)
-//    if (BuildConfig.DEBUG) {
-//        LaunchedEffect(Unit) {
-//            placesViewModel.seedEstablishments()
-//        }
-//    }
+
     val places = placesViewModel.places.collectAsState().value
     MaterialTheme {
-        // Example places with actual direct image URLs
-//        val places = listOf(
-//            Place(
-//                name = "Naughters",
-//                rating = 3.2,
-//                distance = "0.3 mi",
-//                coverImageUrl = "https://i0.wp.com/www.troyrecord.com/wp-content/uploads/2022/02/DSC_5566.jpg?fit=620,9999px&ssl=1&tbnid=NVplyHZxBYgiaM&vet=1",
-//                aboutText = "Naughter's in Troy, New York is a diner and coffee shop ...",
-//                thumbnailUrls = listOf(
-//                    "https://lh3.googleusercontent.com/gps-cs-s/AB5caB-vaLr7eVC5t8VNIa79Jo4DK4wA4_7ki93JfMFFEbdmyeYNrPBHJX99IEokroqFu_dmCMI-QDJqW_WNJJcnSB9wwqKH_Y0saD3-9vSssDfK--d5b4bUrMZgGSr3tPqm_U_xM3pm=s1360-w1360-h1020",
-//                    "https://lh3.googleusercontent.com/p/AF1QipO7FgCa3IkHZjpWSE8erilXu8TQYCIkrXeaFK2W=s1360-w1360-h1020",
-//                    "https://lh3.googleusercontent.com/gps-cs-s/AB5caB8oMzpr4pLQB7hqTCO0dT53PhsTjAkTvjCyq34wTFvdLGvETNPv6_aBff7Mtp0-7vlFQH2K4ZFI0E_6AEZQ6QMKIW3xfxJ1YMdvWxD0zIzNs1orHnsw_Kwn906XBXoAIFzQYZ5T=s1360-w1360-h1020"
-//                )
-//            ),
-//            Place(
-//                name = "Starbucks",
-//                rating = 4.1,
-//                distance = "0.5 mi",
-//                coverImageUrl = "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
-//                aboutText = "Famous coffeehouse chain offering specialty coffees, teas, & light bites...",
-//                thumbnailUrls = listOf(
-//                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
-//                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG"
-//                )
-//            )
-//        )
-        HomeScreen(
-            places,
-            onNavigateToProfile = { onNavigateToProfile() }
-        )
+
+            HomeScreen(
+                places = places,
+                onNavigateToProfile = { onNavigateToProfile() },
+                onNavigateToShowMore = { establishmentId ->
+                    onNavigateToShowMore(establishmentId)
+                },
+            )
     }
 }
 
 @Composable
 fun HomeScreen(
     places: List<PlaceDetails>,
-    onNavigateToProfile: () -> Unit
-
+    onNavigateToProfile: () -> Unit,
+    onNavigateToShowMore: (String) -> Unit,
 ) {
     val state = rememberLazyListState()
+    val placesViewModel: PlacesViewModel = hiltViewModel()
+    val loading = placesViewModel.isLoading.collectAsState().value
     Scaffold(
         topBar = { TopBarCategories() },
         bottomBar = { BottomNavigationBar(onNavigateToProfile = onNavigateToProfile) },
@@ -109,17 +101,30 @@ fun HomeScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
+            contentAlignment = Alignment.Center
         ) {
+            if(loading){
+                CircularProgressIndicator(
+                    modifier = Modifier.size(64.dp),
+                    color = MaterialTheme.colorScheme.secondary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            }
             // Horizontal scroll for multiple places
-            LazyRow(
-                modifier = Modifier.fillMaxSize(),
-                state = state,
-                flingBehavior = rememberSnapFlingBehavior(lazyListState = state),
-            ) {
-                items(places) { place ->
-                    // Each place item takes the full screen width
-                    Box(modifier = Modifier.fillParentMaxSize()) {
-                        PlaceContent(place)
+            else {
+                LazyRow(
+                    modifier = Modifier.fillMaxSize(),
+                    state = state,
+                    flingBehavior = rememberSnapFlingBehavior(lazyListState = state),
+                ) {
+                    items(places) { place ->
+                        // Each place item takes the full screen width
+                        Box(modifier = Modifier.fillParentMaxSize()) {
+                            PlaceContent(
+                                place,
+                                onNavigateToShowMore = onNavigateToShowMore,
+                            )
+                        }
                     }
                 }
             }
@@ -129,11 +134,12 @@ fun HomeScreen(
 
 @Composable
 fun TopBarCategories() {
-    // Keep track of which category is selected
-    var selectedCategory = remember { mutableStateOf("Food") }
+    val placesViewModel: PlacesViewModel = hiltViewModel()
+    val selectedCategory by placesViewModel.selectedCategory.collectAsState()
+//    var selectedCategory = remember { mutableStateOf("Food") }
 
     // List of category labels
-    val categories = listOf("Food", "Bars", "Adventures", "Parks", "Activities")
+    val categories = listOf(Category.FOOD, Category.BARS, Category.ENTERTAINMENT)
 
     Surface(
         color = Color.White,
@@ -172,17 +178,17 @@ fun TopBarCategories() {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     categories.forEach { category ->
-                        if (category == selectedCategory.value) {
+                        if (category == selectedCategory) {
                             // Selected category: Blue pill
                             Box(
                                 modifier =
                                     Modifier
                                         .clip(RoundedCornerShape(16.dp))
                                         .background(Color(0xFFE8F0FE))
-                                        .clickable { selectedCategory.value = category },
+                                        .clickable { placesViewModel.setSelectedCategory(category)},
                             ) {
                                 Text(
-                                    text = category,
+                                    text = category.displayName,
                                     color = Color(0xFF176FF2),
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -191,12 +197,12 @@ fun TopBarCategories() {
                         } else {
                             // Non-selected category: Gray text
                             Text(
-                                text = category,
+                                text = category.displayName,
                                 color = Color.Gray,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier =
                                     Modifier
-                                        .clickable { selectedCategory.value = category }
+                                        .clickable { placesViewModel.setSelectedCategory(category)}
                                         .padding(horizontal = 8.dp, vertical = 8.dp),
                             )
                         }
@@ -284,7 +290,10 @@ fun AboutTextWithShowMore(
 }
 
 @Composable
-fun PlaceContent(place: PlaceDetails) {
+fun PlaceContent(
+    place: PlaceDetails,
+    onNavigateToShowMore: (String) -> Unit,
+) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -358,10 +367,11 @@ fun PlaceContent(place: PlaceDetails) {
         // Only "Show More" is clickable here
         Box(modifier = Modifier.padding(start = 40.dp, bottom = 8.dp)) {
             AboutTextWithShowMore(
-                text = place.editorialSummary ?: "No Editorial Summary Available",
+                text = place.editorialSummary ?: place.id,
                 maxLines = 4,
                 onShowMoreClick = {
-                    // Handle "Show More" click here (e.g., expand text, navigate, etc.)
+
+                    onNavigateToShowMore(place.id)
                 },
             )
         }
@@ -388,48 +398,8 @@ fun PlaceContent(place: PlaceDetails) {
             }
         }
 
-        // Additional details for "Naughters" (example data)
-        if (place.displayName == "Naughters") {
-            AdditionalDetailsSection()
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
-@Composable
-fun AdditionalDetailsSection() {
-    Column(
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
-    ) {
-        Text("Menu", style = MaterialTheme.typography.titleLarge)
-        Text("http://naughters.com", style = MaterialTheme.typography.bodyMedium)
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Address/Contact", style = MaterialTheme.typography.titleLarge)
-        Text(
-            text = "136 2nd St, Troy, NY 12180\n(518) 238-3130",
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Hour of Operations", style = MaterialTheme.typography.titleLarge)
-        Text(
-            text =
-                """
-                Monday 6AM–3PM
-                Tuesday 6AM–3PM
-                Wednesday 6AM–3PM
-                Thursday 6AM–3PM
-                Friday 6AM–3PM
-                Saturday 8AM–5PM
-                Sunday 8AM–5PM
-                """.trimIndent(),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Accessibility", style = MaterialTheme.typography.titleLarge)
-        Text("Wheelchair Accessible", style = MaterialTheme.typography.bodyMedium)
-    }
-}

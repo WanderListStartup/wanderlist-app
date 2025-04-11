@@ -1,7 +1,8 @@
 package com.example.wanderlist.data.firestore.repository
 
+import com.example.wanderlist.data.firestore.model.Category
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
-import com.example.wanderlist.data.google.model.PlaceDetails
+import com.example.wanderlist.data.googlemaps.model.PlaceDetails
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -13,7 +14,7 @@ class EstablishmentDetailsRepository @Inject constructor(
     /**
      * Batch‑writes a list of PlaceDetails into "establishment_details".
      */
-    suspend fun batchUpload(establishments: List<PlaceDetails>) {
+    suspend fun batchUpload(establishments: List<PlaceDetails>, category: Category) {
         val batch = firestore.batch()
         establishments.forEach { est ->
             val docRef = firestore.collection("establishment_details").document(est.id)
@@ -28,11 +29,25 @@ class EstablishmentDetailsRepository @Inject constructor(
                 formattedAddress = est.formattedAddress,
                 editorialSummary = est.editorialSummary,
                 nationalPhoneNumber = est.nationalPhoneNumber,
-                photoURIs = est.photoURIs,
-                websiteUri = est.websiteUri
+                photoURIs = est.photoURIs as List<String>?,
+                websiteUri = est.websiteUri,
+                category = category.displayName
             )
             batch.set(docRef, ef)
         }
         batch.commit().await()
+    }
+
+    suspend fun getEstablishmentDetails(establishmentId: String): EstablishmentDetails? {
+        return try {
+            val snapshot = firestore.collection("establishment_details")
+                .document(establishmentId)
+                .get()
+                .await()
+            snapshot.toObject(EstablishmentDetails::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }

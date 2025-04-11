@@ -1,4 +1,4 @@
-package com.example.wanderlist.data.google.api
+package com.example.wanderlist.data.googlemaps.api
 
 import android.content.Context
 import android.net.Uri
@@ -34,7 +34,7 @@ class PlacesApiService(
     /**
      * Fetches nearby places with a pre-defined configuration.
      */
-    suspend fun getNearbyPlaces(): List<Place> {
+    suspend fun getNearbyPlaces(filters: List<String>): List<Place> {
         // Default configuration parameters.
         Log.d(TAG, "getNearbyPlaces: Starting getNearbyPlaces")
         val defaultFields =
@@ -48,16 +48,17 @@ class PlacesApiService(
                 Place.Field.EDITORIAL_SUMMARY,
                 Place.Field.NATIONAL_PHONE_NUMBER,
                 Place.Field.PHOTO_METADATAS,
-                Place.Field.WEBSITE_URI,
+                Place.Field.WEBSITE_URI
             )
         val defaultCenter = LatLng(42.731544, -73.682535)
         val defaultRadius = 1000.0
-        val defaultResultCount = 10
+        val defaultResultCount = 3
 
         val circle = CircularBounds.newInstance(defaultCenter, defaultRadius)
         val request =
             SearchNearbyRequest
                 .builder(circle, defaultFields)
+                .setIncludedTypes(filters)
                 .setMaxResultCount(defaultResultCount)
                 .build()
 
