@@ -38,10 +38,19 @@ class ProfileViewModel @Inject constructor(
     var profilePictureUrl by mutableStateOf("https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG")
         private set
 
+    // Holds the actual friend list for the current user
+    var friendProfiles by mutableStateOf<List<UserProfile>>(emptyList())
+        private set
+
     init {
-        loadUserProfile()
+        loadUserProfile()  // automatically loads user data and friends
     }
 
+    /**
+     * Fetch the current user's profile from Firestore,
+     * and populate local fields (name, username, etc.).
+     * Then also load this user's friend list.
+     */
     private fun loadUserProfile() {
         viewModelScope.launch {
             val currentUser = authDataStore.getCurrentUser()
@@ -54,8 +63,28 @@ class ProfileViewModel @Inject constructor(
                     location = it.location
                     gender = it.gender
                     // Optionally update profilePictureUrl if your backend stores it
+
+                    // Now that we have the current user's "friends" list, load their profiles
+                    loadFriendsForCurrentUser(it.friends)
                 }
             }
+        }
+    }
+
+    /**
+     * Given a list of friend UIDs, fetch each friend's UserProfile from Firestore
+     * and store them in [friendProfiles].
+     */
+    private fun loadFriendsForCurrentUser(friendUids: List<String>) {
+        viewModelScope.launch {
+            val loadedFriends = mutableListOf<UserProfile>()
+            for (friendUid in friendUids) {
+                val friendProfile = userProfileRepository.getUserProfile(friendUid)
+                if (friendProfile != null) {
+                    loadedFriends.add(friendProfile)
+                }
+            }
+            friendProfiles = loadedFriends
         }
     }
 }
