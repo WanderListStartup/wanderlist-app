@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
@@ -46,9 +48,8 @@ import com.example.wanderlist.viewmodel.ProfileViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileView(
-    viewModel: EditProfileViewModel = hiltViewModel(),
+    editProfileViewModel: EditProfileViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel(),
-    friendViewModel: FindFriendsViewModel = hiltViewModel(),
     onNavigateToHome: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit,
@@ -106,14 +107,14 @@ fun ProfileView(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = viewModel.name,
+                        text = editProfileViewModel.name,
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                         fontSize = 32.sp,
                         modifier = Modifier.padding(PaddingValues(start = 36.dp))
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = viewModel.username,
+                        text = editProfileViewModel.username,
                         modifier = Modifier.padding(PaddingValues(start = 38.dp)),
                         style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
                     )
@@ -150,7 +151,7 @@ fun ProfileView(
                     contentScale = ContentScale.Fit
                 )
                 Text(
-                    text = viewModel.location,
+                    text = editProfileViewModel.location,
                     fontSize = 12.sp,
                     style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
                 )
@@ -186,7 +187,7 @@ fun ProfileView(
             }
 
             Text(
-                text = viewModel.bio,
+                text = editProfileViewModel.bio,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(PaddingValues(start = 15.dp, end = 30.dp))
@@ -254,8 +255,6 @@ fun ProfileView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(bottom = 72.dp)
             ) {
                 when (selectedTab.intValue) {
                     0 -> {
@@ -297,28 +296,23 @@ fun ProfileView(
                             )
                         }
 
-                        // Now replace the hardcoded "UserRow"s with a loop of your real friendProfiles
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(PaddingValues(top = 60.dp))
-                        ) {
-                            val friends = profileViewModel.friendProfiles // The real friend list from your ViewModel
-                            friends.forEachIndexed { index, friend ->
-                                UserRow(
-                                    imageUrl =
-                                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
-                                    name = friend.name,
-                                    handle = "@${friend.username}",
-                                    location = friend.location,
-                                    level = "Lvl: ${friend.level}",
-                                    onRemoveFriendClick = {
-                                        // This means "Accept" in our logic
-                                        friendViewModel.removeFriendRequest(friend.uid)
-                                    }
-                                )
-                                // Exactly the same divider
-                                if (index < friends.lastIndex) {
+                        val friendProfiles = profileViewModel.friendProfiles
+                        LazyColumn (modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(PaddingValues(top = 60.dp))) {
+                            if (friendProfiles.isNotEmpty()) {
+                                items(friendProfiles) { friend ->
+                                    UserRow(
+                                        imageUrl = "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
+                                        name = friend.name,
+                                        handle = "@${friend.username}",
+                                        location = friend.location,
+                                        level = "Lvl: ${friend.level}",
+                                        onRemoveFriendClick = {
+                                            // This means "Accept" in our logic
+                                            profileViewModel.removeFriend(friend.uid)
+                                        }
+                                    )
                                     HorizontalDivider(
                                         modifier = Modifier
                                             .padding(horizontal = 40.dp)
@@ -327,7 +321,6 @@ fun ProfileView(
                                         color = Color.Gray.copy(alpha = 0.2f)
                                     )
                                 }
-
                             }
                         }
                         Spacer(modifier = Modifier.height(24.dp))

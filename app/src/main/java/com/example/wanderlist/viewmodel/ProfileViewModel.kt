@@ -1,6 +1,7 @@
 // ProfileViewModel.kt
 package com.example.wanderlist.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.wanderlist.data.firestore.repository.UserProfileRepository
 import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.data.auth.model.AuthDataStore
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.auth.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -19,6 +21,9 @@ class ProfileViewModel @Inject constructor(
     private val userProfileRepository: UserProfileRepository,
     private val authDataStore: AuthDataStore
 ) : ViewModel() {
+
+    var userProfile by mutableStateOf<UserProfile?>(null)
+        private set
 
     var name by mutableStateOf("")
         private set
@@ -47,6 +52,38 @@ class ProfileViewModel @Inject constructor(
         loadUserProfile()  // automatically loads user data and friends
     }
 
+    private fun reloadUserProfile() {
+        viewModelScope.launch {
+            val currentUser = authDataStore.getCurrentUser()
+            if (currentUser != null) {
+                userProfile = userProfileRepository.getUserProfile(currentUser.uid)
+                loadFriendsForCurrentUser(userProfile?.friends ?: emptyList())
+            }
+        }
+    }
+
+    fun removeFriend(friendUid: String) {
+        val uid = userProfile?.uid ?: return
+        viewModelScope.launch {
+
+            Log.d("ProfileViewModel", "Removing friend: $friendUid from user: $uid")
+            userProfileRepository.updateUserProfile(
+                uid = uid,
+                updatedFields = mapOf(
+                    "friends" to FieldValue.arrayRemove(friendUid)
+                )
+            )
+
+            userProfileRepository.updateUserProfile(
+                uid = friendUid,
+                updatedFields = mapOf(
+                    "friends" to FieldValue.arrayRemove(uid)
+                )
+            )
+            reloadUserProfile()
+        }
+    }
+
     /**
      * Fetch the current user's profile from Firestore,
      * and populate local fields (name, username, etc.).
@@ -68,6 +105,7 @@ class ProfileViewModel @Inject constructor(
                     // Now that we have the current user's "friends" list, load their profiles
                     loadFriendsForCurrentUser(it.friends)
                 }
+                userProfile = profile
             }
         }
     }

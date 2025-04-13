@@ -41,10 +41,10 @@ fun FindFriendsView(
     val searchQuery = viewModel.searchQuery
 
     // 1) The users that are in MY incomingRequests
-    val incomingRequests = viewModel.incomingRequestProfiles()
+    val incomingRequests = viewModel.incomingRequestProfiles
 
     // 2) Everyone else
-    val otherProfiles = viewModel.otherProfilesExcludingRequests()
+    val prospectiveFriends = viewModel.prospectiveFriends
 
     Scaffold(
         containerColor = Color.White,
@@ -131,11 +131,16 @@ fun FindFriendsView(
 
                         items(incomingRequests) { profile ->
                             FriendListItem(
+                                type = "incoming",
                                 userProfile = profile,
                                 isIncomingRequest = true, // We pass a flag
                                 onAddFriendClick = {
                                     // This means "Accept" in our logic
                                     viewModel.acceptFriendRequest(profile.uid)
+                                },
+                                onRemoveRequestClick = {
+                                    // This means "Remove" in our logic
+                                    viewModel.removeFriendRequest(profile.uid)
                                 }
                             )
                         }
@@ -146,7 +151,7 @@ fun FindFriendsView(
                     }
 
                     // B) Show everyone else below
-                    if (otherProfiles.isNotEmpty()) {
+                    if (prospectiveFriends.isNotEmpty()) {
                         item {
                             Text(
                                 text = "Find Friends",
@@ -156,14 +161,20 @@ fun FindFriendsView(
                             )
                         }
 
-                        items(otherProfiles) { profile ->
+                        items(prospectiveFriends) { profile ->
                             FriendListItem(
+                                type = "prospective",
                                 userProfile = profile,
                                 isIncomingRequest = false,
                                 onAddFriendClick = {
                                     // This means "Send request"
                                     viewModel.sendFriendRequest(profile)
+                                },
+                                onRemoveRequestClick = {
+                                    // This means "Remove" in our logic
+                                    viewModel.removeFriendRequest(profile.uid)
                                 }
+
                             )
                         }
                     }
@@ -176,9 +187,11 @@ fun FindFriendsView(
 
 @Composable
 fun FriendListItem(
+    type: String,
     userProfile: UserProfile,
     isIncomingRequest: Boolean = false,
-    onAddFriendClick: () -> Unit
+    onAddFriendClick: () -> Unit,
+    onRemoveRequestClick: () -> Unit,
 ) {
     // Top spacer + divider
     Spacer(modifier = Modifier.height(10.dp))
@@ -283,14 +296,34 @@ fun FriendListItem(
                 }
             }
 
+            if (type == "incoming") {
+                // Accept Friend icon on the far right
+                IconButton(onClick = onAddFriendClick) {
+                    Icon(
+                        imageVector = Icons.Default.PersonAdd,
+                        contentDescription = "Accept Friend",
+                        tint = Color.Gray
+                    )
+                }
 
-            // Add Friend icon on the far right
-            IconButton(onClick = onAddFriendClick) {
-                Icon(
-                    imageVector = Icons.Default.PersonAdd,
-                    contentDescription = "Add Friend",
-                    tint = Color.Gray
-                )
+                // Remove Friend icon on the far right
+                IconButton(onClick = onRemoveRequestClick) {
+                    Icon(
+                        imageVector = Icons.Default.PersonRemove,
+                        contentDescription = "Remove Friend",
+                        tint = Color.Gray
+                    )
+                }
+            }
+            else if (type == "prospective") {
+                // Add Friend icon on the far right
+                IconButton(onClick = onAddFriendClick) {
+                    Icon(
+                        imageVector = Icons.Default.PersonAdd,
+                        contentDescription = "Add Friend",
+                        tint = Color.Gray
+                    )
+                }
             }
         }
     }
