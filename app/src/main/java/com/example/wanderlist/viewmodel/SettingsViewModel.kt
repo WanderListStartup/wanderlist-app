@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val userProfileRepository: UserProfileRepository,
-    private val authDataStore: AuthDataStore
+    private val authDataStore: AuthDataStore,
 ) : ViewModel() {
 
     var phone by mutableStateOf("646-112-1323")
@@ -29,11 +29,18 @@ class SettingsViewModel @Inject constructor(
     var isPrivateAccount by mutableStateOf(false)
         private set
 
-    var isNotificationsEnabled by mutableStateOf(true)
+    var isNotificationsEnabled by mutableStateOf(userProfileRepository.checkNotificationPermission())
+        private set
+
+    var showingNotificationDialog by mutableStateOf(false)
         private set
 
     init {
         loadUserProfile()
+    }
+
+    fun checkNotificationPermissionStatus() : Boolean{
+        return userProfileRepository.checkNotificationPermission()
     }
 
     private fun loadUserProfile() {
@@ -70,6 +77,17 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onNotificationsChange(newValue: Boolean) {
-        isNotificationsEnabled = newValue
+        if (newValue){
+            showingNotificationDialog = true
+            isNotificationsEnabled = true
+        } else{
+           //noop cannot turn off notification perms inside of app
+            return
+        }
     }
+
+    fun dismissNotificationDialog(){
+       showingNotificationDialog = false
+    }
+
 }

@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.androidx.foundation)
     implementation(libs.places)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.messaging.ktx)
     kapt(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
