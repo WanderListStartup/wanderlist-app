@@ -111,4 +111,12 @@ class EstablishmentDetailsRepository @Inject constructor(
             return emptyList()
         }
     }
+
+    suspend fun addReviewToEstablishment(establishmentId: String, reviewId: String) {
+        firestore.collection("establishment_details")
+            .document(establishmentId)
+            .update("reviews", com.google.firebase.firestore.FieldValue.arrayUnion(reviewId))
+            .await()
+    }
+
 }
