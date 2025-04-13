@@ -1,69 +1,51 @@
 package com.example.wanderlist.view
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.*
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.*
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.wanderlist.viewmodel.PostReviewState
+import com.example.wanderlist.viewmodel.WriteReviewViewModel
 
-/**
- * Example composable that displays:
- *  - A "Write a Review" title
- *  - A box with a border that encloses:
- *     -- A row of stars (left) + "Select your rating" (right)
- *     -- A multiline text field below that row
- *  - A "Post Review" button below the box
- */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WriteAReviewBox() {
-    // Keeps track of the user’s rating (0–5, in half increments).
-    val userRating = remember { mutableStateOf(0f) }
-    // For demonstration, we also track the typed text. (Not persisted anywhere.)
-    val reviewText = remember { mutableStateOf("") }
-
-    // 2) A custom row that acts like your top bar
-
-
-
+fun WriteReviewView(
+    establishmentId: String,
+    onBack: () -> Unit,
+    viewModel: WriteReviewViewModel = hiltViewModel()
+) {
+    // Read states from the viewmodel
+    val rating = viewModel.userRating
+    val reviewText = viewModel.reviewText
+    val postState = viewModel.postReviewState
 
     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center // Centers the "Naughters" text
-        ) {
-            // Back arrow placed at the start (left) of the Box.
+        // Top Bar with Back Arrow and Title
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             IconButton(
-                onClick = { /* TODO: handle back action */ },
+                onClick = onBack,
                 modifier = Modifier.align(Alignment.CenterStart)
             ) {
-                // Wrap the Icon in a Box with a circular outline (border).
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .border(
-                            width = 1.dp,
-                            color = Color.Black,
-                            shape = CircleShape
-                        ),
+                        .border(1.dp, Color.Black, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -73,51 +55,41 @@ fun WriteAReviewBox() {
                     )
                 }
             }
-
-            // Centered text
             Text(
-                text = "Naughters",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-                )
+                text = "Write a Review",
+                style = MaterialTheme.typography.titleLarge
             )
         }
 
-
-
-        // 1) Title (e.g. "Write a Review") – center it or left-align as you wish
-
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 2) Outlined box containing the star row + text field
+        // Container for Star Rating and Text Field
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
-                .border(width = 1.dp, color = Color.LightGray, shape = RoundedCornerShape(8.dp))
-                .padding(16.dp) // internal padding so star row & text field aren’t flush
+                .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                .padding(16.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // a) Row for star rating (left) + "Select your rating" (right)
+                // Row for star rating and prompt text
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Star row (left)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         repeat(5) { index ->
+                            // Custom star composable (assumes you have SelectableStarNoGesture available)
                             SelectableStarNoGesture(
                                 starIndex = index,
-                                rating = userRating.value,
-                                onRatingChanged = { newVal -> userRating.value = newVal },
+                                rating = rating,
+                                onRatingChanged = { newRating -> viewModel.updateRating(newRating) },
                                 starSize = 28.dp
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                         }
                     }
-                    // "Select your rating" text (right)
                     Text(
                         text = "Select your rating",
                         style = MaterialTheme.typography.bodyMedium
@@ -126,42 +98,47 @@ fun WriteAReviewBox() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // b) Multiline text field
+                // Multiline TextField for review text
                 TextField(
-                    value = reviewText.value,
-                    onValueChange = { newText -> reviewText.value = newText },
-                    label = { Text("Start your review...") },
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color.Blue,
-                        unfocusedBorderColor = Color.Blue,
-                        cursorColor = Color.Blue,
-                        // You can adjust other colors (e.g., label, error colors) as needed:
-                        focusedLabelColor = Color.Blue
+                    value = reviewText,
+                    onValueChange = { viewModel.updateReviewText(it) },
+                    label = { Text("Write your review...") },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
                     ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(120.dp)
+                    modifier = Modifier.fillMaxWidth().height(120.dp)
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 3) "Post Review" button below the box
+        // Button to post the review
         Button(
-            onClick = { /* Submit logic here, if needed */ },
+            onClick = { viewModel.postReview(establishmentId) },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A73E8)),
             shape = RoundedCornerShape(8.dp)
         ) {
             Text(text = "Post Review", color = Color.White)
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Display posting status for feedback
+        when (postState) {
+            is PostReviewState.Posting -> Text(text = "Posting...", color = Color.Gray)
+            is PostReviewState.Success -> Text(text = "Review posted successfully!", color = Color.Green)
+            is PostReviewState.Error -> Text(text = "Error: ${postState.message}", color = Color.Red)
+            else -> { /* Idle: No message displayed */ }
+        }
     }
+
+
 }
 
-/**
- * A star composable that supports half‑star increments by overlaying
- * two clickable halves. No detectTapGestures needed.
- */
 @Composable
 fun SelectableStarNoGesture(
     starIndex: Int,
@@ -170,22 +147,21 @@ fun SelectableStarNoGesture(
     starSize: Dp = 28.dp
 ) {
     Box(modifier = Modifier.size(starSize)) {
-        // Decide which icon to show
+        // Determine which star icon should be displayed based on the rating.
         val icon = when {
             rating >= starIndex + 1 -> Icons.Filled.Star
-            rating >= starIndex + 0.5f -> Icons.Filled.StarHalf
+            rating >= starIndex + 0.5f -> Icons.AutoMirrored.Filled.StarHalf
             else -> Icons.Filled.StarBorder
         }
 
-        // The star
         Icon(
             imageVector = icon,
             contentDescription = "Star ${starIndex + 1}",
-            tint = Color(0xFFFFC107),
+            tint = Color(0xFFFFC107), // Gold color for stars.
             modifier = Modifier.fillMaxSize()
         )
 
-        // Overlays two clickable halves
+        // Overlay two halves that are clickable to support half-star increments.
         Row(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
@@ -203,8 +179,3 @@ fun SelectableStarNoGesture(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun WriteAReviewBoxPreview() {
-    WriteAReviewBox()
-}

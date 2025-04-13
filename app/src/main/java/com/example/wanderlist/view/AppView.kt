@@ -72,6 +72,17 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
                 )
 
         }
+        composable(
+            route = "writeReview/{establishmentId}",
+            arguments = listOf(navArgument("establishmentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val establishmentId = backStackEntry.arguments?.getString("establishmentId") ?: ""
+            WriteReviewView(
+                establishmentId = establishmentId,
+                onBack = { navController.popBackStack() },
+            )
+
+        }
         composable<Settings> {
             SettingsView(
                 onNavigateToProfile = {navController.navigate(route=Profile)},
