@@ -50,6 +50,10 @@ class ProfileViewModel @Inject constructor(
 
     var likedEstablishmentsDetails by mutableStateOf<List<EstablishmentDetails>>(emptyList())
         private set
+
+    var selectedTab by mutableStateOf(0)
+        private set
+
     init {
         loadUserProfile()  // automatically loads user data and friends
     }
@@ -77,6 +81,13 @@ class ProfileViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Update the selected tab index.
+     */
+    fun updateSelectedTab(index: Int) {
+        selectedTab = index
     }
 
     /**
