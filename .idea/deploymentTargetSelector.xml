@@ -16,6 +16,9 @@
       <SelectionState runConfigName="WriteAReviewBoxPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="SinglePageCloneViewPreview (1)">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>
