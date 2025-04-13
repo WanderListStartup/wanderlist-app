@@ -1,5 +1,6 @@
 package com.example.wanderlist.data.firestore.repository
 
+import androidx.compose.animation.core.snap
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -61,4 +62,44 @@ class UserProfileRepository @Inject constructor(
             .update(mapOf("isCompleted" to isCompleted))
             .await()
     }
+
+
+    suspend fun getFriends(uid: String) : List<String>?
+    {
+        return try {
+            val snapshot = firestore
+                .collection("user_profiles")
+                .document(uid)
+                .get()
+                .await()
+            if (snapshot.exists()) {
+                snapshot.get("friends") as? List<String>
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun getIncomingRequests(uid: String) : List<String>?
+    {
+        return try {
+            val snapshot = firestore
+                .collection("user_profiles")
+                .document(uid)
+                .get()
+                .await()
+            if (snapshot.exists()) {
+                snapshot.get("incomingRequests") as? List<String>
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
 }

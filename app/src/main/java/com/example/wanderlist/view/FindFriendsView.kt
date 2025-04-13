@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -28,6 +29,8 @@ import coil.request.ImageRequest
 import com.example.wanderlist.R
 import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.viewmodel.FindFriendsViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -279,6 +282,7 @@ fun FriendListItem(
                     )
                 }
             }
+
 
             // Add Friend icon on the far right
             IconButton(onClick = onAddFriendClick) {

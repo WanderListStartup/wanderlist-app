@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Assignment
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Settings
@@ -38,6 +39,7 @@ import com.example.wanderlist.R
 import com.example.wanderlist.components.LikedPlacesGrid
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.EditProfileViewModel
+import com.example.wanderlist.viewmodel.FindFriendsViewModel
 import com.example.wanderlist.viewmodel.ProfileViewModel
 
 
@@ -46,6 +48,7 @@ import com.example.wanderlist.viewmodel.ProfileViewModel
 fun ProfileView(
     viewModel: EditProfileViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel(),
+    friendViewModel: FindFriendsViewModel = hiltViewModel(),
     onNavigateToHome: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit,
@@ -308,7 +311,11 @@ fun ProfileView(
                                     name = friend.name,
                                     handle = "@${friend.username}",
                                     location = friend.location,
-                                    level = "Lvl: ${friend.level}"
+                                    level = "Lvl: ${friend.level}",
+                                    onRemoveFriendClick = {
+                                        // This means "Accept" in our logic
+                                        friendViewModel.removeFriendRequest(friend.uid)
+                                    }
                                 )
                                 // Exactly the same divider
                                 if (index < friends.lastIndex) {
@@ -320,6 +327,7 @@ fun ProfileView(
                                         color = Color.Gray.copy(alpha = 0.2f)
                                     )
                                 }
+
                             }
                         }
                         Spacer(modifier = Modifier.height(24.dp))
@@ -371,7 +379,8 @@ fun UserRow(
     name: String,
     handle: String,
     location: String,
-    level: String
+    level: String,
+    onRemoveFriendClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -420,6 +429,18 @@ fun UserRow(
             Text(
                 text = level,
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(15.dp))
+
+        IconButton(
+            onClick = { onRemoveFriendClick() }
+        ) {
+            Icon(
+                imageVector = Icons.Default.PersonRemove,
+                contentDescription = "Remove Friend",
+                tint = Color.Red
             )
         }
     }

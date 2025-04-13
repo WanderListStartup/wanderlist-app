@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.wanderlist.data.firestore.repository.UserProfileRepository
 import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.data.auth.model.AuthDataStore
+import com.google.firebase.firestore.auth.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
