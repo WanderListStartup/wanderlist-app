@@ -301,13 +301,11 @@ fun PlaceContent(
                     },
                     onDragEnd = {
                         if (offsetX.value <= -300f) {
-                            Log.d("NGAGA", "PlaceContent: ${place.id}")
-                            homePageViewModel.addLikedEstablishment(place.id)
+                            homePageViewModel.addDislikedEstablishment(place.id)
                             homePageViewModel.removeSwipedEstablishment()
 
                         } else if (offsetX.value >= 300f) {
-                            Log.d("NGAGA", "PlaceContent: DISLIKE ${place.id}")
-                            homePageViewModel.addDislikedEstablishment(place.id)
+                            homePageViewModel.addLikedEstablishment(place.id)
                             homePageViewModel.removeSwipedEstablishment()
                         }
                         scope.launch {

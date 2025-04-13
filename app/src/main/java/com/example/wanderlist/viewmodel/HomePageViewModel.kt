@@ -22,6 +22,7 @@ class HomePageViewModel @Inject constructor(
     private val userProfileRepository: UserProfileRepository,
     private val auth: FirebaseAuth
 ) : ViewModel() {
+
     private val _establishments = MutableStateFlow<List<EstablishmentDetails>>(emptyList())
     val establishments: StateFlow<List<EstablishmentDetails>> get() = _establishments
     private val _isLoading = MutableStateFlow(false)
@@ -42,11 +43,8 @@ class HomePageViewModel @Inject constructor(
         viewModelScope.launch {
             Log.d(TAG, ": Launching init ")
             val uid = auth.uid
-            if (uid == null){
-                Log.e(TAG, "INVALID USER: CHECK CREDENTIALS ", )
-                throw RuntimeException("INVALID USER IN HOMEPAGEVIEWMODEL")
-            }
-            val profile = userProfileRepository.getUserProfile(uid)
+
+            val profile = uid?.let { userProfileRepository.getUserProfile(it) }
             _userProfile.value = profile
             loadMoreEstablishments()
         }
