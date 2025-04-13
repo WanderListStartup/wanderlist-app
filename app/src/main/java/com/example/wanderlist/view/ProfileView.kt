@@ -40,6 +40,7 @@ import com.example.wanderlist.viewmodel.ProfileViewModel
 fun ProfileView(
     viewModel: EditProfileViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel(),
+    onNavigateToLikedPlace: (String) -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit,
@@ -49,6 +50,9 @@ fun ProfileView(
         ProfileScreen(
             viewModel = viewModel,
             profileViewModel = profileViewModel,
+            onNavigateToLikedPlace = {
+                establishmentId -> onNavigateToLikedPlace(establishmentId)
+            },
             onNavigateToHome = onNavigateToHome,
             onNavigateToSettings = onNavigateToSettings,
             onNavigateToUserSettings = onNavigateToUserSettings,
@@ -61,6 +65,7 @@ fun ProfileView(
 fun ProfileScreen(
     viewModel: EditProfileViewModel,
     profileViewModel: ProfileViewModel,
+    onNavigateToLikedPlace: (String) -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit,
@@ -68,7 +73,7 @@ fun ProfileScreen(
 ) {
     Scaffold(
         containerColor = Color.White,
-        topBar = { TopBar() },
+        topBar = { WlTopBar() },
         bottomBar = {
             BottomNavigationBar(onNavigateToHome = onNavigateToHome)
         }
@@ -159,7 +164,12 @@ fun ProfileScreen(
                 when (selectedTab) {
                     0 -> {
                         val likedEstablishmentsDetails = profileViewModel.likedEstablishmentsDetails
-                        LikedPlacesGrid(likedEstablishmentsDetails)
+                        LikedPlacesGrid(
+                            likedEstablishmentsDetails,
+                            onNavigateToLikedPlace = {
+                                    establishmentId -> onNavigateToLikedPlace(establishmentId)
+                            },
+                        )
                     }
                     1 -> {
                         Text(
@@ -184,7 +194,7 @@ fun ProfileScreen(
 
 // TOP AND BOTTOM BARS
 @Composable
-fun TopBar() {
+fun WlTopBar() {
     Surface(
         color = Color.White,
         shadowElevation = 0.dp,

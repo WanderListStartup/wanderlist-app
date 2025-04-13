@@ -67,7 +67,8 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
                 val establishmentId = backStackEntry.arguments?.getString("establishmentId") ?: ""
                 ShowMoreView(
                     establishmentId = establishmentId,
-                    onNavigateToHomePage = {navController.navigate(route=MainView)}
+                    onBackClick = { navController.popBackStack() }
+
                 )
 
         }
@@ -89,9 +90,21 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
                 onNavigateToSettings = {navController.navigate(route=Settings)},
                 onNavigateToUserSettings = {navController.navigate(route=UserSettings)},
                 onNavigateToFindFriends = { navController.navigate(route = FindFriendsView) },
+                onNavigateToLikedPlace = { establishmentId -> navController.navigate("likedPlace/$establishmentId") },
             )
         }
-
+        composable(
+            route = "likedPlace/{establishmentId}",
+            arguments = listOf(navArgument("establishmentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val establishmentId = backStackEntry.arguments?.getString("establishmentId") ?: ""
+            LikedPlaceView(
+                establishmentId = establishmentId,
+                onBackClick = { navController.popBackStack() },
+                onNavigateToHome = { navController.navigate(route = MainView) },
+                onNavigateToShowMore = { id -> navController.navigate("showMore/$id") }
+            )
+        }
         composable<FindFriendsView> {
             FindFriendsView(
                 onBackClick = { navController.popBackStack() }
