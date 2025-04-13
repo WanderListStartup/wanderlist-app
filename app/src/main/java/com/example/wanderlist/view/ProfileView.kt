@@ -256,9 +256,8 @@ fun ProfileView(
             ) {
                 when (selectedTab.intValue) {
                     0 -> {
-                        // replace Places with
-                        // List<PlaceDetails> userLikedPlaces = [place, place2, ... ]
-
+                        val likedEstablishmentsDetails = profileViewModel.likedEstablishmentsDetails
+                        LikedPlacesGrid(likedEstablishmentsDetails)
                     }
                     1 -> {
                         Text(

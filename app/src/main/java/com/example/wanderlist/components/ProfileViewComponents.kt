@@ -21,12 +21,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.wanderlist.data.firestore.model.EstablishmentDetails
 import com.example.wanderlist.data.googlemaps.model.PlaceDetails
 
 
 @Composable
 fun LikedPlacesGrid(
-    places: List<PlaceDetails>,
+    places: List<EstablishmentDetails>,
     maxLines: Int = 1,
 
     ) {

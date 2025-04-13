@@ -3,6 +3,7 @@ package com.example.wanderlist.data.firestore.repository
 import com.example.wanderlist.data.firestore.model.Category
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
 import com.example.wanderlist.data.googlemaps.model.PlaceDetails
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -52,6 +53,27 @@ class EstablishmentDetailsRepository @Inject constructor(
             null
         }
     }
+
+    suspend fun getEstablishmentsDetailsForLargeLists(establishmentIds: List<String>): List<EstablishmentDetails> {
+        if (establishmentIds.isEmpty()) return emptyList()
+
+        return establishmentIds
+            .chunked(10)  // Split into sublists of size <= 10
+            .flatMap { chunk ->
+                try {
+                    val snapshot = firestore.collection("establishment_details")
+                        .whereIn(FieldPath.documentId(), chunk)
+                        .get()
+                        .await()
+
+                    snapshot.toObjects(EstablishmentDetails::class.java)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    emptyList()
+                }
+            }
+    }
+
 
     suspend fun getEstablishmentsExcluding(
         excludedIds: List<String>, limit: Int, withFilter: String
