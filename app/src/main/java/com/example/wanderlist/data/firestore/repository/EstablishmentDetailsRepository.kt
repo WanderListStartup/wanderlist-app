@@ -1,6 +1,5 @@
 package com.example.wanderlist.data.firestore.repository
 
-import android.util.Log
 import com.example.wanderlist.data.firestore.model.Category
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
 import com.example.wanderlist.data.googlemaps.model.PlaceDetails
@@ -60,10 +59,8 @@ class EstablishmentDetailsRepository @Inject constructor(
         try {
             // Use whereNotIn only if there are fewer than or equal to 10 IDs to filter out.
             val query = if (excludedIds.isEmpty()) {
-                Log.d(TAG, "getEstablishmentsExcluding: 1 ${withFilter}")
                 firestore.collection("establishment_details").where(Filter.equalTo("category", withFilter)).limit(limit.toLong())
             } else if (excludedIds.size <= 10) {
-                Log.d(TAG, "getEstablishmentsExcluding: 2 ${withFilter} exc ${excludedIds}")
                 firestore.collection("establishment_details")
                     .whereNotIn("id", excludedIds)
                     .where(Filter.equalTo("category", withFilter))
@@ -72,7 +69,6 @@ class EstablishmentDetailsRepository @Inject constructor(
                 // More than 10 excluded IDs. Query by category only,
                 // and then we'll do client-side exclusion.
                 // Increase limit so we have enough results after exclusion.
-                Log.d(TAG, "getEstablishmentsExcluding: 3 ${withFilter} exc ${excludedIds}")
                 firestore.collection("establishment_details")
                     .where(Filter.equalTo("category", withFilter))
                     // We'll fetch more than 'limit' to offset the excluded items.
