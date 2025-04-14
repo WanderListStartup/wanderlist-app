@@ -156,6 +156,7 @@ fun EditProfileView(
                         }
                     }
                 },
+                enabled = viewModel.isGenderValid,
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = wanderlistBlue),
                 modifier = Modifier

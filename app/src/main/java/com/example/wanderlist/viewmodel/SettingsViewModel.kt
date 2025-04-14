@@ -11,7 +11,10 @@ import com.example.wanderlist.data.firestore.repository.UserProfileRepository
 import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.data.auth.model.AuthDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.net.InetAddress
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,6 +36,8 @@ class SettingsViewModel @Inject constructor(
         private set
 
     var showingNotificationDialog by mutableStateOf(false)
+        private set
+    var isDomainValidState by mutableStateOf(true)
         private set
 
     init {
@@ -69,6 +74,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onEmailChange(newValue: String) {
         email = newValue
+        updateDomainValidity()
     }
 
     fun onPrivateAccountChange(newValue: Boolean) {
@@ -88,4 +94,30 @@ class SettingsViewModel @Inject constructor(
        showingNotificationDialog = false
     }
 
+
+    private fun updateDomainValidity() {
+        viewModelScope.launch {
+            isDomainValidState = checkDomainAsync(email)
+        }
+    }
+
+    // Performs the domain lookup on the IO dispatcher.
+    private suspend fun checkDomainAsync(email: String): Boolean = withContext(Dispatchers.IO) {
+        val domain = email.substringAfter("@").trim()
+        if (domain.isEmpty()) {
+            return@withContext false
+        }
+        return@withContext try {
+            InetAddress.getByName(domain)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    fun isValidPhoneNumber(): Boolean {
+        // This regex expects the phone number to start optionally with a '+', then a non-zero digit followed by up to 14 digits.
+        val phoneRegex = Regex("^[1-9]\\d{9}$")
+        return phone.trim().matches(phoneRegex)
+    }
 }
