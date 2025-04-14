@@ -1,5 +1,6 @@
 package com.example.wanderlist.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.R
 import com.example.wanderlist.components.LikedPlacesGrid
+import com.example.wanderlist.components.ProfileReviewCard
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.EditProfileViewModel
 import com.example.wanderlist.viewmodel.ProfileViewModel
@@ -74,6 +77,7 @@ fun ProfileScreen(
     onNavigateToUserSettings: () -> Unit,
     onNavigateToFindFriends: () -> Unit,
 ) {
+
     Scaffold(
         containerColor = Color.White,
         topBar = { WlTopBar() },
@@ -162,7 +166,7 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 30.dp)
             ) {
                 when (selectedTab) {
                     0 -> {
@@ -175,13 +179,24 @@ fun ProfileScreen(
                         )
                     }
                     1 -> {
-                        Text(
-                            text = "Quest tab content here",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            textAlign = TextAlign.Center
-                        )
+                        val reviews = profileViewModel.reviewsForUser
+                        Column {
+
+                            reviews.forEach { review ->
+                                val displayName = profileViewModel.establishmentNames[review.establishmentId] ?: "Unknown"
+                                val location = "Troy, NY"
+                                ProfileReviewCard(
+                                    establishmentName = displayName,
+                                    location = location,
+                                    rating = review.rating,
+                                    reviewText = review.reviewText,
+                                    onEditClick = {  },
+                                    onDeleteClick = { },
+                                )
+
+                                HorizontalDivider()
+                            }
+                        }
                     }
                     2 -> {
                         FriendsTab(

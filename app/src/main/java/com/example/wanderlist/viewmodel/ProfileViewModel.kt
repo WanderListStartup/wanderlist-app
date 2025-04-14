@@ -13,7 +13,9 @@ import com.example.wanderlist.data.auth.model.AuthDataStore
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.auth.User
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
+import com.example.wanderlist.data.firestore.model.Reviews
 import com.example.wanderlist.data.firestore.repository.EstablishmentDetailsRepository
+import com.example.wanderlist.data.firestore.repository.ReviewsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,6 +24,7 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     private val userProfileRepository: UserProfileRepository,
     private val establishmentDetailsRepo: EstablishmentDetailsRepository,
+    private val reviewsRepository: ReviewsRepository,
     private val authDataStore: AuthDataStore
 ) : ViewModel() {
 
@@ -60,11 +63,18 @@ class ProfileViewModel @Inject constructor(
     var selectedTab by mutableStateOf(0)
         private set
 
+    var reviewsForUser by mutableStateOf<List<Reviews>>(emptyList())
+        private set
+
+    var establishmentNames by mutableStateOf<Map<String, String>>(emptyMap())
+        private set
+
+
     init {
         loadUserProfile()  // automatically loads user data and friends
     }
 
-     private fun reloadUserProfile() {
+    private fun reloadUserProfile() {
         viewModelScope.launch {
             val currentUser = authDataStore.getCurrentUser()
             if (currentUser != null) {
@@ -115,7 +125,15 @@ class ProfileViewModel @Inject constructor(
                     likedEstablishments = it.likedEstablishments
 
                     loadFriendsForCurrentUser(it.friends)
-                    likedEstablishmentsDetails = establishmentDetailsRepo.getEstablishmentsDetailsForLargeLists(likedEstablishments)
+                    likedEstablishmentsDetails =
+                        establishmentDetailsRepo.getEstablishmentsDetailsForLargeLists(
+                            likedEstablishments
+                        )
+
+                    val loadedReviews = reviewsRepository.getReviewsForUser(currentUser.uid)
+                    reviewsForUser = loadedReviews
+
+                    loadEstablishmentNamesForReviews(loadedReviews)
                 }
                 userProfile = profile
             }
@@ -145,4 +163,28 @@ class ProfileViewModel @Inject constructor(
             friendProfiles = loadedFriends
         }
     }
+
+
+    private fun loadEstablishmentNamesForReviews(reviews: List<Reviews>) {
+        viewModelScope.launch {
+            // Create a mapping of establishmentId to displayName
+            val nameMap = mutableMapOf<String, String>()
+            reviews.forEach { review ->
+                // Avoid duplicate calls if multiple reviews have the same establishment ID.
+                if (!nameMap.containsKey(review.establishmentId)) {
+                    val name = establishmentDetailsRepo.getDisplayNameById(review.establishmentId)
+                    if (name != null) {
+                        nameMap[review.establishmentId] = name
+                    }
+                }
+            }
+            // Save this mapping to your view model state.
+            establishmentNames = nameMap
+        }
+    }
+
+
+
+
+
 }

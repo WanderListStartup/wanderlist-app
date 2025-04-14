@@ -55,6 +55,22 @@ class ReviewsRepository @Inject constructor(
     }
 
 
+    suspend fun getReviewsForUser(uid: String): List<Reviews>
+    {
+        return try {
+            val snapshot = firestore.collection("reviews")
+                .whereEqualTo("userId", uid)
+                .get()
+                .await()
+            snapshot.documents.mapNotNull { document ->
+                document.toObject(Reviews::class.java)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
 
 
 }
