@@ -269,12 +269,19 @@ fun PlaceContent(
             val reviews = likedPlacesViewModel.reviewsForEstablishment
 
             if (reviews.isEmpty()) {
-                Text(
-                    text = "No Reviews Yet. Write a Review!",
+                // If there are no reviews, show a message.
+                Box(
                     modifier = Modifier
-                        .padding(horizontal = 50.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No Reviews Yet. Write a Review!",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                Spacer(modifier = Modifier.height(50.dp))
             } else {
                 Column {
                     // Only take up to 5 reviews from the list
@@ -285,9 +292,12 @@ fun PlaceContent(
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(25.dp))
+
             }
 
         }
+
     }
 }
 
@@ -447,3 +457,6 @@ fun RatingBar(rating: Int) {
 //fun SinglePageCloneViewPreview() {
 //    LikedPlaceView()
 //}
+
+
+
