@@ -22,6 +22,7 @@ data class UserProfile(
     val likedEstablishments: List<String> = emptyList(),
     val dislikedEstablishments: List<String> = emptyList(),
     val reviews: List<String> = emptyList(),
+    val quests: List<String> = emptyList(),
     val friends: List<String> = emptyList(),
     val incomingRequests: List<String> = emptyList(),
     val level: Int = 0,

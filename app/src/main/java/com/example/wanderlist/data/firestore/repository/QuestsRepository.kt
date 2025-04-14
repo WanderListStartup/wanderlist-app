@@ -1,5 +1,6 @@
 package com.example.wanderlist.data.firestore.repository
 
+import com.example.wanderlist.data.firestore.model.Quests
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -28,4 +29,15 @@ class QuestsRepository @Inject constructor (
 
         return !snapshot.isEmpty
     }
+
+    suspend fun getAllQuests(establishmentId: String): List<Quests> {
+        val snapshot = firestore.collection("quests")
+            .whereEqualTo("establishmentId", establishmentId)
+            .get()
+            .await()
+
+        // Convert QuerySnapshot documents directly to a list of Quest objects.
+        return snapshot.toObjects(Quests::class.java)
+    }
+
 }
