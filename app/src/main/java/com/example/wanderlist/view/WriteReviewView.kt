@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +31,10 @@ fun WriteReviewView(
     onBack: () -> Unit,
     viewModel: WriteReviewViewModel = hiltViewModel()
 ) {
+
+    LaunchedEffect(establishmentId) {
+        viewModel.loadExistingReview(establishmentId)
+    }
     // Read states from the viewmodel
     val rating = viewModel.userRating
     val reviewText = viewModel.reviewText

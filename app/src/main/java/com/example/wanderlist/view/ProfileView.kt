@@ -47,6 +47,7 @@ fun ProfileView(
     editProfileViewModel: EditProfileViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel(),
     onNavigateToLikedPlace: (String) -> Unit,
+    onNavigateToWriteReview: (String) -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit,
@@ -58,6 +59,9 @@ fun ProfileView(
             profileViewModel = profileViewModel,
             onNavigateToLikedPlace = {
                 establishmentId -> onNavigateToLikedPlace(establishmentId)
+            },
+            onNavigateToWriteReview = { establishmentId ->
+                onNavigateToWriteReview(establishmentId)
             },
             onNavigateToHome = onNavigateToHome,
             onNavigateToSettings = onNavigateToSettings,
@@ -72,6 +76,7 @@ fun ProfileScreen(
     editProfileViewModel: EditProfileViewModel,
     profileViewModel: ProfileViewModel,
     onNavigateToLikedPlace: (String) -> Unit,
+    onNavigateToWriteReview: (String) -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit,
@@ -192,6 +197,7 @@ fun ProfileScreen(
                                     reviewText = review.reviewText,
                                     onEditClick = {
                                         Log.d("ProfileView", "Edit Button Clicked")
+                                        onNavigateToWriteReview(review.establishmentId)
                                     },
                                     onDeleteClick = {
                                         profileViewModel.deleteReview(

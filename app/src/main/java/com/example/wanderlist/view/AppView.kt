@@ -102,6 +102,8 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
                 onNavigateToUserSettings = {navController.navigate(route=UserSettings)},
                 onNavigateToFindFriends = { navController.navigate(route = FindFriendsView) },
                 onNavigateToLikedPlace = { establishmentId -> navController.navigate("likedPlace/$establishmentId") },
+                onNavigateToWriteReview = {id -> navController.navigate( "writeReview/$id")}
+
             )
         }
         composable(

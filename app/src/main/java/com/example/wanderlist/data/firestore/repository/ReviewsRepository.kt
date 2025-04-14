@@ -84,6 +84,20 @@ class ReviewsRepository @Inject constructor(
         }
     }
 
+    suspend fun getReviewForUserAndEstablishment(userId: String, establishmentId: String): Reviews? {
+        return try {
+            val snapshot = firestore.collection("reviews")
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("establishmentId", establishmentId)
+                .get()
+                .await()
+            snapshot.toObjects(Reviews::class.java).firstOrNull()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
 
 
 }
