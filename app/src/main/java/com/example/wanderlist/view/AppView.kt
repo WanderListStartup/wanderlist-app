@@ -118,7 +118,7 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
         }
         composable<FindFriendsView> {
             FindFriendsView(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.navigate(route = Profile) }
             )
         }
         navigation<RegisterLoginView>(startDestination = Landing) {

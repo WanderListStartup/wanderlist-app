@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -28,20 +29,23 @@ import coil.request.ImageRequest
 import com.example.wanderlist.R
 import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.viewmodel.FindFriendsViewModel
+import com.example.wanderlist.viewmodel.ProfileViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FindFriendsView(
     onBackClick: () -> Unit = {},
-    viewModel: FindFriendsViewModel = hiltViewModel()
+    findFriendsViewModel: FindFriendsViewModel = hiltViewModel(),
 ) {
-    val searchQuery = viewModel.searchQuery
+    val searchQuery = findFriendsViewModel.searchQuery
 
     // 1) The users that are in MY incomingRequests
-    val incomingRequests = viewModel.incomingRequestProfiles()
+    val incomingRequests = findFriendsViewModel.incomingRequestProfiles
 
     // 2) Everyone else
-    val otherProfiles = viewModel.otherProfilesExcludingRequests()
+    val prospectiveFriends = findFriendsViewModel.prospectiveFriends
 
     Scaffold(
         containerColor = Color.White,
@@ -98,7 +102,7 @@ fun FindFriendsView(
             ) {
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = { viewModel.onSearchQueryChange(it) },
+                    onValueChange = { findFriendsViewModel.onSearchQueryChange(it) },
                     label = { Text("Search") },
                     singleLine = true,
                     trailingIcon = {
@@ -128,11 +132,17 @@ fun FindFriendsView(
 
                         items(incomingRequests) { profile ->
                             FriendListItem(
+                                type = "incoming",
                                 userProfile = profile,
                                 isIncomingRequest = true, // We pass a flag
                                 onAddFriendClick = {
                                     // This means "Accept" in our logic
-                                    viewModel.acceptFriendRequest(profile.uid)
+                                    findFriendsViewModel.acceptFriendRequest(profile.uid)
+
+                                },
+                                onRemoveRequestClick = {
+                                    // This means "Remove" in our logic
+                                    findFriendsViewModel.removeFriendRequest(profile.uid)
                                 }
                             )
                         }
@@ -143,7 +153,7 @@ fun FindFriendsView(
                     }
 
                     // B) Show everyone else below
-                    if (otherProfiles.isNotEmpty()) {
+                    if (prospectiveFriends.isNotEmpty()) {
                         item {
                             Text(
                                 text = "Find Friends",
@@ -153,14 +163,20 @@ fun FindFriendsView(
                             )
                         }
 
-                        items(otherProfiles) { profile ->
+                        items(prospectiveFriends) { profile ->
                             FriendListItem(
+                                type = "prospective",
                                 userProfile = profile,
                                 isIncomingRequest = false,
                                 onAddFriendClick = {
                                     // This means "Send request"
-                                    viewModel.sendFriendRequest(profile)
+                                    findFriendsViewModel.sendFriendRequest(profile)
+                                },
+                                onRemoveRequestClick = {
+                                    // This means "Remove" in our logic
+                                    findFriendsViewModel.removeFriendRequest(profile.uid)
                                 }
+
                             )
                         }
                     }
@@ -173,9 +189,11 @@ fun FindFriendsView(
 
 @Composable
 fun FriendListItem(
+    type: String,
     userProfile: UserProfile,
     isIncomingRequest: Boolean = false,
-    onAddFriendClick: () -> Unit
+    onAddFriendClick: () -> Unit,
+    onRemoveRequestClick: () -> Unit,
 ) {
     // Top spacer + divider
     Spacer(modifier = Modifier.height(10.dp))
@@ -280,13 +298,34 @@ fun FriendListItem(
                 }
             }
 
-            // Add Friend icon on the far right
-            IconButton(onClick = onAddFriendClick) {
-                Icon(
-                    imageVector = Icons.Default.PersonAdd,
-                    contentDescription = "Add Friend",
-                    tint = Color.Gray
-                )
+            if (type == "incoming") {
+                // Accept Friend icon on the far right
+                IconButton(onClick = onAddFriendClick) {
+                    Icon(
+                        imageVector = Icons.Default.PersonAdd,
+                        contentDescription = "Accept Friend",
+                        tint = Color.Gray
+                    )
+                }
+
+                // Remove Friend icon on the far right
+                IconButton(onClick = onRemoveRequestClick) {
+                    Icon(
+                        imageVector = Icons.Default.PersonRemove,
+                        contentDescription = "Remove Friend",
+                        tint = Color.Gray
+                    )
+                }
+            }
+            else if (type == "prospective") {
+                // Add Friend icon on the far right
+                IconButton(onClick = onAddFriendClick) {
+                    Icon(
+                        imageVector = Icons.Default.PersonAdd,
+                        contentDescription = "Add Friend",
+                        tint = Color.Gray
+                    )
+                }
             }
         }
     }

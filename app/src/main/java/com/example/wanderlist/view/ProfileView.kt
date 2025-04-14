@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
@@ -12,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Assignment
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Settings
@@ -38,7 +41,7 @@ import com.example.wanderlist.viewmodel.ProfileViewModel
 
 @Composable
 fun ProfileView(
-    viewModel: EditProfileViewModel = hiltViewModel(),
+    editProfileViewModel: EditProfileViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel(),
     onNavigateToLikedPlace: (String) -> Unit,
     onNavigateToHome: () -> Unit,
@@ -48,7 +51,7 @@ fun ProfileView(
 ) {
     MaterialTheme {
         ProfileScreen(
-            viewModel = viewModel,
+            editProfileViewModel = editProfileViewModel,
             profileViewModel = profileViewModel,
             onNavigateToLikedPlace = {
                 establishmentId -> onNavigateToLikedPlace(establishmentId)
@@ -63,7 +66,7 @@ fun ProfileView(
 
 @Composable
 fun ProfileScreen(
-    viewModel: EditProfileViewModel,
+    editProfileViewModel: EditProfileViewModel,
     profileViewModel: ProfileViewModel,
     onNavigateToLikedPlace: (String) -> Unit,
     onNavigateToHome: () -> Unit,
@@ -86,7 +89,7 @@ fun ProfileScreen(
         ) {
             // User details
             UserDetails(
-                editProfileViewModel = viewModel,
+                editProfileViewModel = editProfileViewModel,
             )
 
 
@@ -408,35 +411,36 @@ fun FriendsTab(
             color = Color.Gray.copy(alpha = 0.2f)
         )
     }
+    val friendProfiles = profileViewModel.friendProfiles
 
-    // Now replace the hardcoded "UserRow"s with a loop of your real friendProfiles
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(PaddingValues(top = 60.dp))
+            .padding(top = 60.dp)
     ) {
-        val friends = profileViewModel.friendProfiles // The real friend list from your ViewModel
-        friends.forEachIndexed { index, friend ->
+        friendProfiles.forEach { friend ->
             UserRow(
-                imageUrl =
-                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
+                imageUrl = "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
                 name = friend.name,
                 handle = "@${friend.username}",
                 location = friend.location,
-                level = "Lvl: ${friend.level}"
+                level = "Lvl: ${friend.level}",
+                onRemoveFriendClick = {
+                    // This means "Accept" in our logic
+                    profileViewModel.removeFriend(friend.uid)
+                }
             )
-            // Exactly the same divider
-            if (index < friends.lastIndex) {
-                HorizontalDivider(
-                    modifier = Modifier
-                        .padding(horizontal = 40.dp)
-                        .fillMaxWidth(),
-                    thickness = 1.dp,
-                    color = Color.Gray.copy(alpha = 0.2f)
-                )
-            }
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .padding(horizontal = 40.dp)
+                    .fillMaxWidth(),
+                thickness = 1.dp,
+                color = Color.Gray.copy(alpha = 0.2f)
+            )
         }
     }
+
     Spacer(modifier = Modifier.height(24.dp))
 }
 
@@ -446,7 +450,8 @@ fun UserRow(
     name: String,
     handle: String,
     location: String,
-    level: String
+    level: String,
+    onRemoveFriendClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -496,6 +501,23 @@ fun UserRow(
                 text = level,
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
             )
+        }
+
+        Spacer(modifier = Modifier.width(15.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconButton(
+                onClick = { onRemoveFriendClick() }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PersonRemove,
+                    contentDescription = "Remove Friend",
+                    tint = Color.Red
+                )
+            }
         }
     }
 }
