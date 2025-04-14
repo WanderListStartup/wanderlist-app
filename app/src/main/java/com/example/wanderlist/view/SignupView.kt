@@ -1,8 +1,10 @@
 // SignUpView.kt
 package com.example.wanderlist.view
+import android.os.Build
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,16 +39,17 @@ import com.example.wanderlist.viewmodel.SignUpViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SignUpView(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
-    viewModel: SignUpViewModel = viewModel(),
     onBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToHome: () -> Unit,
 ) {
     val context = LocalContext.current
+    val viewModel: SignUpViewModel = viewModel()
     Box(
         modifier =
         modifier
