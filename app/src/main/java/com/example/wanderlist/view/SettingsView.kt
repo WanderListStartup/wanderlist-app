@@ -1,16 +1,25 @@
 // SettingsView.kt
 package com.example.wanderlist.view
 
+import android.Manifest
+import android.os.Build
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +45,49 @@ fun SettingsView(
     authViewModel: AuthViewModel
 ) {
     val context = LocalContext.current
+
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            Log.d("Permission", "Notification permission granted")
+        } else {
+            Log.d("Permission", "Notification permission denied")
+        }
+        viewModel.dismissNotificationDialog()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.checkNotificationPermissionStatus()
+    }
+
+
+    if (viewModel.showingNotificationDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissNotificationDialog() },
+            title = { Text("Enable Notifications") },
+            text = { Text("We use notifications for friend requests.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else{
+                        //noop should be true already? idfk
+                    }
+                }) {
+                    Text("Allow")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    viewModel.dismissNotificationDialog()
+                }) {
+                    Text("Not Now")
+                }
+            }
+        )
+    }
 
     Column(
         modifier = Modifier

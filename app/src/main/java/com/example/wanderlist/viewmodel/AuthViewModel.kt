@@ -8,6 +8,7 @@ import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.data.firestore.repository.UserProfileRepository
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -67,6 +68,7 @@ class AuthViewModel @Inject constructor(
                             level = 0
                         )
                         userProfileRepository.createUserProfile(profile)
+                        userProfileRepository.putFCMToken(user.uid)
                         _authState.value = AuthState.Authenticated
                     } catch (e: Exception) {
                         _authState.value = AuthState.Error(e.message ?: "Failed to create user profile")
@@ -140,7 +142,7 @@ class AuthViewModel @Inject constructor(
     }
 
 
-        fun checkAuth() {
+        private fun checkAuth() {
             val user = authDataStore.getCurrentUser()
             _authState.value = if (user == null) AuthState.UnAuthenticated else AuthState.Authenticated
         }

@@ -30,6 +30,7 @@ firebaseCrashlyticsBuildtools = "3.0.3"
 runtimeLivedata = "1.7.8"
 vertexai = "16.0.0"
 composeMaterial = "1.4.1"
+firebaseMessagingKtx = "24.1.1"
 
 [libraries]
 androidx-compose-foundation-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
@@ -75,6 +76,7 @@ firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx",
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 firebase-vertexai = { module = "com.google.firebase:firebase-vertexai", version.ref = "vertexai"}
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
