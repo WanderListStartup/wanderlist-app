@@ -2,6 +2,9 @@ package com.example.wanderlist.data.firestore.repository
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.firebase.firestore.FirebaseFirestore
@@ -139,11 +142,11 @@ class UserProfileRepository @Inject constructor(
     }
 
 
-    fun checkNotificationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            context,
-            "android.permission.POST_NOTIFICATIONS"
-        ) == PackageManager.PERMISSION_GRANTED
+
+
+    fun checkNotificationPermission():Boolean{
+        Log.d(TAG, "checkNotificationPermission: ${ContextCompat.checkSelfPermission(context, "android.permission.POST_NOTIFICATIONS") == PackageManager.PERMISSION_GRANTED}")
+        return ContextCompat.checkSelfPermission(context, "android.permission.POST_NOTIFICATIONS") == PackageManager.PERMISSION_GRANTED
     }
 
     suspend fun addReviewToUserProfile(uid: String, reviewId: String) {

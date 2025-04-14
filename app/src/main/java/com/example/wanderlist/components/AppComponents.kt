@@ -1,5 +1,6 @@
 package com.example.wanderlist.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -192,7 +193,9 @@ fun EmailInput(value: String, infoViewModel: SignUpViewModel) {
                 fontSize = 15.sp
             )
         },
-        modifier = Modifier.fillMaxWidth(0.95f).padding(horizontal = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth(0.95f)
+            .padding(horizontal = 16.dp),
         shape = RoundedCornerShape(12.dp)
     )
 }
@@ -211,7 +214,9 @@ fun PasswordInput(value: String, infoViewModel: SignUpViewModel) {
                 fontSize = 15.sp
             )
         },
-        modifier = Modifier.fillMaxWidth(0.95f).padding(horizontal = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth(0.95f)
+            .padding(horizontal = 16.dp),
         shape = RoundedCornerShape(12.dp)
     )
 }
@@ -221,7 +226,8 @@ fun PasswordInput(value: String, infoViewModel: SignUpViewModel) {
 fun BackCircle()
 {
     Box(
-        modifier = Modifier.padding()
+        modifier = Modifier
+            .padding()
             .padding(horizontal = 31.dp)
             .size(24.dp)
             .clip(CircleShape)
