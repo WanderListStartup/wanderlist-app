@@ -6,7 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,6 +45,7 @@ fun LikedPlaceView(
     onBackClick: () -> Unit,
     onNavigateToShowMore: (String) -> Unit,
     onNavigateToHome: () -> Unit,
+    onNavigateToWriteReview: (String) -> Unit,
     showMoreViewModel: ShowMoreViewModel = hiltViewModel(),
     likedPlaceViewModel: LikedPlaceViewModel = hiltViewModel(),
 
@@ -72,8 +77,8 @@ fun LikedPlaceView(
                     onNavigateToShowMore = { establishmentId ->
                         onNavigateToShowMore(establishmentId)
                     },
-                    likedPlacesViewModel = likedPlaceViewModel
-
+                    likedPlacesViewModel = likedPlaceViewModel,
+                    onNavigateToWriteReview = onNavigateToWriteReview
                 )
             }
         }
@@ -86,6 +91,7 @@ fun PlaceContent(
     onBackClick: () -> Unit,
     onNavigateToShowMore: (String) -> Unit,
     likedPlacesViewModel:  LikedPlaceViewModel = hiltViewModel(),
+    onNavigateToWriteReview: (String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
@@ -230,6 +236,23 @@ fun PlaceContent(
                     )
                 }
             }
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Write a Review section
+            Text(
+                text = "Write A Review",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(start = 20.dp, bottom = 4.dp),
+            )
+            Column(
+                modifier = Modifier.padding(start = 20.dp, top = 4.dp, end = 20.dp)
+            ) {
+                WriteReviewCard { onNavigateToWriteReview(establishment.id)  }
+            }
+
+
         }
     }
 }
@@ -257,6 +280,43 @@ fun QuestCheckBox(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.widthIn(max = 275.dp)
         )
+    }
+}
+
+
+@Composable
+fun WriteReviewCard(
+    onClick: () -> Unit
+) {
+    Card(
+        // Rounded corners & shadow
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            // Make the entire card clickable
+            .clickable { onClick() }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                // Internal padding for spacing
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Left side text
+            Text(
+                text = "Write a Review",
+                style = MaterialTheme.typography.titleMedium
+            )
+            // Edit/Write icon
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Edit Icon",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
     }
 }
 

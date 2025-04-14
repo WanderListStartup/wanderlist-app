@@ -47,40 +47,25 @@ class WriteReviewViewModel @Inject constructor(
         reviewText = newText
     }
 
-    /**
-     * Posts the review by:
-     *  1. Creating a new review document in the "reviews" collection.
-     *  2. Updating the user's profile document with the review id.
-     *  3. Updating the establishment document with the review id.
-     *
-     * @param userId the uid of the reviewer.
-     * @param establishmentId the uid of the establishment being reviewed.
-     */
     fun postReview(establishmentId: String) {
         viewModelScope.launch {
             val currentUser = authDataStore.getCurrentUser()
             val currentUserUID = currentUser?.uid
-            if (currentUser == null && currentUserUID == null) {
+            if (currentUser != null && currentUserUID != null) {
                 postReviewState = PostReviewState.Posting
                 try {
-                    // Generate a unique review id
                     val reviewId = UUID.randomUUID().toString()
 
-                    // Create the Review object.
                     val review = Reviews(
                         id = reviewId,
                         userId = currentUserUID.toString(),
                         establishmentId = establishmentId,
-                        // You might include reviewText here, if desired
+                        rating = userRating,
+                        reviewText = reviewText,
                     )
 
-                    // 1. Add the review document.
                     reviewsRepository.addReview(review)
-
-                    // 2. Append review id to the user's profile reviews array.
                     userProfileRepository.addReviewToUserProfile(currentUserUID.toString(), reviewId)
-
-                    // 3. Append review id to the establishment's reviews array.
                     establishmentDetailsRepository.addReviewToEstablishment(establishmentId, reviewId)
 
                     postReviewState = PostReviewState.Success
