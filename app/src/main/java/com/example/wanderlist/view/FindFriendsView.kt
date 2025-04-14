@@ -56,7 +56,6 @@ fun FindFriendsView(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // 1) The WList logo on top
             Image(
                 painter = rememberAsyncImagePainter(R.drawable.bigwlist),
                 contentDescription = "WList Logo",
@@ -66,8 +65,6 @@ fun FindFriendsView(
                     .height(43.dp),
                 contentScale = ContentScale.Fit
             )
-
-            // 2) A custom row that acts like your top bar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
