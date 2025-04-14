@@ -1,5 +1,6 @@
 package com.example.wanderlist.view
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,7 +9,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -17,9 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +38,7 @@ import com.example.wanderlist.components.BackCircle
 import androidx.compose.ui.unit.sp
 import com.example.wanderlist.components.TopThreePhotos
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
+import com.example.wanderlist.data.firestore.model.Reviews
 import com.example.wanderlist.viewmodel.LikedPlaceViewModel
 import com.example.wanderlist.viewmodel.ShowMoreViewModel
 
@@ -48,20 +51,25 @@ fun LikedPlaceView(
     onNavigateToWriteReview: (String) -> Unit,
     showMoreViewModel: ShowMoreViewModel = hiltViewModel(),
     likedPlaceViewModel: LikedPlaceViewModel = hiltViewModel(),
+    onNavigateToProfile: () -> Unit,
 
-) {
+    ) {
 
 
     LaunchedEffect(establishmentId) {
         showMoreViewModel.loadEstablishmentDetails(establishmentId)
         likedPlaceViewModel.loadLikedEstablishmentDetails(establishmentId)
         likedPlaceViewModel.loadQuestDetails(establishmentId)
+        likedPlaceViewModel.loadReviews(establishmentId)
         likedPlaceViewModel.getQuests()
     }
 
     Scaffold (
         topBar = { WlTopBar() },
-        bottomBar = { BottomNavigationBar(onNavigateToHome = onNavigateToHome) },
+        bottomBar = { BottomNavigationBar(
+            onNavigateToHome = onNavigateToHome,
+            onNavigateToProfile = onNavigateToProfile,
+        ) },
     ) { innerPadding ->
         Box(
             modifier =
@@ -252,12 +260,51 @@ fun PlaceContent(
                 WriteReviewCard { onNavigateToWriteReview(establishment.id)  }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // List Reviews for Establishment
+            Text(
+                text = "User Reviews",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(start = 20.dp, bottom = 4.dp),
+            )
+
+            val reviews = likedPlacesViewModel.reviewsForEstablishment
+
+            if (reviews.isEmpty()) {
+                // If there are no reviews, show a message.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No Reviews Yet. Write a Review!",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                Spacer(modifier = Modifier.height(50.dp))
+            } else {
+                Column {
+                    // Only take up to 5 reviews from the list
+                    reviews.take(5).forEach { review ->
+                        ReviewItem(
+                            review = review,
+                            likedPlacesViewModel = likedPlacesViewModel
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(25.dp))
+
+            }
 
         }
+
     }
 }
 
-
+// Quest CheckBox.
 @Composable
 fun QuestCheckBox(
     title: String,
@@ -283,7 +330,7 @@ fun QuestCheckBox(
     }
 }
 
-
+// Card to Write a Review for the Establishment
 @Composable
 fun WriteReviewCard(
     onClick: () -> Unit
@@ -320,6 +367,87 @@ fun WriteReviewCard(
     }
 }
 
+// Card to Hold each Review from a User
+@Composable
+fun ReviewItem(
+    review: Reviews,
+    likedPlacesViewModel: LikedPlaceViewModel = hiltViewModel()
+) {
+    // Get AuthorName
+    val authorName by produceState(initialValue = "Loading...", key1 = review.userId) {
+        value = likedPlacesViewModel.getReviewAuthorSuspend(review.userId) ?: "Unknown"
+    }
+
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp, vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(1.dp, Color.Black)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Author Name Top Left
+                Text(
+                    text = authorName,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                // Stars Corresponding to Rating in Top Right
+                RatingBar(rating = review.rating)
+            }
+
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // The review text, accounting for overflow if super long review text
+            Text(
+                text = review.reviewText,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+        }
+    }
+}
+
+// Simple Function for Outputting Rating as Gold Stars
+// Out of a 5-star rating
+@Composable
+fun RatingBar(rating: Int) {
+    // For a 5-star scale, we'll round the rating to an integer (0..5)
+    val filledStars = rating
+    val maxStars = 5
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        // Draw filled stars
+        repeat(filledStars) {
+            Icon(
+                imageVector = Icons.Default.Star,
+                contentDescription = "Star",
+                tint = Color(0xFFFFD700), // gold color
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        // Draw outlined stars for the remainder (if you want a 5-star display)
+        repeat(maxStars - filledStars) {
+            Icon(
+                imageVector = Icons.Default.StarBorder,
+                contentDescription = "Empty Star",
+                tint = Color(0xFFFFD700),
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+}
 
 ///**
 // * A selectable star rating bar that does not use detectTapGestures.
@@ -332,3 +460,6 @@ fun WriteReviewCard(
 //fun SinglePageCloneViewPreview() {
 //    LikedPlaceView()
 //}
+
+
+

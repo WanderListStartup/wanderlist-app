@@ -1,11 +1,10 @@
 package com.example.wanderlist.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
@@ -34,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.R
 import com.example.wanderlist.components.LikedPlacesGrid
+import com.example.wanderlist.components.ProfileReviewCard
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.EditProfileViewModel
 import com.example.wanderlist.viewmodel.ProfileViewModel
@@ -44,10 +44,12 @@ fun ProfileView(
     editProfileViewModel: EditProfileViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel(),
     onNavigateToLikedPlace: (String) -> Unit,
+    onNavigateToWriteReview: (String) -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit,
     onNavigateToFindFriends: () -> Unit,
+    onNavigateToProfile: () -> Unit,
 ) {
     MaterialTheme {
         ProfileScreen(
@@ -56,10 +58,14 @@ fun ProfileView(
             onNavigateToLikedPlace = {
                 establishmentId -> onNavigateToLikedPlace(establishmentId)
             },
+            onNavigateToWriteReview = { establishmentId ->
+                onNavigateToWriteReview(establishmentId)
+            },
             onNavigateToHome = onNavigateToHome,
             onNavigateToSettings = onNavigateToSettings,
             onNavigateToUserSettings = onNavigateToUserSettings,
             onNavigateToFindFriends = onNavigateToFindFriends,
+            onNavigateToProfile = onNavigateToProfile,
         )
     }
 }
@@ -69,16 +75,22 @@ fun ProfileScreen(
     editProfileViewModel: EditProfileViewModel,
     profileViewModel: ProfileViewModel,
     onNavigateToLikedPlace: (String) -> Unit,
+    onNavigateToWriteReview: (String) -> Unit,
     onNavigateToHome: () -> Unit,
+    onNavigateToProfile: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit,
     onNavigateToFindFriends: () -> Unit,
 ) {
+
     Scaffold(
         containerColor = Color.White,
         topBar = { WlTopBar() },
         bottomBar = {
-            BottomNavigationBar(onNavigateToHome = onNavigateToHome)
+            BottomNavigationBar(
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToProfile = onNavigateToProfile
+            )
         }
     ) { innerPadding ->
         Column(
@@ -162,7 +174,7 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 30.dp)
             ) {
                 when (selectedTab) {
                     0 -> {
@@ -175,13 +187,34 @@ fun ProfileScreen(
                         )
                     }
                     1 -> {
-                        Text(
-                            text = "Quest tab content here",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            textAlign = TextAlign.Center
-                        )
+                        val reviews = profileViewModel.reviewsForUser
+                        Column {
+
+                            reviews.forEach { review ->
+                                val displayName = profileViewModel.establishmentNames[review.establishmentId] ?: "Unknown"
+                                val location = "Troy, NY"
+                                ProfileReviewCard(
+                                    establishmentName = displayName,
+                                    location = location,
+                                    rating = review.rating,
+                                    reviewText = review.reviewText,
+                                    onEditClick = {
+                                        Log.d("ProfileView", "Edit Button Clicked")
+                                        onNavigateToWriteReview(review.establishmentId)
+                                    },
+                                    onDeleteClick = {
+                                        profileViewModel.deleteReview(
+                                            reviewId = review.id,
+                                            userId = review.userId,
+                                            establishmentId = review.establishmentId,
+                                        )
+                                        Log.d("ProfileView", "Delete Button Clicked")
+                                    },
+                                )
+
+                                HorizontalDivider()
+                            }
+                        }
                     }
                     2 -> {
                         FriendsTab(
@@ -228,7 +261,7 @@ fun WlTopBar() {
 }
 
 @Composable
-fun BottomNavigationBar(onNavigateToHome: () -> Unit) {
+fun BottomNavigationBar(onNavigateToHome: () -> Unit, onNavigateToProfile: () -> Unit) {
     NavigationBar(
         containerColor = Color.White,
         tonalElevation = 8.dp,
@@ -255,6 +288,7 @@ fun BottomNavigationBar(onNavigateToHome: () -> Unit) {
             icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
             selected = true,
             onClick = {
+                onNavigateToProfile()
             },
         )
 
