@@ -113,9 +113,11 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
                 establishmentId = establishmentId,
                 onBackClick = { navController.popBackStack() },
                 onNavigateToHome = { navController.navigate(route = MainView) },
-                onNavigateToShowMore = { id -> navController.navigate("showMore/$id") }
+                onNavigateToShowMore = { id -> navController.navigate("showMore/$id") },
+                onNavigateToWriteReview = {id -> navController.navigate( "writeReview/$id")}
             )
         }
+
         composable<FindFriendsView> {
             FindFriendsView(
                 onBackClick = { navController.navigate(route = Profile) }
