@@ -1,16 +1,25 @@
 package com.example.wanderlist.view
 
+import androidx.compose.foundation.BorderStroke
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Assignment
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonRemove
@@ -29,14 +38,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.R
 import com.example.wanderlist.components.LikedPlacesGrid
 import com.example.wanderlist.components.ProfileReviewCard
+import com.example.wanderlist.data.firestore.model.Badges
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.EditProfileViewModel
 import com.example.wanderlist.viewmodel.ProfileViewModel
+import kotlin.math.floor
 
 
 @Composable
@@ -82,7 +95,6 @@ fun ProfileScreen(
     onNavigateToUserSettings: () -> Unit,
     onNavigateToFindFriends: () -> Unit,
 ) {
-
     Scaffold(
         containerColor = Color.White,
         topBar = { WlTopBar() },
@@ -97,11 +109,12 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = 16.dp)
         ) {
             // User details
             UserDetails(
                 editProfileViewModel = editProfileViewModel,
+                profileViewModel = profileViewModel,
             )
 
 
@@ -300,122 +313,339 @@ fun BottomNavigationBar(onNavigateToHome: () -> Unit, onNavigateToProfile: () ->
 @Composable
 fun UserDetails(
     editProfileViewModel: EditProfileViewModel,
+    profileViewModel: ProfileViewModel = hiltViewModel(),
 ) {
-    // Profile picture and user details
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.Top // Align columns at the top for consistency
     ) {
-        // Profile picture
-        Image(
-            painter = rememberAsyncImagePainter(
-                "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG"
-            ),
-            contentDescription = "User Profile Picture",
-            modifier = Modifier
-                .size(125.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
+        // Left Column: User image only
+        Column(
+            modifier = Modifier.width(140.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG"
+                ),
+                contentDescription = "User Profile Picture",
+                modifier = Modifier
+                    .size(125.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = editProfileViewModel.location,
+                    color = Color.Gray
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                Image(
+                    painter = rememberAsyncImagePainter(R.drawable.distance),
+                    contentDescription = "Distance Icon",
+                    modifier = Modifier.size(20.dp),
+                    contentScale = ContentScale.Fit
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+
         Spacer(modifier = Modifier.width(16.dp))
 
-        // User details
+        // Right Column: All user details
         Column(
             modifier = Modifier.weight(1f),
-            horizontalAlignment = Alignment.Start
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
         ) {
+
+
+            // Name and username
             Text(
                 text = editProfileViewModel.name,
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                fontSize = 32.sp,
-                modifier = Modifier.padding(PaddingValues(start = 36.dp))
+                fontSize = 32.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = editProfileViewModel.username,
-                modifier = Modifier.padding(PaddingValues(start = 38.dp)),
+                text = "@" + editProfileViewModel.username,
                 style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
             )
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Friends count section
             Row(
-                modifier = Modifier
-                    .padding(start = 40.dp, end = 40.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(48.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "Followers", color = Color.Gray)
-                    Text(text = "15", fontWeight = FontWeight.Bold)
+                    Text(text = profileViewModel.friendProfiles.size.toString(),
+                        fontWeight = FontWeight.Bold)
+                    Text(
+                        color = Color.Gray,
+                        text = "Friends",
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
+
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "Following", color = Color.Gray)
-                    Text(text = "20", fontWeight = FontWeight.Bold)
+                    Text(text = profileViewModel.likedEstablishments.size.toString(),
+                        fontWeight = FontWeight.Bold)
+                    Text(
+                        color = Color.Gray,
+                        text = "Liked Places",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Badge slots row
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                repeat(3) { index ->
+                    val badge = profileViewModel.selectedBadges.getOrNull(index)
+                    BadgeSlot(
+                        badge = badge,
+                        onClick = { profileViewModel.openBadgeDialog(index) }
+                    )
+                }
+            }
+            if (profileViewModel.slotIndexToSelect != null) {
+                BadgeSelectionDialog(
+                    slotIndex = profileViewModel.slotIndexToSelect!!,
+                    allOwnedBadges = profileViewModel.userBadges,
+                    selectedBadges = profileViewModel.selectedBadges,
+                    onBadgeSelected = { chosenBadge ->
+                        profileViewModel.onBadgeSelected(chosenBadge)
+                    },
+                    onDismiss = {
+                        profileViewModel.closeBadgeDialog()
+                    }
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
+
+    // Row with level progress
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+    {
+        LevelProgressView(profileViewModel = profileViewModel)
+    }
+
+    Spacer(modifier = Modifier.height(12.dp))
+    // Bio section
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 40.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = editProfileViewModel.bio,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun BadgeSlot(
+    badge: Badges?,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(54.dp)
+            .clip(CircleShape)
+            .border(2.dp, Color.Gray, CircleShape)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (badge == null || badge.badgeId.isEmpty()) {
+            Image(
+                painter = rememberAsyncImagePainter(R.drawable.plus_sign),
+                contentDescription = "Empty Badge Slot",
+                modifier = Modifier.size(24.dp)
+            )
+        } else {
+            AsyncImage(
+                model = badge.badgeImageUrl,
+                contentDescription = badge.name,
+                modifier = Modifier.size(38.dp)
+            )
+        }
+    }
+}
+
+
+@Composable
+fun BadgeSelectionDialog(
+    slotIndex: Int,
+    allOwnedBadges: List<Badges>,
+    selectedBadges: List<Badges>,
+    onBadgeSelected: (Badges) -> Unit,
+    onDismiss: () -> Unit
+) {
+    // Get the badge currently assigned to the active slot (if any)
+    val currentBadgeForSlot = selectedBadges.getOrNull(slotIndex)
+
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.padding(16.dp),
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .heightIn(max = 500.dp)
+            ) {
+                Text(
+                    text = "Select a Badge for Slot ${slotIndex + 1}",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Build exactly 12 grid items.
+                    items(12) { index ->
+                        if (index < allOwnedBadges.size) {
+                            val badge = allOwnedBadges[index]
+                            // Determine if the badge is selected in any slot.
+                            val isBadgeSelected = selectedBadges.any { it.badgeId == badge.badgeId }
+                            // Determine if the badge is in the current slot being edited.
+                            val isCurrentSlotSelected = currentBadgeForSlot?.badgeId == badge.badgeId
+
+                            BadgeGridItem(
+                                badge = badge,
+                                isSelected = isBadgeSelected,
+                                isCurrentSlotSelected = isCurrentSlotSelected,
+                                onClick = { onBadgeSelected(badge) }
+                            )
+                        } else {
+                            // Render a locked badge if the index exceeds the user's owned badge count.
+                            val lockedBadge = Badges(
+                                badgeId = "null", // Use a reserved/invalid ID for locked badges.
+                                name = "Locked",
+                                badgeImageUrl = "https://firebasestorage.googleapis.com/v0/b/wanderlist-b088c.firebasestorage.app/o/locked_badge.png?alt=media&token=ca84dd5a-dfcd-4433-886b-ef420aba51b3"
+                            )
+                            BadgeGridItem(
+                                badge = lockedBadge,
+                                isSelected = false,
+                                isCurrentSlotSelected = false,
+                                onClick = { /* Optionally indicate this badge is locked. */ }
+                            )
+                        }
+                    }
                 }
             }
         }
     }
-    // Location and level
-    Row(
-        modifier = Modifier
-            .padding(PaddingValues(start = 30.dp, top = 5.dp))
-            .fillMaxWidth()
-    ) {
-        Image(
-            painter = rememberAsyncImagePainter(R.drawable.distance),
-            contentDescription = "Distance Icon",
-            modifier = Modifier
-                .width(25.dp)
-                .height(20.dp)
-                .padding(PaddingValues(end = 0.dp)),
-            contentScale = ContentScale.Fit
-        )
-        Text(
-            text = editProfileViewModel.location,
-            fontSize = 12.sp,
-            style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
-        )
-    }
+}
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(PaddingValues(start = 28.dp, top = 8.dp, bottom = 8.dp)),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Level 10",
-            fontSize = 20.sp,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
 
+@Composable
+fun BadgeGridItem(
+    badge: Badges,
+    isSelected: Boolean,
+    isCurrentSlotSelected: Boolean,
+    onClick: () -> Unit
+) {
+    // The container is clickable only if the badge isn't already used in another slot,
+    // unless it is currently selected.
+    Column(
+        modifier = Modifier
+            .padding(4.dp)
+            .size(100.dp)
+            .clickable(enabled = (!isSelected || isCurrentSlotSelected)) { onClick() },
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Box(
             modifier = Modifier
-                .width(250.dp)
-                .height(20.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .border(width = 2.dp, color = Color.Black, shape = CircleShape)
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(8.dp))
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth(0.4f)
-                    .background(Color(0xFF176FF2))
+            // The badge image fills the container.
+            AsyncImage(
+                model = badge.badgeImageUrl,
+                contentDescription = badge.name,
+                modifier = Modifier.fillMaxSize()
             )
-        }
-        Spacer(modifier = Modifier.width(12.dp))
-    }
 
-    Text(
-        text = editProfileViewModel.bio,
-        style = MaterialTheme.typography.bodyMedium,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.padding(PaddingValues(start = 15.dp, end = 30.dp))
-    )
-    Spacer(modifier = Modifier.height(12.dp))
+            // Overlay an icon in the top right corner if this badge is selected.
+            when {
+                isCurrentSlotSelected -> {
+                    // Current slot badge: show a circular green background with a checkmark.
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(4.dp)
+                            .size(24.dp)
+                            .background(color = Color(0xFF338333), shape = CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Selected in current slot",
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+                isSelected -> {
+                    // Badge already used in another slot: show a circular blue background with an 'x' icon.
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(4.dp)
+                            .size(24.dp)
+                            .background(color = Color.DarkGray, shape = CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Selected in another slot",
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = badge.name,
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            maxLines = 1
+        )
+    }
 }
+
+
 
 @Composable
 fun FriendsTab(
@@ -477,6 +707,40 @@ fun FriendsTab(
 
     Spacer(modifier = Modifier.height(24.dp))
 }
+
+@Composable
+fun LevelProgressView(profileViewModel: ProfileViewModel) {
+    val userLevel = profileViewModel.level
+
+    // Display the "floored" level
+    Text(
+        text = "Level " + userLevel.toInt().toString(),
+        fontSize = 20.sp,
+        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+    )
+
+    Spacer(modifier = Modifier.width(12.dp))
+
+    // Calculate the fraction from 0.0 to 1.0
+    val fraction = userLevel - floor(userLevel) // e.g., 10.6 -> 0.6
+
+    // Display a progress bar that fills according to the fraction
+    Box(
+        modifier = Modifier
+            .width(250.dp)
+            .height(20.dp)
+            .clip(RoundedCornerShape(6.dp))
+            .border(width = 2.dp, color = Color.Black, shape = CircleShape)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(fraction.toFloat())  // 0.6 -> 60% filled
+                .background(Color(0xFF176FF2))
+        )
+    }
+}
+
 
 @Composable
 fun UserRow(

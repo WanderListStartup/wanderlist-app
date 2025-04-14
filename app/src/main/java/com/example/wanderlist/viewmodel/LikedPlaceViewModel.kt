@@ -11,6 +11,7 @@ import com.example.wanderlist.data.firestore.model.EstablishmentDetails
 import com.example.wanderlist.data.firestore.model.Quests
 import com.example.wanderlist.data.firestore.model.Reviews
 import com.example.wanderlist.data.firestore.model.UserProfile
+import com.example.wanderlist.data.firestore.repository.BadgesRepository
 import com.example.wanderlist.data.firestore.repository.EstablishmentDetailsRepository
 import com.example.wanderlist.data.firestore.repository.QuestsRepository
 import com.example.wanderlist.data.firestore.repository.ReviewsRepository
@@ -27,6 +28,7 @@ class LikedPlaceViewModel @Inject constructor(
     private val questsRepository: QuestsRepository,
     private val userRepository: UserProfileRepository,
     private val reviewsRepository: ReviewsRepository,
+    private val badgesRepository: BadgesRepository,
     private val auth: FirebaseAuth,
 ) : ViewModel() {
     var likedEstablishmentDetails by mutableStateOf<EstablishmentDetails?>(null)
@@ -66,6 +68,11 @@ class LikedPlaceViewModel @Inject constructor(
     {
         viewModelScope.launch {
             auth.uid?.let { userRepository.addQuests(it, questId) }
+            auth.uid?.let { userRepository.incrementLevelByPointTwo(it) }
+            val badgeId = badgesRepository.getBadgeId(userRepository.getUserLevel(auth.uid!!).toInt())
+            if (badgeId.isNotEmpty()) {
+                auth.uid?.let { userRepository.addBadgeToUserProfile(it, badgeId) }
+            }
             getQuests()
         }
     }

@@ -237,10 +237,16 @@ fun PlaceContent(
 
             Column(modifier = Modifier.padding(start = 40.dp, top = 4.dp)) {
                 quests.forEachIndexed { _, quest ->
+                    val checked = quest.questId in completedQuests
                     QuestCheckBox(
                         title = quest.questName,
-                        checked = quest.questId in completedQuests,
-                        onCheckedChange = { likedPlacesViewModel.completeQuests(quest.questId) }
+                        checked = checked,
+                        onCheckedChange = { isNowChecked ->
+                            // Only call completeQuests if it transitions from unchecked -> checked.
+                            if (!checked && isNowChecked) {
+                                likedPlacesViewModel.completeQuests(quest.questId)
+                            }
+                        }
                     )
                 }
             }
@@ -319,7 +325,8 @@ fun QuestCheckBox(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+        Checkbox(checked = checked,
+            onCheckedChange = onCheckedChange)
         Text(text = title,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,

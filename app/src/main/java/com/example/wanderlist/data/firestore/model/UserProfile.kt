@@ -1,7 +1,5 @@
 package com.example.wanderlist.data.firestore.model
 
-import com.google.firebase.firestore.PropertyName
-
 data class UserProfile(
     val uid: String = "",
     val name: String = "",
@@ -22,5 +20,8 @@ data class UserProfile(
     val quests: List<String> = emptyList(),
     val friends: List<String> = emptyList(),
     val incomingRequests: List<String> = emptyList(),
-    val level: Int = 0,
+    val level: Double = 0.0,
+
+    val selectedBadges: List<String> = emptyList(),
+    val badges: List<String> = emptyList(),
 )
