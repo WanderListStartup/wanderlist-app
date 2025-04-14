@@ -26,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -49,9 +50,13 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import com.example.wanderlist.data.firestore.model.Category
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
+import com.example.wanderlist.view.ReviewItem
 import com.example.wanderlist.viewmodel.HomePageViewModel
+import com.example.wanderlist.viewmodel.LikedPlaceViewModel
 import kotlinx.coroutines.launch
 
 
@@ -284,6 +289,16 @@ fun PlaceContent(
 ) {
 
     val homePageViewModel: HomePageViewModel = hiltViewModel()
+    val likedPlaceViewModel: LikedPlaceViewModel = hiltViewModel()
+
+    LaunchedEffect(place.id) {
+        likedPlaceViewModel.loadReviews(place.id)
+        likedPlaceViewModel.loadQuestDetails(place.id)
+        likedPlaceViewModel.getQuests()
+    }
+
+
+
     val scrollState = rememberScrollState()
 
     val offsetX = remember { Animatable(0f) }
@@ -417,6 +432,77 @@ fun PlaceContent(
 
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            // QUEST SECTION
+            val quests = likedPlaceViewModel.questForEstablishment
+            Text(
+                text = "Quests",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(start = 20.dp, bottom = 4.dp),
+            )
+
+            Column(modifier = Modifier.padding(start = 40.dp, top = 4.dp)) {
+                quests.forEach { quest ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        // quest name
+                        Text(
+                            text = "• ${quest.questName}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontSize = 16.sp,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.widthIn(max = 340.dp)
+                        )
+                    }
+                }
+            }
+            // END QUEST SECTION
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // User Reviews for Establishment
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "User Reviews",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(start = 20.dp, bottom = 4.dp),
+            )
+            val reviews = likedPlaceViewModel.reviewsForEstablishment
+            if (reviews.isEmpty()) {
+                // If there are no reviews, show a message.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 40.dp, vertical = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No Reviews Yet. Visit ${place.displayName} and Write One!",
+                        textAlign = TextAlign.Center,
+                        maxLines = 4,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                Spacer(modifier = Modifier.height(50.dp))
+
+            } else {
+                // Display up to 5 reviews
+                reviews.take(5).forEach { review ->
+                    ReviewItem(
+                        review = review,
+                        likedPlacesViewModel = likedPlaceViewModel
+                    )
+                }
+            }
+            // END USER REVIEW SECTION
+
 
         }
 

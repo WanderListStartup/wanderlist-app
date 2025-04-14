@@ -119,4 +119,23 @@ class EstablishmentDetailsRepository @Inject constructor(
             .await()
     }
 
+    suspend fun getDisplayNameById(uid: String): String? {
+        return try {
+            val snapshot = firestore
+                .collection("establishment_details")
+                .document(uid)
+                .get()
+                .await()
+            if (snapshot.exists()) {
+                snapshot.getString("displayName")
+            } else {
+                null
+            }
+        } catch (e: Exception)
+        {
+            e.printStackTrace()
+            null
+        }
+    }
+
 }

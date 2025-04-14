@@ -162,7 +162,37 @@ class AuthViewModel @Inject constructor(
                 _authState.value = AuthState.Loading
                 val result = authDataStore.startGoogleOAuth(request)
                 _authState.value =
-                    if (result is AuthDataStore.Result.Success) AuthState.Authenticated
+                    if (result is AuthDataStore.Result.Success) {
+                        val user = authDataStore.getCurrentUser()
+                        if (user != null){
+                            try {
+                                val profile = UserProfile(
+                                    uid = user.uid,
+                                    name = user.displayName ?: "",
+                                    username = "",
+                                    bio = "",
+                                    location = "Troy, NY",
+                                    gender = "",
+                                    dob = "",
+                                    email = user.email ?: "",
+                                    phone = "",
+                                    isPrivateAccount = false,
+                                    isNotificationsEnabled = false,
+                                    likedEstablishments = emptyList(),
+                                    reviews = emptyList(),
+                                    friends = emptyList(),
+                                    incomingRequests = emptyList(),
+                                    level = 0.0
+                                )
+                                userProfileRepository.createUserProfile(profile)
+                                userProfileRepository.putFCMToken(user.uid)
+                                _authState.value = AuthState.Authenticated
+                            } catch (e: Exception) {
+                                _authState.value = AuthState.Error(e.message ?: "Failed to create user profile")
+                            }
+                        }
+                        AuthState.Authenticated
+                    }
                     else if (result is AuthDataStore.Result.Error) AuthState.Error(result.exception.message ?: "Login failed")
                     else AuthState.UnAuthenticated
                 callback(result)

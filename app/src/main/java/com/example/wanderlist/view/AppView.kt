@@ -98,10 +98,12 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
         composable<Profile> {
             ProfileView(
                 onNavigateToHome = { navController.navigate(route = MainView) },
+                onNavigateToProfile = {navController.navigate(route=Profile)},
                 onNavigateToSettings = {navController.navigate(route=Settings)},
                 onNavigateToUserSettings = {navController.navigate(route=UserSettings)},
                 onNavigateToFindFriends = { navController.navigate(route = FindFriendsView) },
                 onNavigateToLikedPlace = { establishmentId -> navController.navigate("likedPlace/$establishmentId") },
+                onNavigateToWriteReview = {id -> navController.navigate( "writeReview/$id")}
             )
         }
         composable(
@@ -113,9 +115,12 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
                 establishmentId = establishmentId,
                 onBackClick = { navController.navigate(route=Profile) },
                 onNavigateToHome = { navController.navigate(route = MainView) },
-                onNavigateToShowMore = { id -> navController.navigate("showMore/$id") }
+                onNavigateToProfile = {navController.navigate(route = Profile)},
+                onNavigateToShowMore = { id -> navController.navigate("showMore/$id") },
+                onNavigateToWriteReview = {id -> navController.navigate( "writeReview/$id")}
             )
         }
+
         composable<FindFriendsView> {
             FindFriendsView(
                 onBackClick = { navController.navigate(route = Profile) }

@@ -252,5 +252,24 @@ class UserProfileRepository @Inject constructor(
             .update("badges", FieldValue.arrayUnion(badgeId))
             .await()
     }
+    suspend fun getNamebyId(uid: String): String? {
+        return try {
+            val snapshot = firestore
+                .collection("user_profiles")
+                .document(uid)
+                .get()
+                .await()
+            if (snapshot.exists()) {
+                snapshot.getString("name")
+            } else {
+                null
+            }
+        } catch (e: Exception)
+        {
+            e.printStackTrace()
+            null
+        }
+    }
+
 }
 
