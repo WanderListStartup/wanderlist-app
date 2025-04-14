@@ -6,11 +6,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,11 +29,10 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.wanderlist.AboutTextWithShowMore
 import com.example.wanderlist.R
 import com.example.wanderlist.components.BackCircle
-import com.example.wanderlist.components.LoginTitle
+import androidx.compose.ui.unit.sp
 import com.example.wanderlist.components.TopThreePhotos
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
 import com.example.wanderlist.viewmodel.LikedPlaceViewModel
-import com.example.wanderlist.viewmodel.ProfileViewModel
 import com.example.wanderlist.viewmodel.ShowMoreViewModel
 
 @Composable
@@ -39,11 +43,15 @@ fun LikedPlaceView(
     onNavigateToHome: () -> Unit,
     showMoreViewModel: ShowMoreViewModel = hiltViewModel(),
     likedPlaceViewModel: LikedPlaceViewModel = hiltViewModel(),
+
 ) {
+
 
     LaunchedEffect(establishmentId) {
         showMoreViewModel.loadEstablishmentDetails(establishmentId)
         likedPlaceViewModel.loadLikedEstablishmentDetails(establishmentId)
+        likedPlaceViewModel.loadQuestDetails(establishmentId)
+        likedPlaceViewModel.getQuests()
     }
 
     Scaffold (
@@ -64,6 +72,8 @@ fun LikedPlaceView(
                     onNavigateToShowMore = { establishmentId ->
                         onNavigateToShowMore(establishmentId)
                     },
+                    likedPlacesViewModel = likedPlaceViewModel
+
                 )
             }
         }
@@ -75,6 +85,7 @@ fun PlaceContent(
     establishment: EstablishmentDetails,
     onBackClick: () -> Unit,
     onNavigateToShowMore: (String) -> Unit,
+    likedPlacesViewModel:  LikedPlaceViewModel = hiltViewModel(),
 ) {
     val scrollState = rememberScrollState()
 
@@ -200,9 +211,55 @@ fun PlaceContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Quests section
+            Text(
+                text = "Quests",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(start = 20.dp, bottom = 4.dp),
+            )
+
+            val quests = likedPlacesViewModel.questForEstablishment
+            val completedQuests = likedPlacesViewModel.userCompletedQuests
+
+            Column(modifier = Modifier.padding(start = 40.dp, top = 4.dp)) {
+                quests.forEachIndexed { _, quest ->
+                    QuestCheckBox(
+                        title = quest.questName,
+                        checked = quest.questId in completedQuests,
+                        onCheckedChange = { likedPlacesViewModel.completeQuests(quest.questId) }
+                    )
+                }
+            }
         }
     }
 }
+
+
+@Composable
+fun QuestCheckBox(
+    title: String,
+    checked: Boolean,
+    maxLines: Int = 2,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+        Text(text = title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            maxLines = maxLines,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.widthIn(max = 275.dp)
+        )
+    }
+}
+
 
 ///**
 // * A selectable star rating bar that does not use detectTapGestures.

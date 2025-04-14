@@ -15,6 +15,7 @@ import com.google.firebase.firestore.toObject
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.qualifiers.ApplicationContext
 import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FieldValue
 
 class UserProfileRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
@@ -28,14 +29,14 @@ class UserProfileRepository @Inject constructor(
             .await()
     }
 
-    suspend fun putFCMToken(userid : String){
+    suspend fun putFCMToken(userid: String) {
         try {
             val token = FirebaseMessaging.getInstance().token.await()
             firestore.collection("user_profiles")
                 .document(userid)
                 .update("fcmToken", token)
-        } catch (e:Exception){
-            Log.e(TAG, "getFCMToken: FAILED TO GET TOKEN", )
+        } catch (e: Exception) {
+            Log.e(TAG, "getFCMToken: FAILED TO GET TOKEN",)
         }
 
     }
@@ -155,8 +156,7 @@ class UserProfileRepository @Inject constructor(
             .await()
     }
 
-    suspend fun getFriends(uid: String) : List<String>?
-    {
+    suspend fun getFriends(uid: String): List<String>? {
         return try {
             val snapshot = firestore
                 .collection("user_profiles")
@@ -174,8 +174,7 @@ class UserProfileRepository @Inject constructor(
         }
     }
 
-    suspend fun getIncomingRequests(uid: String) : List<String>?
-    {
+    suspend fun getIncomingRequests(uid: String): List<String>? {
         return try {
             val snapshot = firestore
                 .collection("user_profiles")
@@ -193,4 +192,34 @@ class UserProfileRepository @Inject constructor(
         }
     }
 
+    suspend fun addQuests(uid: String, questId: String) {
+        firestore.collection("user_profiles")
+            .document(uid)
+            .update("quests", FieldValue.arrayUnion(questId))
+            .await()
+    }
+
+    suspend fun getQuests(uid: String): List<String> {
+        return try {
+            // Get the user document snapshot
+            val documentSnapshot = firestore
+                .collection("user_profiles")
+                .document(uid)
+                .get()
+                .await()
+
+            // If the document exists and has a "quests" field, cast it to a List<String>
+            if (documentSnapshot.exists()) {
+                documentSnapshot.get("quests") as? List<String> ?: emptyList()
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            // Optionally, log or handle the error here
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
 }
+

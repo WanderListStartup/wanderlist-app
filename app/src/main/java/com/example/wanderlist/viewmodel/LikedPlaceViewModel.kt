@@ -5,8 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
+import com.example.wanderlist.data.firestore.model.Quests
+import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.data.firestore.repository.EstablishmentDetailsRepository
+import com.example.wanderlist.data.firestore.repository.QuestsRepository
+import com.example.wanderlist.data.firestore.repository.UserProfileRepository
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,8 +21,17 @@ import javax.inject.Inject
 @HiltViewModel
 class LikedPlaceViewModel @Inject constructor(
     private val establishmentDetailsRepo: EstablishmentDetailsRepository,
+    private val questsRepository: QuestsRepository,
+    private val userRepository: UserProfileRepository,
+    private val auth: FirebaseAuth,
 ) : ViewModel() {
     var likedEstablishmentDetails by mutableStateOf<EstablishmentDetails?>(null)
+        private set
+
+    var questForEstablishment by mutableStateOf<List<Quests>>(emptyList())
+        private set
+
+    var userCompletedQuests by mutableStateOf<List<String>>(emptyList())
         private set
 
 
@@ -25,4 +40,30 @@ class LikedPlaceViewModel @Inject constructor(
             likedEstablishmentDetails = establishmentDetailsRepo.getEstablishmentDetails(establishmentId)
         }
     }
+
+    fun loadQuestDetails(establishmentId: String)
+    {
+        viewModelScope.launch {
+            questForEstablishment = questsRepository.getAllQuests(establishmentId)
+        }
+    }
+
+    fun completeQuests(questId: String)
+    {
+        viewModelScope.launch {
+            auth.uid?.let { userRepository.addQuests(it, questId) }
+            getQuests()
+        }
+    }
+
+    fun getQuests()
+    {
+        viewModelScope.launch {
+            userCompletedQuests = auth.uid?.let { userRepository.getQuests(it) }!!
+        }
+    }
+
+
+
+
 }
