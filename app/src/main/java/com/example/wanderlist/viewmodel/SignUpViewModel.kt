@@ -89,7 +89,7 @@ class SignUpViewModel : ViewModel() {
 
 
     /**
-     * Checks if [dob] is in the "dd/MM/yyyy" format and represents a valid date.
+     * Checks if [dob] is in the "MM/dd/yyyy" format and represents a valid date.
      * Returns true if valid; false otherwise.
      */
     @RequiresApi(Build.VERSION_CODES.O)
