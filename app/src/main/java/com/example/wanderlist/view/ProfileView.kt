@@ -5,8 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
@@ -21,7 +19,6 @@ import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,6 +49,7 @@ fun ProfileView(
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit,
     onNavigateToFindFriends: () -> Unit,
+    onNavigateToProfile: () -> Unit,
 ) {
     MaterialTheme {
         ProfileScreen(
@@ -67,6 +65,7 @@ fun ProfileView(
             onNavigateToSettings = onNavigateToSettings,
             onNavigateToUserSettings = onNavigateToUserSettings,
             onNavigateToFindFriends = onNavigateToFindFriends,
+            onNavigateToProfile = onNavigateToProfile,
         )
     }
 }
@@ -78,6 +77,7 @@ fun ProfileScreen(
     onNavigateToLikedPlace: (String) -> Unit,
     onNavigateToWriteReview: (String) -> Unit,
     onNavigateToHome: () -> Unit,
+    onNavigateToProfile: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToUserSettings: () -> Unit,
     onNavigateToFindFriends: () -> Unit,
@@ -87,7 +87,10 @@ fun ProfileScreen(
         containerColor = Color.White,
         topBar = { WlTopBar() },
         bottomBar = {
-            BottomNavigationBar(onNavigateToHome = onNavigateToHome)
+            BottomNavigationBar(
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToProfile = onNavigateToProfile
+            )
         }
     ) { innerPadding ->
         Column(
@@ -258,7 +261,7 @@ fun WlTopBar() {
 }
 
 @Composable
-fun BottomNavigationBar(onNavigateToHome: () -> Unit) {
+fun BottomNavigationBar(onNavigateToHome: () -> Unit, onNavigateToProfile: () -> Unit) {
     NavigationBar(
         containerColor = Color.White,
         tonalElevation = 8.dp,
@@ -285,6 +288,7 @@ fun BottomNavigationBar(onNavigateToHome: () -> Unit) {
             icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
             selected = true,
             onClick = {
+                onNavigateToProfile()
             },
         )
 

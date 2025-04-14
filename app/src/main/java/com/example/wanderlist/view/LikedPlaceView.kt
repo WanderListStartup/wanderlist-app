@@ -1,6 +1,5 @@
 package com.example.wanderlist.view
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -52,8 +51,9 @@ fun LikedPlaceView(
     onNavigateToWriteReview: (String) -> Unit,
     showMoreViewModel: ShowMoreViewModel = hiltViewModel(),
     likedPlaceViewModel: LikedPlaceViewModel = hiltViewModel(),
+    onNavigateToProfile: () -> Unit,
 
-) {
+    ) {
 
 
     LaunchedEffect(establishmentId) {
@@ -66,7 +66,10 @@ fun LikedPlaceView(
 
     Scaffold (
         topBar = { WlTopBar() },
-        bottomBar = { BottomNavigationBar(onNavigateToHome = onNavigateToHome) },
+        bottomBar = { BottomNavigationBar(
+            onNavigateToHome = onNavigateToHome,
+            onNavigateToProfile = onNavigateToProfile,
+        ) },
     ) { innerPadding ->
         Box(
             modifier =
