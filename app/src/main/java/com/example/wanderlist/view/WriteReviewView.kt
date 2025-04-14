@@ -142,15 +142,14 @@ fun WriteReviewView(
 @Composable
 fun SelectableStarNoGesture(
     starIndex: Int,
-    rating: Float,
-    onRatingChanged: (Float) -> Unit,
+    rating: Int,
+    onRatingChanged: (Int) -> Unit,
     starSize: Dp = 28.dp
 ) {
     Box(modifier = Modifier.size(starSize)) {
         // Determine which star icon should be displayed based on the rating.
         val icon = when {
             rating >= starIndex + 1 -> Icons.Filled.Star
-            rating >= starIndex + 0.5f -> Icons.AutoMirrored.Filled.StarHalf
             else -> Icons.Filled.StarBorder
         }
 
@@ -167,13 +166,7 @@ fun SelectableStarNoGesture(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .clickable { onRatingChanged(starIndex + 0.5f) }
-            )
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .clickable { onRatingChanged(starIndex + 1f) }
+                    .clickable { onRatingChanged(starIndex + 1) }
             )
         }
     }

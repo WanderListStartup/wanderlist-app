@@ -2,7 +2,7 @@ package com.example.wanderlist.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,14 +32,14 @@ class WriteReviewViewModel @Inject constructor(
 ) : ViewModel() {
 
     // State variables for the UI:
-    var userRating by mutableFloatStateOf(0f)
+    var userRating by mutableIntStateOf(0)
         private set
     var reviewText by mutableStateOf("")
         private set
     var postReviewState by mutableStateOf<PostReviewState>(PostReviewState.Idle)
         private set
 
-    fun updateRating(newRating: Float) {
+    fun updateRating(newRating: Int) {
         userRating = newRating
     }
 

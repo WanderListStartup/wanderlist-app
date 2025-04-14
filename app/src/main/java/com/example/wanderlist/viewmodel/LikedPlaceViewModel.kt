@@ -1,5 +1,6 @@
 package com.example.wanderlist.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
@@ -8,9 +9,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
 import com.example.wanderlist.data.firestore.model.Quests
+import com.example.wanderlist.data.firestore.model.Reviews
 import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.data.firestore.repository.EstablishmentDetailsRepository
 import com.example.wanderlist.data.firestore.repository.QuestsRepository
+import com.example.wanderlist.data.firestore.repository.ReviewsRepository
 import com.example.wanderlist.data.firestore.repository.UserProfileRepository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +26,7 @@ class LikedPlaceViewModel @Inject constructor(
     private val establishmentDetailsRepo: EstablishmentDetailsRepository,
     private val questsRepository: QuestsRepository,
     private val userRepository: UserProfileRepository,
+    private val reviewsRepository: ReviewsRepository,
     private val auth: FirebaseAuth,
 ) : ViewModel() {
     var likedEstablishmentDetails by mutableStateOf<EstablishmentDetails?>(null)
@@ -33,6 +37,10 @@ class LikedPlaceViewModel @Inject constructor(
 
     var userCompletedQuests by mutableStateOf<List<String>>(emptyList())
         private set
+
+    var reviewsForEstablishment by mutableStateOf<List<Reviews>>(emptyList())
+        private set
+
 
 
     fun loadLikedEstablishmentDetails(establishmentId: String) {
@@ -45,6 +53,12 @@ class LikedPlaceViewModel @Inject constructor(
     {
         viewModelScope.launch {
             questForEstablishment = questsRepository.getAllQuests(establishmentId)
+        }
+    }
+
+    fun loadReviews(establishmentId: String) {
+        viewModelScope.launch {
+            reviewsForEstablishment = reviewsRepository.getAllReviewsForEstablishment(establishmentId)
         }
     }
 
@@ -61,6 +75,12 @@ class LikedPlaceViewModel @Inject constructor(
         viewModelScope.launch {
             userCompletedQuests = auth.uid?.let { userRepository.getQuests(it) }!!
         }
+    }
+
+
+    // Here is the new suspend function that returns the review author's name.
+    suspend fun getReviewAuthorSuspend(uid: String): String? {
+        return userRepository.getNamebyId(uid)
     }
 
 

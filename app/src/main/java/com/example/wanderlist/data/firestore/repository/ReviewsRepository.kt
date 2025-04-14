@@ -38,4 +38,23 @@ class ReviewsRepository @Inject constructor(
             .update(updatedFields)
             .await()
     }
+
+    suspend fun getAllReviewsForEstablishment(establishmentId: String): List<Reviews> {
+        return try {
+            val snapshot = firestore.collection("reviews")
+                .whereEqualTo("establishmentId", establishmentId)
+                .get()
+                .await()
+            snapshot.documents.mapNotNull { document ->
+                document.toObject(Reviews::class.java)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
+
+
+
 }
