@@ -8,12 +8,9 @@ data class UserProfile(
     val dob: String = "",
     val email: String = "",
     val phone: String = "",
-    @get:PropertyName("privateAccount")
-    @set:PropertyName("privateAccount")
-    var isPrivateAccount: Boolean = false,
-    @get:PropertyName("notificationsEnabled")
-    @set:PropertyName("notificationsEnabled")
-    var isNotificationsEnabled: Boolean = false,
+    val isPrivateAccount: Boolean = false,
+    val isNotificationsEnabled: Boolean = false,
+    val fcmToken: String? = null,
     val username: String = "",
     val bio: String = "",
     val gender: String = "",
