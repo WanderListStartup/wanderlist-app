@@ -61,4 +61,12 @@ class UserProfileRepository @Inject constructor(
             .update(mapOf("isCompleted" to isCompleted))
             .await()
     }
+
+    suspend fun addReviewToUserProfile(uid: String, reviewId: String) {
+        firestore.collection("user_profiles")
+            .document(uid)
+            .update("reviews", com.google.firebase.firestore.FieldValue.arrayUnion(reviewId))
+            .await()
+    }
+
 }
