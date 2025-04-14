@@ -39,8 +39,8 @@ class SettingsViewModel @Inject constructor(
         loadUserProfile()
     }
 
-    fun checkNotificationPermissionStatus() : Boolean{
-        return userProfileRepository.checkNotificationPermission()
+    fun checkNotificationPermissionStatus(){
+        isNotificationsEnabled = userProfileRepository.checkNotificationPermission()
     }
 
     private fun loadUserProfile() {
@@ -53,7 +53,6 @@ class SettingsViewModel @Inject constructor(
                     phone = profile.phone
                     email = profile.email
                     isPrivateAccount = profile.isPrivateAccount
-                    isNotificationsEnabled = profile.isNotificationsEnabled
                 } else {
                     Log.e("SettingsViewModel", "User profile is null for UID: ${currentUser.uid}")
                 }
@@ -81,8 +80,7 @@ class SettingsViewModel @Inject constructor(
             showingNotificationDialog = true
             isNotificationsEnabled = true
         } else{
-           //noop cannot turn off notification perms inside of app
-            return
+            //noop
         }
     }
 

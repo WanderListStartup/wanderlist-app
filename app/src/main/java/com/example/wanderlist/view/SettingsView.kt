@@ -4,17 +4,12 @@ package com.example.wanderlist.view
 import android.Manifest
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -25,6 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+
+import android.provider.Settings
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.wanderlist.components.BackCircle
@@ -158,10 +161,24 @@ fun SettingsView(
             ToggleSettingItem(
                 title = "Notifications",
                 checked = viewModel.isNotificationsEnabled,
-                onCheckedChange = { viewModel.onNotificationsChange(it) }
+                onCheckedChange = { newVal ->
+                    if (!newVal) {
+                        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                            }
+                        } else {
+                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = Uri.parse("package:${context.packageName}")
+                            }
+                        }
+                        context.startActivity(intent)
+                    }
+                    viewModel.onNotificationsChange(newVal)
+                }
             )
 
-            // Save button at the bottom.
+//             Save button at the bottom.
             Button(
                 onClick = {
                     authViewModel.updateUserSettings(
