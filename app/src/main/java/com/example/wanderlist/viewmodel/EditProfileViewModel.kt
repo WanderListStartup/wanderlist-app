@@ -31,13 +31,6 @@ class EditProfileViewModel @Inject constructor(
         private set
     var gender by mutableStateOf("")
         private set
-    val isGenderValid: Boolean
-        get() {
-            // Allow empty (you might allow this if the user is not forced to provide gender),
-            // or else require one of "male", "female", "other" (case-insensitive)
-            val normalized = gender.trim().lowercase()
-            return normalized.isEmpty() || normalized in setOf("male", "female", "other")
-        }
 
     // For profile picture, you might handle it separately. We'll keep a default.
     var profilePicture by mutableIntStateOf(R.drawable.lebron)
