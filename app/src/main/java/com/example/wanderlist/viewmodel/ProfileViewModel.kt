@@ -183,6 +183,27 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    // Example function to delete a review.
+    fun deleteReview(reviewId: String, userId: String, establishmentId: String) {
+        Log.d("ProfileViewModel", "We are now in the delete reviews")
+        viewModelScope.launch {
+            try {
+                // Delete the review document.
+                reviewsRepository.deleteReview(reviewId)
+                // Optionally, remove the review uid from the user's profile.
+                userProfileRepository.updateUserProfile(userId,
+                    mapOf("reviews" to com.google.firebase.firestore.FieldValue.arrayRemove(reviewId))
+                )
+                // Optionally, also remove the review uid from the establishment's reviews array.
+                establishmentDetailsRepo.addReviewToEstablishment(establishmentId, reviewId) // You'll need an analogous removal method here.
+                // Log success, refresh state if necessary.
+                Log.d(TAG, "Review $reviewId successfully deleted.")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error deleting review: ${e.message}", e)
+            }
+        }
+    }
+
 
 
 

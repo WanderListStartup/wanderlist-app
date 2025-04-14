@@ -8,6 +8,19 @@ import com.example.wanderlist.data.firestore.model.Reviews
 class ReviewsRepository @Inject constructor(
    private val firestore: FirebaseFirestore
 ) {
+
+    suspend fun deleteReview(reviewId: String) {
+        try {
+            firestore.collection("reviews")
+                .document(reviewId)
+                .delete()
+                .await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
+
     suspend fun addReview(review: Reviews) {
         firestore.collection("reviews")
             .document(review.id)

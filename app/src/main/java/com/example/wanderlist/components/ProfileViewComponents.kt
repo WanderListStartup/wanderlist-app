@@ -186,7 +186,7 @@ fun ProfileReviewCard(
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
-                IconButton(onClick = onEditClick,
+                IconButton(onClick = onDeleteClick,
                         modifier = Modifier
                             .size(36.dp)
                             .padding(0.dp),

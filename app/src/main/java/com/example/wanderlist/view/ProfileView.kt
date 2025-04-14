@@ -190,8 +190,17 @@ fun ProfileScreen(
                                     location = location,
                                     rating = review.rating,
                                     reviewText = review.reviewText,
-                                    onEditClick = {  },
-                                    onDeleteClick = { },
+                                    onEditClick = {
+                                        Log.d("ProfileView", "Edit Button Clicked")
+                                    },
+                                    onDeleteClick = {
+                                        profileViewModel.deleteReview(
+                                            reviewId = review.id,
+                                            userId = review.userId,
+                                            establishmentId = review.establishmentId,
+                                        )
+                                        Log.d("ProfileView", "Delete Button Clicked")
+                                    },
                                 )
 
                                 HorizontalDivider()
