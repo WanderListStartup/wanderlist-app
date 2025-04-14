@@ -227,5 +227,30 @@ class UserProfileRepository @Inject constructor(
             .update("level", FieldValue.increment(0.2))
             .await()
     }
+
+    suspend fun getUserLevel(uid: String): Double {
+        return try {
+            val snapshot = firestore
+                .collection("user_profiles")
+                .document(uid)
+                .get()
+                .await()
+            if (snapshot.exists()) {
+                snapshot.getDouble("level") ?: 0.0
+            } else {
+                0.0
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0.0
+        }
+    }
+
+    suspend fun addBadgeToUserProfile(uid: String, badgeId: String) {
+        firestore.collection("user_profiles")
+            .document(uid)
+            .update("badges", FieldValue.arrayUnion(badgeId))
+            .await()
+    }
 }
 

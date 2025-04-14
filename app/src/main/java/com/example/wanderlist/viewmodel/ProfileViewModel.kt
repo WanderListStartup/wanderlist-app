@@ -12,9 +12,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.wanderlist.data.firestore.repository.UserProfileRepository
 import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.data.auth.model.AuthDataStore
+import com.example.wanderlist.data.firestore.model.Badges
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.auth.User
 import com.example.wanderlist.data.firestore.model.EstablishmentDetails
+import com.example.wanderlist.data.firestore.repository.BadgesRepository
 import com.example.wanderlist.data.firestore.repository.EstablishmentDetailsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,7 +26,8 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     private val userProfileRepository: UserProfileRepository,
     private val establishmentDetailsRepo: EstablishmentDetailsRepository,
-    private val authDataStore: AuthDataStore
+    private val authDataStore: AuthDataStore,
+    private val badgesRepository: BadgesRepository
 ) : ViewModel() {
 
     var userProfile by mutableStateOf<UserProfile?>(null)
@@ -48,11 +51,6 @@ class ProfileViewModel @Inject constructor(
     var level by mutableDoubleStateOf(0.0)
         private set
 
-    // Default profile picture URL if none is set
-    var profilePictureUrl by mutableStateOf("https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG")
-        private set
-
-    // Holds the actual friend list for the current user
     var friendProfiles by mutableStateOf<List<UserProfile>>(emptyList())
         private set
 
@@ -65,6 +63,19 @@ class ProfileViewModel @Inject constructor(
     var selectedTab by mutableIntStateOf(0)
         private set
 
+    var userBadges by mutableStateOf<List<Badges>>(emptyList())
+        private set
+
+    var selectedBadges by mutableStateOf<List<Badges>>(emptyList())
+        private set
+
+    var slotIndexToSelect by mutableStateOf<Int?>(null)
+        private set
+
+    var profilePictureUrl by mutableStateOf("https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG")
+        private set
+
+
     init {
         loadUserProfile()  // automatically loads user data and friends
     }
@@ -75,6 +86,9 @@ class ProfileViewModel @Inject constructor(
             if (currentUser != null) {
                 userProfile = userProfileRepository.getUserProfile(currentUser.uid)
                 loadFriendsForCurrentUser(userProfile?.friends ?: emptyList())
+                selectedBadges = userProfile?.let { badgesRepository.getBadges(it.selectedBadges) } ?: emptyList()
+                userBadges = userProfile?.let { badgesRepository.getBadges(it.badges) } ?: emptyList()
+
             }
         }
     }
@@ -124,21 +138,16 @@ class ProfileViewModel @Inject constructor(
                     likedEstablishmentsDetails = establishmentDetailsRepo.getEstablishmentsDetailsForLargeLists(likedEstablishments)
                 }
                 userProfile = profile
+                getBadges()
+                getSelectedBadges()
             }
         }
     }
 
-    /**
-     * Update the selected tab index.
-     */
     fun updateSelectedTab(index: Int) {
         selectedTab = index
     }
 
-    /**
-     * Given a list of friend UIDs, fetch each friend's UserProfile from Firestore
-     * and store them in [friendProfiles].
-     */
     private fun loadFriendsForCurrentUser(friendUids: List<String>) {
         viewModelScope.launch {
             val loadedFriends = mutableListOf<UserProfile>()
@@ -151,4 +160,78 @@ class ProfileViewModel @Inject constructor(
             friendProfiles = loadedFriends
         }
     }
+
+    fun updateSelectedBadges(badgeIds: List<String>) {
+        viewModelScope.launch {
+            val currentUser = authDataStore.getCurrentUser()
+            if (currentUser != null) {
+                userProfileRepository.updateUserProfile(
+                    uid = currentUser.uid,
+                    updatedFields = mapOf(
+                        "selectedBadges" to badgeIds
+                    )
+                )
+                reloadUserProfile()
+            }
+        }
+    }
+
+    private fun getBadges() {
+        viewModelScope.launch {
+            val badges = userProfile?.let { badgesRepository.getBadges(it.badges) }
+            userBadges = badges!!
+            reloadUserProfile()
+        }
+    }
+
+    private fun getSelectedBadges() {
+        viewModelScope.launch {
+            val badges = userProfile?.let { badgesRepository.getBadges(it.selectedBadges) }
+            selectedBadges = badges!!
+            reloadUserProfile()
+        }
+    }
+
+    fun openBadgeDialog(slotIndex: Int) {
+        slotIndexToSelect = slotIndex
+    }
+
+    fun closeBadgeDialog() {
+        slotIndexToSelect = null
+    }
+
+    fun onBadgeSelected(chosenBadge: Badges) {
+        val index = slotIndexToSelect ?: return
+        val currentBadge = selectedBadges.getOrNull(index)
+
+        // If the chosen badge is already assigned to the active slot, deselect it.
+        if (currentBadge != null && currentBadge.badgeId == chosenBadge.badgeId) {
+            val currentList = selectedBadges.toMutableList()
+            currentList[index] = Badges() // Resets to an empty badge.
+            selectedBadges = currentList
+
+            val badgeIds = currentList.filter { it.badgeId.isNotEmpty() }.map { it.badgeId }
+            viewModelScope.launch {
+                updateSelectedBadges(badgeIds)
+                closeBadgeDialog()
+            }
+            return
+        }
+
+        // Otherwise, assign the selected badge to the slot.
+        val currentList = selectedBadges.toMutableList()
+        while (currentList.size < 4) {
+            currentList.add(Badges())
+        }
+        currentList[index] = chosenBadge
+        selectedBadges = currentList
+
+        val badgeIds = currentList.filter { it.badgeId.isNotEmpty() }.map { it.badgeId }
+        viewModelScope.launch {
+            updateSelectedBadges(badgeIds)
+            closeBadgeDialog()
+        }
+    }
+
+
 }
