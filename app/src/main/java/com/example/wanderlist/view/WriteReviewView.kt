@@ -118,7 +118,8 @@ fun WriteReviewView(
 
         // Button to post the review
         Button(
-            onClick = { viewModel.postReview(establishmentId) },
+            onClick = { viewModel.postReview(establishmentId)
+                      println("Posting review with ID: $establishmentId") },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A73E8)),
             shape = RoundedCornerShape(8.dp)
         ) {

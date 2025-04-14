@@ -57,10 +57,18 @@ class WriteReviewViewModel @Inject constructor(
      * @param establishmentId the uid of the establishment being reviewed.
      */
     fun postReview(establishmentId: String) {
+        println("Posting review with rating: $userRating and text: $reviewText")
         viewModelScope.launch {
             val currentUser = authDataStore.getCurrentUser()
             val currentUserUID = currentUser?.uid
-            if (currentUser == null && currentUserUID == null) {
+            println("On the if statement cur user and uid: $currentUser, $currentUserUID")
+            if (currentUser != null && currentUserUID != null) {
+                println("why not printing?")
+                println("why not printing?")
+                println("why not printing?")
+                println("why not printing?")
+                println("why not printing?")
+                println("why not printing?")
                 postReviewState = PostReviewState.Posting
                 try {
                     // Generate a unique review id
@@ -71,16 +79,21 @@ class WriteReviewViewModel @Inject constructor(
                         id = reviewId,
                         userId = currentUserUID.toString(),
                         establishmentId = establishmentId,
+                        rating = userRating,
+                        reviewText = reviewText,
                         // You might include reviewText here, if desired
                     )
 
                     // 1. Add the review document.
+                    println("Adding review: $review")
                     reviewsRepository.addReview(review)
 
                     // 2. Append review id to the user's profile reviews array.
+                    println("Adding review ID to user profile: $currentUserUID")
                     userProfileRepository.addReviewToUserProfile(currentUserUID.toString(), reviewId)
 
                     // 3. Append review id to the establishment's reviews array.
+                    println("Adding review ID to establishment: $establishmentId")
                     establishmentDetailsRepository.addReviewToEstablishment(establishmentId, reviewId)
 
                     postReviewState = PostReviewState.Success
