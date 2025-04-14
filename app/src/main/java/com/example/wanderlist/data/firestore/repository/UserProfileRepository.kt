@@ -83,7 +83,15 @@ class UserProfileRepository @Inject constructor(
     }
 
 
+
     fun checkNotificationPermission():Boolean{
         return ContextCompat.checkSelfPermission(context, "android.permission.POST_NOTIFICATIONS") == PackageManager.PERMISSION_GRANTED
+    }
+
+    suspend fun addReviewToUserProfile(uid: String, reviewId: String) {
+        firestore.collection("user_profiles")
+            .document(uid)
+            .update("reviews", com.google.firebase.firestore.FieldValue.arrayUnion(reviewId))
+            .await()
     }
 }

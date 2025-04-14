@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.wanderlist.data.firestore.repository.UserProfileRepository
 import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.data.auth.model.AuthDataStore
+import com.example.wanderlist.data.firestore.model.EstablishmentDetails
+import com.example.wanderlist.data.firestore.repository.EstablishmentDetailsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userProfileRepository: UserProfileRepository,
+    private val establishmentDetailsRepo: EstablishmentDetailsRepository,
     private val authDataStore: AuthDataStore
 ) : ViewModel() {
 
@@ -42,6 +45,15 @@ class ProfileViewModel @Inject constructor(
     var friendProfiles by mutableStateOf<List<UserProfile>>(emptyList())
         private set
 
+    var likedEstablishments by mutableStateOf<List<String>>(emptyList())
+        private set
+
+    var likedEstablishmentsDetails by mutableStateOf<List<EstablishmentDetails>>(emptyList())
+        private set
+
+    var selectedTab by mutableStateOf(0)
+        private set
+
     init {
         loadUserProfile()  // automatically loads user data and friends
     }
@@ -62,13 +74,20 @@ class ProfileViewModel @Inject constructor(
                     bio = it.bio
                     location = it.location
                     gender = it.gender
-                    // Optionally update profilePictureUrl if your backend stores it
+                    likedEstablishments = it.likedEstablishments
 
-                    // Now that we have the current user's "friends" list, load their profiles
                     loadFriendsForCurrentUser(it.friends)
+                    likedEstablishmentsDetails = establishmentDetailsRepo.getEstablishmentsDetailsForLargeLists(likedEstablishments)
                 }
             }
         }
+    }
+
+    /**
+     * Update the selected tab index.
+     */
+    fun updateSelectedTab(index: Int) {
+        selectedTab = index
     }
 
     /**

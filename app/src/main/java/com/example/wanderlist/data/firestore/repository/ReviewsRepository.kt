@@ -5,7 +5,7 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import com.example.wanderlist.data.firestore.model.Reviews
 
-class ReviewsRepository (
+class ReviewsRepository @Inject constructor(
    private val firestore: FirebaseFirestore
 ) {
     suspend fun addReview(review: Reviews) {

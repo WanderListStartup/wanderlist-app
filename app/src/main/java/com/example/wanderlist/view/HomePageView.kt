@@ -1,4 +1,5 @@
 package com.example.wanderlist
+
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
