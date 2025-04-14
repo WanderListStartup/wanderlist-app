@@ -106,6 +106,12 @@ class UserProfileRepository @Inject constructor(
             .await()
     }
 
+    suspend fun addReviewToUserProfile(uid: String, reviewId: String) {
+        firestore.collection("user_profiles")
+            .document(uid)
+            .update("reviews", com.google.firebase.firestore.FieldValue.arrayUnion(reviewId))
+            .await()
+    }
 
     suspend fun getFriends(uid: String) : List<String>?
     {

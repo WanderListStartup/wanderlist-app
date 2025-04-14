@@ -32,7 +32,7 @@ import com.example.wanderlist.viewmodel.ShowMoreViewModel
 fun ShowMoreView(
     establishmentId: String,
     viewModel: ShowMoreViewModel = hiltViewModel(),
-    onNavigateToHomePage: () -> Unit,
+    onBackClick: () -> Unit = {},
 
     ) {
     LaunchedEffect(establishmentId) {
@@ -64,7 +64,7 @@ fun ShowMoreView(
                 modifier = Modifier
                     // actually make the button a circle but idk why the png disappears .size(36.dp)
                     .clip(CircleShape)
-                    .clickable { onNavigateToHomePage() },
+                    .clickable { onBackClick() },
             ) {
                 BackCircle()
             }

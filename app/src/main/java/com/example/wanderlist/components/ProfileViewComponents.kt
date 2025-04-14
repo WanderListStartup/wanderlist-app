@@ -21,12 +21,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.wanderlist.data.firestore.model.EstablishmentDetails
 import com.example.wanderlist.data.googlemaps.model.PlaceDetails
 
 
 @Composable
 fun LikedPlacesGrid(
-    places: List<PlaceDetails>,
+    places: List<EstablishmentDetails>,
+    onNavigateToLikedPlace: (String) -> Unit,
     maxLines: Int = 1,
 
     ) {
@@ -53,7 +55,7 @@ fun LikedPlacesGrid(
                                 .weight(1f)
                                 .padding(vertical = 8.dp)
                                 .clickable {
-                                    // add navigation //
+                                    onNavigateToLikedPlace(place.id)
                                 }
                         ) {
                             Column {
@@ -68,7 +70,7 @@ fun LikedPlacesGrid(
                                             .aspectRatio(1f)
                                             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                                             .clickable {
-                                                // add navigation //
+                                                onNavigateToLikedPlace(place.id)
                                             }
                                     )
                                 }
@@ -81,7 +83,7 @@ fun LikedPlacesGrid(
                                         modifier = Modifier
                                             .padding(8.dp)
                                             .clickable {
-                                                // add navigation //
+                                                onNavigateToLikedPlace(place.id)
                                             }
                                     )
                                 }

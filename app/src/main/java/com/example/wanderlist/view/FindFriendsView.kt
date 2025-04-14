@@ -29,6 +29,7 @@ import coil.request.ImageRequest
 import com.example.wanderlist.R
 import com.example.wanderlist.data.firestore.model.UserProfile
 import com.example.wanderlist.viewmodel.FindFriendsViewModel
+import com.example.wanderlist.viewmodel.ProfileViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -36,15 +37,15 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun FindFriendsView(
     onBackClick: () -> Unit = {},
-    viewModel: FindFriendsViewModel = hiltViewModel()
+    findFriendsViewModel: FindFriendsViewModel = hiltViewModel(),
 ) {
-    val searchQuery = viewModel.searchQuery
+    val searchQuery = findFriendsViewModel.searchQuery
 
     // 1) The users that are in MY incomingRequests
-    val incomingRequests = viewModel.incomingRequestProfiles
+    val incomingRequests = findFriendsViewModel.incomingRequestProfiles
 
     // 2) Everyone else
-    val prospectiveFriends = viewModel.prospectiveFriends
+    val prospectiveFriends = findFriendsViewModel.prospectiveFriends
 
     Scaffold(
         containerColor = Color.White,
@@ -101,7 +102,7 @@ fun FindFriendsView(
             ) {
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = { viewModel.onSearchQueryChange(it) },
+                    onValueChange = { findFriendsViewModel.onSearchQueryChange(it) },
                     label = { Text("Search") },
                     singleLine = true,
                     trailingIcon = {
@@ -136,11 +137,12 @@ fun FindFriendsView(
                                 isIncomingRequest = true, // We pass a flag
                                 onAddFriendClick = {
                                     // This means "Accept" in our logic
-                                    viewModel.acceptFriendRequest(profile.uid)
+                                    findFriendsViewModel.acceptFriendRequest(profile.uid)
+
                                 },
                                 onRemoveRequestClick = {
                                     // This means "Remove" in our logic
-                                    viewModel.removeFriendRequest(profile.uid)
+                                    findFriendsViewModel.removeFriendRequest(profile.uid)
                                 }
                             )
                         }
@@ -168,11 +170,11 @@ fun FindFriendsView(
                                 isIncomingRequest = false,
                                 onAddFriendClick = {
                                     // This means "Send request"
-                                    viewModel.sendFriendRequest(profile)
+                                    findFriendsViewModel.sendFriendRequest(profile)
                                 },
                                 onRemoveRequestClick = {
                                     // This means "Remove" in our logic
-                                    viewModel.removeFriendRequest(profile.uid)
+                                    findFriendsViewModel.removeFriendRequest(profile.uid)
                                 }
 
                             )
