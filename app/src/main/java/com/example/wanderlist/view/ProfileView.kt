@@ -37,6 +37,7 @@ import com.example.wanderlist.components.LikedPlacesGrid
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.EditProfileViewModel
 import com.example.wanderlist.viewmodel.ProfileViewModel
+import kotlin.math.floor
 
 
 @Composable
@@ -90,6 +91,7 @@ fun ProfileScreen(
             // User details
             UserDetails(
                 editProfileViewModel = editProfileViewModel,
+                profileViewModel = profileViewModel,
             )
 
 
@@ -266,6 +268,7 @@ fun BottomNavigationBar(onNavigateToHome: () -> Unit) {
 @Composable
 fun UserDetails(
     editProfileViewModel: EditProfileViewModel,
+    profileViewModel: ProfileViewModel = hiltViewModel(),
 ) {
     // Profile picture and user details
     Row(
@@ -350,28 +353,7 @@ fun UserDetails(
             .padding(PaddingValues(start = 28.dp, top = 8.dp, bottom = 8.dp)),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "Level 10",
-            fontSize = 20.sp,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Box(
-            modifier = Modifier
-                .width(250.dp)
-                .height(20.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .border(width = 2.dp, color = Color.Black, shape = CircleShape)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth(0.4f)
-                    .background(Color(0xFF176FF2))
-            )
-        }
-        Spacer(modifier = Modifier.width(12.dp))
+        LevelProgressView(profileViewModel = profileViewModel)
     }
 
     Text(
@@ -443,6 +425,40 @@ fun FriendsTab(
 
     Spacer(modifier = Modifier.height(24.dp))
 }
+
+@Composable
+fun LevelProgressView(profileViewModel: ProfileViewModel) {
+    val userLevel = profileViewModel.level
+
+    // Display the "floored" level
+    Text(
+        text = "Level " + userLevel.toInt().toString(),
+        fontSize = 20.sp,
+        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+    )
+
+    Spacer(modifier = Modifier.width(12.dp))
+
+    // Calculate the fraction from 0.0 to 1.0
+    val fraction = userLevel - floor(userLevel) // e.g., 10.6 -> 0.6
+
+    // Display a progress bar that fills according to the fraction
+    Box(
+        modifier = Modifier
+            .width(250.dp)
+            .height(20.dp)
+            .clip(RoundedCornerShape(6.dp))
+            .border(width = 2.dp, color = Color.Black, shape = CircleShape)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(fraction.toFloat())  // 0.6 -> 60% filled
+                .background(Color(0xFF176FF2))
+        )
+    }
+}
+
 
 @Composable
 fun UserRow(

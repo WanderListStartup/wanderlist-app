@@ -22,5 +22,5 @@ data class UserProfile(
     val quests: List<String> = emptyList(),
     val friends: List<String> = emptyList(),
     val incomingRequests: List<String> = emptyList(),
-    val level: Int = 0,
+    val level: Double = 0.0,
 )

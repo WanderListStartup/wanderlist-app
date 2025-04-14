@@ -111,7 +111,7 @@ fun AppView(authViewModel: AuthViewModel = viewModel()) {
             val establishmentId = backStackEntry.arguments?.getString("establishmentId") ?: ""
             LikedPlaceView(
                 establishmentId = establishmentId,
-                onBackClick = { navController.popBackStack() },
+                onBackClick = { navController.navigate(route=Profile) },
                 onNavigateToHome = { navController.navigate(route = MainView) },
                 onNavigateToShowMore = { id -> navController.navigate("showMore/$id") }
             )

@@ -52,6 +52,7 @@ class LikedPlaceViewModel @Inject constructor(
     {
         viewModelScope.launch {
             auth.uid?.let { userRepository.addQuests(it, questId) }
+            auth.uid?.let { userRepository.incrementLevelByPointTwo(it) }
             getQuests()
         }
     }

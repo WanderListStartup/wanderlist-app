@@ -221,5 +221,11 @@ class UserProfileRepository @Inject constructor(
         }
     }
 
+    suspend fun incrementLevelByPointTwo(uid: String) {
+        firestore.collection("user_profiles")
+            .document(uid)
+            .update("level", FieldValue.increment(0.2))
+            .await()
+    }
 }
 

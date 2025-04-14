@@ -3,6 +3,8 @@ package com.example.wanderlist.viewmodel
 
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -43,6 +45,9 @@ class ProfileViewModel @Inject constructor(
     var gender by mutableStateOf("")
         private set
 
+    var level by mutableDoubleStateOf(0.0)
+        private set
+
     // Default profile picture URL if none is set
     var profilePictureUrl by mutableStateOf("https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG")
         private set
@@ -57,7 +62,7 @@ class ProfileViewModel @Inject constructor(
     var likedEstablishmentsDetails by mutableStateOf<List<EstablishmentDetails>>(emptyList())
         private set
 
-    var selectedTab by mutableStateOf(0)
+    var selectedTab by mutableIntStateOf(0)
         private set
 
     init {
@@ -112,6 +117,7 @@ class ProfileViewModel @Inject constructor(
                     bio = it.bio
                     location = it.location
                     gender = it.gender
+                    level = it.level
                     likedEstablishments = it.likedEstablishments
 
                     loadFriendsForCurrentUser(it.friends)

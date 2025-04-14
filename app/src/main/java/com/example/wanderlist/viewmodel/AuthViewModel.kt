@@ -65,7 +65,7 @@ class AuthViewModel @Inject constructor(
                             reviews = emptyList(),
                             friends = emptyList(),
                             incomingRequests = emptyList(),
-                            level = 0
+                            level = 0.0
                         )
                         userProfileRepository.createUserProfile(profile)
                         userProfileRepository.putFCMToken(user.uid)
