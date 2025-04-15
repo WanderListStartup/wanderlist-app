@@ -80,7 +80,11 @@ class LikedPlaceViewModel @Inject constructor(
     fun getQuests()
     {
         viewModelScope.launch {
-            userCompletedQuests = auth.uid?.let { userRepository.getQuests(it) }!!
+            userCompletedQuests = if (userCompletedQuests.isNotEmpty()) {
+                userRepository.getQuests(auth.uid!!)
+            } else {
+                emptyList()
+            }
         }
     }
 
