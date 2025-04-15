@@ -32,6 +32,8 @@ import com.example.wanderlist.viewmodel.FindFriendsViewModel
 import com.example.wanderlist.viewmodel.ProfileViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -286,7 +288,7 @@ fun FriendListItem(
 
                     // Level
                     Text(
-                        text = "Lvl: ${userProfile.level}",
+                        text = "Lvl: ${BigDecimal(userProfile.level).setScale(1, RoundingMode.HALF_UP).toDouble()}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray,
                         modifier = Modifier.padding(PaddingValues(start = 4.dp)),

@@ -276,7 +276,10 @@ fun AboutTextWithShowMore(
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         modifier =
-            Modifier.clickable {
+
+            Modifier
+                .padding(end = 16.dp)
+                .clickable {
                 onShowMoreClick()
             },
     )
@@ -453,8 +456,7 @@ fun PlaceContent(
                         // quest name
                         Text(
                             text = "• ${quest.questName}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.bodyMedium,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.widthIn(max = 340.dp)
@@ -487,7 +489,7 @@ fun PlaceContent(
                         textAlign = TextAlign.Center,
                         maxLines = 4,
                         overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
                 Spacer(modifier = Modifier.height(50.dp))

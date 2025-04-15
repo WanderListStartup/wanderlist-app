@@ -49,6 +49,8 @@ import com.example.wanderlist.data.firestore.model.Badges
 import com.example.wanderlist.ui.theme.wanderlistBlue
 import com.example.wanderlist.viewmodel.EditProfileViewModel
 import com.example.wanderlist.viewmodel.ProfileViewModel
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.floor
 
 
@@ -688,7 +690,7 @@ fun FriendsTab(
                 name = friend.name,
                 handle = "@${friend.username}",
                 location = friend.location,
-                level = "Lvl: ${friend.level}",
+                level = "Lvl: ${BigDecimal(friend.level).setScale(1, RoundingMode.HALF_UP).toDouble()}",
                 onRemoveFriendClick = {
                     // This means "Accept" in our logic
                     profileViewModel.removeFriend(friend.uid)
@@ -710,7 +712,7 @@ fun FriendsTab(
 
 @Composable
 fun LevelProgressView(profileViewModel: ProfileViewModel) {
-    val userLevel = profileViewModel.level
+    val userLevel = BigDecimal(profileViewModel.level).setScale(1, RoundingMode.HALF_UP).toDouble()
 
     // Display the "floored" level
     Text(
@@ -729,7 +731,7 @@ fun LevelProgressView(profileViewModel: ProfileViewModel) {
         modifier = Modifier
             .width(250.dp)
             .height(20.dp)
-            .clip(RoundedCornerShape(6.dp))
+            .clip(RoundedCornerShape(10.dp))
             .border(width = 2.dp, color = Color.Black, shape = CircleShape)
     ) {
         Box(
