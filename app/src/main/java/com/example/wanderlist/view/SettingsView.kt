@@ -179,6 +179,7 @@ fun SettingsView(
 
 //             Save button at the bottom.
             Button(
+                enabled = viewModel.isDomainValidState && viewModel.isValidPhoneNumber(),
                 onClick = {
                     authViewModel.updateUserSettings(
                         phone = viewModel.phone,

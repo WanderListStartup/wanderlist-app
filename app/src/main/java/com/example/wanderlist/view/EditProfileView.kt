@@ -3,25 +3,46 @@ package com.example.wanderlist.view
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.wanderlist.components.BackCircle
 import com.example.wanderlist.components.EditProfileTextField
@@ -127,11 +148,29 @@ fun EditProfileView(
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
 
-            EditProfileTextField(
-                label = "Gender",
-                value = viewModel.gender,
-                onValueChange = { viewModel.onGenderChange(it) }
-            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // "Gender" label, same style as "Name" or "Location"
+                Text(
+                    text = "Gender",
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.width(80.dp) // Or .weight(1f) if you want flexible sizing
+                )
+
+                // The dropdown on the right
+                ForcedDownwardDropdown(
+                    currentGender = viewModel.gender,
+                    onGenderChange = { selected ->
+                        viewModel.onGenderChange(selected)
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
             HorizontalDivider()
             Spacer(modifier = Modifier.height(32.dp))
@@ -166,6 +205,83 @@ fun EditProfileView(
                 Text("Save", fontSize = 16.sp)
             }
             Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+fun ForcedDownwardDropdown(
+    currentGender: String,
+    onGenderChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val expanded = remember { mutableStateOf(false) }
+    val textFieldSize = remember { mutableStateOf(Size.Zero) }
+    val genderOptions = listOf("Male", "Female", "Other")
+
+    Box(modifier = modifier.padding(start = 10.dp)) {
+        OutlinedTextField(
+            value = currentGender,
+            onValueChange = { /* No direct typing; use the dropdown */ },
+            readOnly = true,
+            trailingIcon = {
+                IconButton(onClick = { expanded.value = !expanded.value }) {
+                    Icon(
+                        imageVector = if (expanded.value) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                        contentDescription = null
+                    )
+                }
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                // Make the outline transparent in all states
+                focusedBorderColor = Color.Transparent,
+                unfocusedBorderColor = Color.Transparent,
+                disabledBorderColor = Color.Transparent,
+                errorBorderColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                errorContainerColor = Color.Transparent
+            ),
+            modifier = Modifier
+                .width(130.dp)
+                .onGloballyPositioned { coords ->
+                    textFieldSize.value = coords.size.toSize()
+                }
+        )
+
+        if (expanded.value) {
+            Popup(
+                alignment = Alignment.TopStart,
+                offset = with(LocalDensity.current) {
+                    IntOffset(x = 0, y = textFieldSize.value.height.toInt())
+                },
+                onDismissRequest = { expanded.value = false }
+            ) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.width(
+                        with(LocalDensity.current) { textFieldSize.value.width.toDp() }
+                    )
+                ) {
+                    Column {
+                        genderOptions.forEach { gender ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onGenderChange(gender)
+                                        expanded.value = false
+                                    }
+                                    .padding(12.dp)
+                            ) {
+                                Text(text = gender, fontWeight = FontWeight.Normal)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

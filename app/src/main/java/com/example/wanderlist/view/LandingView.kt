@@ -2,6 +2,7 @@ package com.example.wanderlist.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,6 +26,8 @@ import androidx.compose.ui.unit.sp
 import com.example.wanderlist.R
 import com.example.wanderlist.ui.theme.Acme
 import com.example.wanderlist.ui.theme.Alef
+import com.example.wanderlist.ui.theme.Exo
+import com.example.wanderlist.ui.theme.Fascinate
 import com.example.wanderlist.ui.theme.Montserrat
 import com.example.wanderlist.ui.theme.wanderlistBlue
 
@@ -32,6 +36,7 @@ import com.example.wanderlist.ui.theme.wanderlistBlue
 //        modifier = Modifier.padding(innerPadding)
 //    )
 // }
+
 @Composable
 fun Landing(
     modifier: Modifier = Modifier,
@@ -50,28 +55,11 @@ fun Landing(
             contentDescription = null,
             modifier = Modifier.padding(bottom = 54.dp).size(300.dp),
         )
-        Text(
-            "Wanderlist",
-            style =
-                TextStyle(
-                    fontFamily = Montserrat,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 24.sp,
-                    lineHeight = 29.sp,
-                ),
-        )
-        Text(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ",
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 27.dp).padding(top = 10.dp),
-            style =
-                TextStyle(
-                    fontFamily = Acme,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 17.sp,
-                    lineHeight = 21.sp,
-                ),
-        )
+
+          CustomFontTextRow()
+        Spacer(modifier = Modifier.weight(0.5f))
+
+
         Spacer(modifier = Modifier.weight(0.5f))
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -135,3 +123,26 @@ fun Landing(
 //        // Content goes here
 //        Text("Login Screen Content", modifier = Modifier.padding(paddingValues))
 //    }}
+
+
+@Composable
+fun CustomFontTextRow() {
+    // Replace these with your actual font families.
+    val fontForW: FontFamily = Fascinate     // Font for "W"
+    val exoFont: FontFamily = Exo       // Font for "anderlist"
+    val textStyle = TextStyle(
+        fontWeight = FontWeight.Bold,
+        fontSize = 28.sp,
+        lineHeight = 37.sp
+    )
+    Row {
+        Text(
+            text = "W",
+            style = textStyle.copy(fontFamily = fontForW)
+        )
+        Text(
+            text = "anderlist",
+            style = textStyle.copy(fontFamily = exoFont)
+        )
+    }
+}

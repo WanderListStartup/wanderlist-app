@@ -13,20 +13,32 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.wanderlist.R
@@ -78,31 +90,36 @@ fun EditProfileTextField(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        // Label on the left.
         Text(
             text = label,
             fontFamily = Montserrat,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp)
         )
-        // The text field on the right.
         OutlinedTextField(
             value = value,
             textStyle = TextStyle(
                 fontFamily = Montserrat,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                lineHeight = 18.sp
             ),
             onValueChange = onValueChange,
             modifier = Modifier
                 .weight(2f)
-                .height(46.dp),
+                .padding(end = 4.dp),
             shape = RoundedCornerShape(12.dp),
+            singleLine = true,
+            maxLines = 1,
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
@@ -110,10 +127,10 @@ fun EditProfileTextField(
                 unfocusedContainerColor = Color.Transparent,
                 disabledContainerColor = Color(0xFFF2F2F2)
             )
-
         )
     }
 }
+
 
 // For Both the Login Text and Create Account Text
 @Composable
@@ -202,6 +219,7 @@ fun EmailInput(value: String, infoViewModel: SignUpViewModel) {
 
 @Composable
 fun PasswordInput(value: String, infoViewModel: SignUpViewModel) {
+    var passwordVisible by remember { mutableStateOf(false) }
 
     OutlinedTextField(
         value = infoViewModel.password,
@@ -213,6 +231,18 @@ fun PasswordInput(value: String, infoViewModel: SignUpViewModel) {
                 fontWeight = FontWeight.Bold,
                 fontSize = 15.sp
             )
+        },
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        trailingIcon = {
+            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                val icon: ImageVector = if (passwordVisible) {
+                    Icons.Filled.Visibility
+                } else {
+                    Icons.Filled.VisibilityOff
+                }
+                val description = if (passwordVisible) "Hide password" else "Show password"
+                Icon(imageVector = icon, contentDescription = description)
+            }
         },
         modifier = Modifier
             .fillMaxWidth(0.95f)
