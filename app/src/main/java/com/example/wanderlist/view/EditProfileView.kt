@@ -219,7 +219,7 @@ fun ForcedDownwardDropdown(
     val textFieldSize = remember { mutableStateOf(Size.Zero) }
     val genderOptions = listOf("Male", "Female", "Other")
 
-    Box(modifier = modifier.padding(start = 10.dp)) {
+    Box(modifier = modifier.padding(start = 20.dp)) {
         OutlinedTextField(
             value = currentGender,
             onValueChange = { /* No direct typing; use the dropdown */ },
