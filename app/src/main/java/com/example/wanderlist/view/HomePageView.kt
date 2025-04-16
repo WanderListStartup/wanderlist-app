@@ -297,7 +297,6 @@ fun PlaceContent(
     LaunchedEffect(place.id) {
         likedPlaceViewModel.loadReviews(place.id)
         likedPlaceViewModel.loadQuestDetails(place.id)
-        likedPlaceViewModel.getQuests()
     }
 
 
