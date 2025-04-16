@@ -286,6 +286,7 @@ class ProfileViewModel @Inject constructor(
                 establishmentDetailsRepo.addReviewToEstablishment(establishmentId, reviewId) // You'll need an analogous removal method here.
                 // Log success, refresh state if necessary.
                 Log.d(TAG, "Review $reviewId successfully deleted.")
+                loadUserProfile()
             } catch (e: Exception) {
                 Log.e(TAG, "Error deleting review: ${e.message}", e)
             }

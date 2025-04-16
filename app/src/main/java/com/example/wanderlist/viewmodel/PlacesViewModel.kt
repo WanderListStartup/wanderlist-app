@@ -2,6 +2,9 @@ package com.example.wanderlist.viewmodel
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -30,15 +33,18 @@ const val TAG = "PlacesViewModel"
 class PlacesViewModel @Inject constructor(
     private val repository: PlacesRepository
 ) : ViewModel() {
-    private val _selectedCategory = MutableStateFlow(Category.FOOD)
-    val selectedCategory: StateFlow<Category> = _selectedCategory
     private val establishmentRepo = EstablishmentDetailsRepository(FirebaseFirestore.getInstance())
     private val questsRepo = QuestsRepository(FirebaseFirestore.getInstance())
     private val geminiRepo = GeminiRepository()
-    private val _places = MutableStateFlow<List<PlaceDetails>>(emptyList())
-    val places: StateFlow<List<PlaceDetails>> = _places
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+
+    var name by mutableStateOf("")
+        private set
+
+    var existingEstablishments by mutableStateOf<List<String>>(emptyList())
+        private set
+
+    var newEstablishments by mutableStateOf<List<EstablishmentDetails>>(emptyList())
+        private set
 
     private val categoryMapping = mapOf(
         Category.FOOD to listOf("restaurant"),
@@ -46,74 +52,68 @@ class PlacesViewModel @Inject constructor(
         Category.ENTERTAINMENT to listOf("park", "plaza", "movie_theater", "zoo", "casino")
     )
 
+    // Keep Commented Out
 //    init {
-//        KEEP COMMENTED OUT
-//        val initList = categoryMapping[Category.FOOD]!!
-//        fetchPlaces(initList)
-//        fetchPlaces(categoryMapping[Category.BARS]!!)
-//        fetchPlaces(categoryMapping[Category.ENTERTAINMENT]!!)
+//        findNewEstablishments()
 //    }
 
-
-    fun setSelectedCategory(category: Category) {
-        _selectedCategory.value = category
-        var filterList = categoryMapping[category]
-        //ERROR NO MATCHING CATEGORY
-        if (filterList == null){
-            Log.e(TAG, "setSelectedCategory: $category does not have a matching string in Category Mapping")
-            filterList = categoryMapping[Category.FOOD]!!
-        }
-        //fetchPlaces(filterList)
-    }
-
-    /* Fetches places from the repository and updates the state.
-     * This function is called when the ViewModel is initialized.
-     * It runs in a coroutine to avoid blocking the main thread.
-     */
-
-
-    private fun fetchPlaces(filters : List<String> = emptyList()) {
-        Log.d("PlacesViewModel", "fetchPlaces: startingfetch")
+    fun findNewEstablishments() {
         viewModelScope.launch {
-            _isLoading.value = true
-            Log.d(TAG, "fetchPlaces: starting async repo fetch")
-            val placeDetails = withContext(Dispatchers.IO) {
-                repository.fetchAndStorePlaces(filters)
+            // 1) Load the IDs of what we’ve already stored
+            val currentIds = withContext(Dispatchers.IO) {
+                establishmentRepo.getAllEstablishmentIds()
             }
-            Log.d(TAG, "fetchPlaces: after async repo fetch got: $placeDetails")
-            _places.value = placeDetails
-            _isLoading.value = false
+            existingEstablishments = currentIds
 
-            // ONLY RUN SEED ESTABLISHMENTS IF WE CHANGE THE JSON FILE.
-            // FUTURE FIX IS TO NOT PUT IN JSON AND UPDATE FIRESTORE DIRECTLY
-            seedEstablishments(category = selectedCategory.value)
-            generateQuests()
+            // 2) Prepare a collector for all the new details
+            val newlyFound = mutableListOf<EstablishmentDetails>()
 
-        }
-    }
-
-    private fun seedEstablishments(category: Category) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val list = _places.value
-                if (list.isNotEmpty()) {
-                    establishmentRepo.batchUpload(list, category)
-                    Log.d(TAG, "seedEstablishments: uploaded ${list.size} establishments")
-                } else {
-                    Log.w(TAG, "seedEstablishments: no places to upload")
+            // 3) For each category & its filters
+            categoryMapping.forEach { (category, filters) ->
+                // fetch raw PlaceDetails (IO)
+                val places = withContext(Dispatchers.IO) {
+                    repository.fetchAndStorePlaces(filters)
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "seedEstablishments: error uploading establishments", e)
+
+                // keep only those whose id isn’t already in Firestore
+                val toAdd = places.filter { it.id !in currentIds }
+                if (toAdd.isNotEmpty()) {
+                    // 4) write them in batch
+                    withContext(Dispatchers.IO) {
+                        establishmentRepo.batchUpload(toAdd, category)
+                    }
+                    // 5) map into our UI model and collect
+                    newlyFound += toAdd.map { place ->
+                        EstablishmentDetails(
+                            id                = place.id,
+                            displayName       = place.displayName,
+                            openingHours      = place.openingHours,
+                            rating            = place.rating,
+                            latitude          = place.location?.latitude,
+                            longitude         = place.location?.longitude,
+                            distance          = place.distance,
+                            formattedAddress  = place.formattedAddress,
+                            editorialSummary  = place.editorialSummary,
+                            nationalPhoneNumber = place.nationalPhoneNumber,
+                            photoURIs         = place.photoURIs as List<String>?,
+                            websiteUri        = place.websiteUri,
+                            category          = category.displayName
+                        )
+                    }
+                }
             }
+
+            // 6) finally, update your state
+            newEstablishments = newlyFound
+            generateQuests()
         }
     }
 
     private fun generateQuests() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val establishments = _places.value
-                if (establishments.isNotEmpty()) {
-                    for (establishment in establishments) {
+                if (newEstablishments.isNotEmpty()) {
+                    for (establishment in newEstablishments) {
                         if (!questsRepo.checkHasQuests(establishment.id)) {
                             val quests = geminiRepo.generateQuests(establishment.displayName)
                             if (quests != null) {

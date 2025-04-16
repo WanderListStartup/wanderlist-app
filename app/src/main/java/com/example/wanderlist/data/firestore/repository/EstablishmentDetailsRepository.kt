@@ -41,6 +41,16 @@ class EstablishmentDetailsRepository @Inject constructor(
         batch.commit().await()
     }
 
+    suspend fun getAllEstablishmentIds(): List<String> {
+        return try {
+            val snapshot = firestore.collection("establishment_details").get().await()
+            snapshot.documents.map { it.id }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
     suspend fun getEstablishmentDetails(establishmentId: String): EstablishmentDetails? {
         return try {
             val snapshot = firestore.collection("establishment_details")

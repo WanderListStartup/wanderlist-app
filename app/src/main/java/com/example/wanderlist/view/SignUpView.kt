@@ -130,7 +130,7 @@ fun SignUpView(
                             fontSize = 15.sp,
                         )
                     },
-                    modifier = Modifier.fillMaxWidth(0.95f),
+                    modifier = Modifier.fillMaxWidth(1f),
                     shape = RoundedCornerShape(12.dp),
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -146,7 +146,7 @@ fun SignUpView(
                             fontSize = 15.sp,
                         )
                     },
-                    modifier = Modifier.fillMaxWidth(0.95f),
+                    modifier = Modifier.fillMaxWidth(1f),
                     shape = RoundedCornerShape(12.dp),
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -161,7 +161,7 @@ fun SignUpView(
                             fontSize = 15.sp,
                         )
                     },
-                    modifier = Modifier.fillMaxWidth(0.95f),
+                    modifier = Modifier.fillMaxWidth(1f),
                     shape = RoundedCornerShape(12.dp),
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -176,7 +176,7 @@ fun SignUpView(
                             fontSize = 15.sp,
                         )
                     },
-                    modifier = Modifier.fillMaxWidth(0.95f),
+                    modifier = Modifier.fillMaxWidth(1f),
                     shape = RoundedCornerShape(12.dp),
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -193,7 +193,7 @@ fun SignUpView(
                             fontSize = 15.sp
                         )
                     },
-                    modifier = Modifier.fillMaxWidth(0.95f),
+                    modifier = Modifier.fillMaxWidth(1f),
                     shape = RoundedCornerShape(12.dp),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
@@ -218,7 +218,7 @@ fun SignUpView(
                             fontSize = 15.sp
                         )
                     },
-                    modifier = Modifier.fillMaxWidth(0.95f),
+                    modifier = Modifier.fillMaxWidth(1f),
                     shape = RoundedCornerShape(12.dp),
                     visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {

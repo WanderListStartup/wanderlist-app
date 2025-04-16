@@ -45,21 +45,6 @@ class PlacesRepository @Inject constructor(
 ) {
     private val apiService = PlacesApiService(context)
 
-    private fun readJsonFromRaw(
-        context: Context,
-        resourceId: Int,
-    ): String {
-        val inputStream = context.resources.openRawResource(resourceId)
-        val reader = InputStreamReader(inputStream)
-        return reader.readText().also { reader.close() }
-    }
-
-    private fun parseJsonToPlaces(context: Context): List<PlaceDetails> {
-        val json = readJsonFromRaw(context, R.raw.places)
-        val gson = Gson()
-        val type = object : TypeToken<List<PlaceDetails>>() {}.type
-        return gson.fromJson(json, type)
-    }
 
     /**
      * Fetches nearby places via the API (using default parameters),
@@ -67,13 +52,6 @@ class PlacesRepository @Inject constructor(
      * and stores them locally as a JSON file.
      */
     suspend fun fetchAndStorePlaces(filters: List<String> = emptyList()): List<PlaceDetails> {
-        /* Check if the places data is already stored locally.
-         * If it is, return it immediately without making an API call.
-         */
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "fetchAndStorePlaces: NOT FETCHING APIS!!!! using test data from res/raw/places.json")
-            return parseJsonToPlaces(context)
-        }
         Log.d(TAG, "fetchAndStorePlaces: starting getNearbyPlaces")
         val places = apiService.getNearbyPlaces(filters)
         Log.d(TAG, "fetchAndStorePlaces: after getNearbyPlaces got: $places")
