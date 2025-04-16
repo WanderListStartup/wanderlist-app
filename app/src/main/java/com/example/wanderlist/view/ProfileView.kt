@@ -375,7 +375,7 @@ fun UserDetails(
             Text(
                 text = editProfileViewModel.name,
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                fontSize = 32.sp
+                fontSize = 30.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -640,7 +640,7 @@ fun BadgeGridItem(
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = badge.name,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.labelSmall,
             textAlign = TextAlign.Center,
             maxLines = 1
         )

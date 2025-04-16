@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 
 @HiltViewModel
@@ -69,7 +70,10 @@ class LikedPlaceViewModel @Inject constructor(
         viewModelScope.launch {
             auth.uid?.let { userRepository.addQuests(it, questId) }
             auth.uid?.let { userRepository.incrementLevelByPointTwo(it) }
-            val badgeId = badgesRepository.getBadgeId(userRepository.getUserLevel(auth.uid!!).toInt())
+            val userLevel = userRepository.getUserLevel(auth.uid!!).roundToInt()
+
+            // Use the rounded level to determine the badge:
+            val badgeId = badgesRepository.getBadgeId(userLevel)
             if (badgeId.isNotEmpty()) {
                 auth.uid?.let { userRepository.addBadgeToUserProfile(it, badgeId) }
             }
