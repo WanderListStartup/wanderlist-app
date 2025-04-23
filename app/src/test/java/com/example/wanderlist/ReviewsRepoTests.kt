@@ -36,7 +36,7 @@ class ReviewsRepositoryTest {
             id = "r1",
             establishmentId = "e1",
             userId = "u1",
-            rating = 0f,
+            rating = 0,
             reviewText = "hello"
         )
         val docRef = mockk<DocumentReference>()
@@ -63,7 +63,7 @@ class ReviewsRepositoryTest {
             id = reviewId,
             establishmentId = "e2",
             userId = "u2",
-            rating = 0f,
+            rating = 0,
             reviewText = "hello"
         )
 

@@ -92,7 +92,7 @@ class UserProfileRepositoryTest {
             quests = listOf("q1"),
             friends = listOf("uid2"),
             incomingRequests = listOf("uid3"),
-            level = 5
+            level = 5.0
         )
         val p2 = UserProfile(
             uid = "1234",
@@ -113,7 +113,7 @@ class UserProfileRepositoryTest {
             quests = listOf("q1"),
             friends = listOf("uid2"),
             incomingRequests = listOf("uid3"),
-            level = 5
+            level = 5.0
         )
         every { d1.toObject(UserProfile::class.java) } returns p1
         every { d2.toObject(UserProfile::class.java) } returns p2
@@ -149,7 +149,7 @@ class UserProfileRepositoryTest {
             quests = listOf("q1"),
             friends = listOf("uid2"),
             incomingRequests = listOf("uid3"),
-            level = 5
+            level = 5.0
         )
         every { snap.toObject(UserProfile::class.java) } returns expected
 
@@ -218,7 +218,7 @@ class UserProfileRepositoryTest {
             quests = listOf("q1"),
             friends = listOf("uid2"),
             incomingRequests = listOf("uid3"),
-            level = 5
+            level = 5.0
         )
         val p2 = UserProfile(
             uid = "1234",
@@ -239,7 +239,7 @@ class UserProfileRepositoryTest {
             quests = listOf("q1"),
             friends = listOf("uid2"),
             incomingRequests = listOf("uid3"),
-            level = 5
+            level = 5.0
         )
         every { d1.toObject(UserProfile::class.java) } returns p1
         every { d2.toObject(UserProfile::class.java) } returns p2
@@ -281,7 +281,7 @@ class UserProfileRepositoryTest {
             quests = listOf("q1"),
             friends = listOf("uid2"),
             incomingRequests = listOf("uid3"),
-            level = 5
+            level = 5.0
         )
         val p2 = UserProfile(
             uid = "1234",
@@ -302,7 +302,7 @@ class UserProfileRepositoryTest {
             quests = listOf("q1"),
             friends = listOf("uid2"),
             incomingRequests = listOf("uid3"),
-            level = 5
+            level = 5.0
         )
         val d1 = mockk<DocumentSnapshot>(); every { d1.toObject(UserProfile::class.java) } returns p1
         val d2 = mockk<DocumentSnapshot>(); every { d2.toObject(UserProfile::class.java) } returns p2
