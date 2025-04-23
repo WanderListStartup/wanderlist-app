@@ -15,7 +15,7 @@ Documenting the coding standards used by your group can improve the quality of t
 ### Variable Naming:
 
 #### Classes:
-Should be nouns, starting with an uppercase letter, and use camel case.
+Should be nouns, starting with an uppercase letter, and use pascal case.
 Example:
 ```
 class Car
